@@ -83,7 +83,6 @@ CREATE INDEX IF NOT EXISTS idx_tickets_agent_id ON tickets(agent_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
 CREATE INDEX IF NOT EXISTS idx_ticket_fichiers_ticket_id ON ticket_fichiers(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_echanges_ticket_id ON ticket_echanges(ticket_id);
-CREATE INDEX IF NOT EXISTS idx_ticket_echanges_ticket_id ON ticket_echanges(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_echanges_created_at ON ticket_echanges(created_at);
 CREATE INDEX IF NOT EXISTS idx_demandeurs_email ON demandeurs(email);
 CREATE INDEX IF NOT EXISTS idx_agents_email ON agents(email);
