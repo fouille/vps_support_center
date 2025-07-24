@@ -62,7 +62,15 @@ const TicketsPage = () => {
       let params = {};
       if (isAgent) {
         if (statusFilter === 'active') {
-          params.status_filter = 'nouveau,en_cours,en_attente';
+          params.status_filter = 'nouveau,en_cours,en_attente,repondu';
+        }
+        if (clientFilter) {
+          params.client_id = clientFilter;
+        }
+      } else {
+        // Filtres pour les demandeurs
+        if (statusFilter === 'active') {
+          params.status_filter = 'nouveau,en_cours,en_attente,repondu';
         }
         if (clientFilter) {
           params.client_id = clientFilter;
