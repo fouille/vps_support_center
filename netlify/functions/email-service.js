@@ -217,13 +217,21 @@ const createEmailTemplate = {
 // Fonction principale pour envoyer un email
 const sendEmail = async (to, subject, htmlContent, textContent) => {
   try {
-    if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
-      console.log('Mailjet API keys not configured. Email would be sent to:', to);
+    const mailjetClient = initializeMailjet();
+    
+    if (!mailjetClient) {
+      console.log('Mailjet not initialized. Email would be sent to:', to);
       console.log('Subject:', subject);
       return { success: false, error: 'Mailjet not configured' };
     }
 
-    const request = mj.post('send', { version: 'v3.1' }).request({
+    if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
+      console.log('Mailjet API keys not configured. Email would be sent to:', to);
+      console.log('Subject:', subject);
+      return { success: false, error: 'Mailjet API keys not configured' };
+    }
+
+    const request = mailjetClient.post('send', { version: 'v3.1' }).request({
       Messages: [
         {
           From: {
