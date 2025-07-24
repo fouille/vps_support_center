@@ -145,6 +145,18 @@ const TicketsPage = () => {
     try {
       const response = await api.get(`/api/ticket-echanges?ticketId=${ticketId}`);
       setViewingTicketEchanges(response.data);
+      
+      // Auto-scroll vers le bas après chargement des commentaires
+      setTimeout(() => {
+        const commentsContainer = document.querySelector('.comments-scroll-container');
+        if (commentsContainer) {
+          commentsContainer.scrollTo({
+            top: commentsContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+      
     } catch (error) {
       console.error('Erreur lors du chargement des échanges:', error);
     } finally {
