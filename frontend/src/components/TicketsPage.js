@@ -370,13 +370,13 @@ const TicketsPage = () => {
         status: newStatus
       });
       
-      // Mettre à jour le ticket dans la modal si viewingTicket existe
-      if (viewingTicket) {
-        setViewingTicket({
-          ...viewingTicket,
-          status: newStatus
-        });
-      }
+      // Mettre à jour le ticket dans la modal avec le nouveau statut
+      const updatedTicket = {
+        ...(ticketData || viewingTicket),
+        status: newStatus
+      };
+      
+      setViewingTicket(updatedTicket);
       
       // Actualiser la liste des tickets
       fetchTickets();
