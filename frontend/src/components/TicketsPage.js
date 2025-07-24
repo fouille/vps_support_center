@@ -706,11 +706,11 @@ const TicketsPage = () => {
                   Client *
                 </label>
                 <SearchableSelect
-                  options={clients.map(client => ({
+                  options={Array.isArray(clients) ? clients.map(client => ({
                     value: client.id,
                     label: client.nom_societe,
                     subtitle: client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : ''
-                  }))}
+                  })) : []}
                   value={formData.client_id}
                   onChange={(value) => setFormData({ ...formData, client_id: value })}
                   placeholder="Sélectionner un client"
