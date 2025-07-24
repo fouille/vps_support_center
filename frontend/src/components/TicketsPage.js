@@ -571,7 +571,23 @@ const TicketsPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
                     {viewingTicket.titre}
                   </h3>
-                  {getStatusBadge(viewingTicket.status)}
+                  <div className="flex items-center space-x-3">
+                    {getStatusBadge(viewingTicket.status)}
+                    {isAgent && (
+                      <select
+                        value={viewingTicket.status}
+                        onChange={(e) => handleStatusChange(viewingTicket.id, e.target.value)}
+                        className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="nouveau">Nouveau</option>
+                        <option value="en_cours">En cours</option>
+                        <option value="en_attente">En attente</option>
+                        <option value="repondu">Répondu</option>
+                        <option value="resolu">Résolu</option>
+                        <option value="ferme">Fermé</option>
+                      </select>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-4">
