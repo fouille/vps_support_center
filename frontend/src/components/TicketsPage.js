@@ -823,7 +823,10 @@ const TicketsPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
                     {viewingTicket.titre}
                   </h3>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full">
+                      Ticket #{viewingTicket.numero_ticket}
+                    </span>
                     {getStatusBadge(viewingTicket.status)}
                     {isAgent && (
                       <select
