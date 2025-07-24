@@ -52,7 +52,14 @@ const TicketsPage = () => {
     if (isAgent) {
       fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
     }
-  }, [isAgent, statusFilter, clientFilter]); // Refetch when filters change
+    
+    // Nettoyage à la fermeture du composant
+    return () => {
+      if (commentsRefreshInterval) {
+        clearInterval(commentsRefreshInterval);
+      }
+    };
+  }, [isAgent, statusFilter, clientFilter, commentsRefreshInterval]); // Refetch when filters change
 
   const fetchTickets = async () => {
     try {
