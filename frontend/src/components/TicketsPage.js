@@ -173,13 +173,23 @@ const TicketsPage = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
           {isAgent ? 'Supervision des Tickets' : 'Mes Tickets'}
         </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Nouveau Ticket
-        </button>
+        <div className="flex space-x-3">
+          <button
+            onClick={fetchTickets}
+            className="btn-secondary flex items-center"
+            title="Actualiser la liste"
+          >
+            <RefreshCw className="h-5 w-5 mr-2" />
+            Actualiser
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-primary flex items-center"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Nouveau Ticket
+          </button>
+        </div>
       </div>
 
       {error && (
