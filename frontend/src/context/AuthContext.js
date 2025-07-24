@@ -17,8 +17,10 @@ export const AuthProvider = ({ children }) => {
 
   const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || '';
 
-  // Configure axios defaults
-  axios.defaults.baseURL = API_BASE_URL;
+  // Create axios instance
+  const api = axios.create({
+    baseURL: API_BASE_URL
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('token');
@@ -40,13 +42,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth', { email, password });
+      const response = await api.post('/api/auth', { email, password });
       const { access_token, user: userData } = response.data;
       
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(userData));
       
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       setUser(userData);
       
       return { success: true };
@@ -62,7 +64,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common['Authorization'];
     setUser(null);
   };
 
