@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2, Shield, AlertCircle, Check, Mail } from 'lucide-react';
 
 const AgentsPage = () => {
+  const { api } = useAuth();
   const [agents, setAgents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,7 +23,7 @@ const AgentsPage = () => {
 
   const fetchAgents = async () => {
     try {
-      const response = await axios.get('/api/agents');
+      const response = await api.get('/api/agents');
       setAgents(response.data);
     } catch (error) {
       setError('Erreur lors du chargement des agents');
@@ -35,9 +36,9 @@ const AgentsPage = () => {
     e.preventDefault();
     try {
       if (editingAgent) {
-        await axios.put(`/api/agents/${editingAgent.id}`, formData);
+        await api.put(`/api/agents/${editingAgent.id}`, formData);
       } else {
-        await axios.post('/api/agents', formData);
+        await api.post('/api/agents', formData);
       }
       fetchAgents();
       handleCloseModal();
@@ -49,7 +50,7 @@ const AgentsPage = () => {
   const handleDelete = async (agentId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet agent ?')) {
       try {
-        await axios.delete(`/api/agents/${agentId}`);
+        await api.delete(`/api/agents/${agentId}`);
         fetchAgents();
       } catch (error) {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
