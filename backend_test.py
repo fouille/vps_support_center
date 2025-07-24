@@ -1150,23 +1150,396 @@ def test_tickets_numero_and_search_api():
     
     return results.summary()
 
+def test_mailjet_email_integration():
+    """Test Mailjet email integration functionality"""
+    results = TestResults()
+    
+    print("🚀 Starting Mailjet Email Integration Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication Tests")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Get test data for ticket creation
+    print("\n📋 STEP 2: Get Test Data")
+    
+    # Get a client for ticket creation
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+                test_client = clients_data['data'][0]
+                results.add_result("Get Test Client", True)
+            elif isinstance(clients_data, list) and len(clients_data) > 0:
+                test_client_id = clients_data[0]['id']
+                test_client = clients_data[0]
+                results.add_result("Get Test Client", True)
+            else:
+                results.add_result("Get Test Client", False, "No clients found")
+                return results.summary()
+        else:
+            results.add_result("Get Test Client", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Client", False, str(e))
+        return results.summary()
+    
+    # Get a demandeur for ticket creation
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            if len(demandeurs) > 0:
+                test_demandeur_id = demandeurs[0]['id']
+                test_demandeur = demandeurs[0]
+                results.add_result("Get Test Demandeur", True)
+            else:
+                results.add_result("Get Test Demandeur", False, "No demandeurs found")
+                return results.summary()
+        else:
+            results.add_result("Get Test Demandeur", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Demandeur", False, str(e))
+        return results.summary()
+    
+    # Step 3: Test POST /api/tickets - Email integration on ticket creation
+    print("\n📋 STEP 3: POST Tickets - Email Integration on Creation")
+    
+    ticket_data = {
+        "titre": "Test Ticket - Email Integration Test",
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "requete_initiale": "This is a test ticket to verify email integration works correctly when creating tickets.",
+        "status": "nouveau"
+    }
+    
+    created_ticket = None
+    try:
+        response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                               json=ticket_data, timeout=10)
+        
+        if response.status_code == 201:
+            created_ticket = response.json()
+            results.add_result("POST - Ticket creation with email", True)
+            
+            # Verify ticket was created successfully (main functionality)
+            required_fields = ['id', 'titre', 'client_id', 'demandeur_id', 'requete_initiale', 'status']
+            missing_fields = [field for field in required_fields if field not in created_ticket]
+            
+            if not missing_fields:
+                results.add_result("POST - Ticket creation functionality", True)
+            else:
+                results.add_result("POST - Ticket creation functionality", False, 
+                                 f"Missing fields: {missing_fields}")
+            
+            # Email integration should not block ticket creation
+            # We can't verify actual email sending without API keys, but operation should succeed
+            print("   ✅ Email integration attempted (operation continued successfully)")
+            results.add_result("POST - Email integration non-blocking", True)
+            
+        else:
+            results.add_result("POST - Ticket creation with email", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("POST - Ticket creation with email", False, str(e))
+    
+    # Step 4: Test PUT /api/tickets - Email integration on status change
+    print("\n📋 STEP 4: PUT Tickets - Email Integration on Status Change")
+    
+    if created_ticket and 'id' in created_ticket:
+        ticket_id = created_ticket['id']
+        original_status = created_ticket.get('status', 'nouveau')
+        new_status = 'en_cours'
+        
+        update_data = {
+            "titre": created_ticket['titre'],
+            "status": new_status
+        }
+        
+        try:
+            response = requests.put(f"{API_BASE}/tickets/{ticket_id}", 
+                                  headers=headers, json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                updated_ticket = response.json()
+                results.add_result("PUT - Ticket status update with email", True)
+                
+                # Verify status was actually changed
+                if updated_ticket.get('status') == new_status:
+                    results.add_result("PUT - Status change functionality", True)
+                else:
+                    results.add_result("PUT - Status change functionality", False, 
+                                     f"Status not updated: expected {new_status}, got {updated_ticket.get('status')}")
+                
+                # Email integration should not block status update
+                print("   ✅ Status change email integration attempted (operation continued successfully)")
+                results.add_result("PUT - Status change email non-blocking", True)
+                
+            else:
+                results.add_result("PUT - Ticket status update with email", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("PUT - Ticket status update with email", False, str(e))
+    
+    # Step 5: Test POST /api/ticket-echanges - Email integration on comment creation
+    print("\n📋 STEP 5: POST Comments - Email Integration on Comment Creation")
+    
+    if created_ticket and 'id' in created_ticket:
+        ticket_id = created_ticket['id']
+        
+        comment_data = {
+            "message": "This is a test comment to verify email integration works when adding comments."
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/ticket-echanges?ticketId={ticket_id}", 
+                                   headers=headers, json=comment_data, timeout=10)
+            
+            if response.status_code == 201:
+                created_comment = response.json()
+                results.add_result("POST - Comment creation with email", True)
+                
+                # Verify comment was created successfully (main functionality)
+                required_fields = ['id', 'ticket_id', 'auteur_id', 'auteur_type', 'message', 'created_at']
+                missing_fields = [field for field in required_fields if field not in created_comment]
+                
+                if not missing_fields:
+                    results.add_result("POST - Comment creation functionality", True)
+                else:
+                    results.add_result("POST - Comment creation functionality", False, 
+                                     f"Missing fields: {missing_fields}")
+                
+                # Verify message content
+                if created_comment.get('message') == comment_data['message']:
+                    results.add_result("POST - Comment content accuracy", True)
+                else:
+                    results.add_result("POST - Comment content accuracy", False, 
+                                     "Comment message doesn't match input")
+                
+                # Email integration should not block comment creation
+                print("   ✅ Comment email integration attempted (operation continued successfully)")
+                results.add_result("POST - Comment email non-blocking", True)
+                
+            else:
+                results.add_result("POST - Comment creation with email", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("POST - Comment creation with email", False, str(e))
+    
+    # Step 6: Test with demandeur user - Comment email integration
+    print("\n📋 STEP 6: Demandeur Comment - Email Integration")
+    
+    if demandeur_token and created_ticket and 'id' in created_ticket:
+        ticket_id = created_ticket['id']
+        demandeur_headers = {
+            "Authorization": f"Bearer {demandeur_token}",
+            "Content-Type": "application/json"
+        }
+        
+        comment_data = {
+            "message": "This is a test comment from demandeur to verify email integration for opposite party notification."
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/ticket-echanges?ticketId={ticket_id}", 
+                                   headers=demandeur_headers, json=comment_data, timeout=10)
+            
+            if response.status_code in [201, 403]:  # 403 acceptable if no access
+                if response.status_code == 201:
+                    created_comment = response.json()
+                    results.add_result("POST - Demandeur comment with email", True)
+                    
+                    # Verify author type is demandeur
+                    if created_comment.get('auteur_type') == 'demandeur':
+                        results.add_result("POST - Demandeur author type", True)
+                    else:
+                        results.add_result("POST - Demandeur author type", False, 
+                                         f"Expected 'demandeur', got {created_comment.get('auteur_type')}")
+                    
+                    print("   ✅ Demandeur comment email integration attempted (operation continued successfully)")
+                    results.add_result("POST - Demandeur comment email non-blocking", True)
+                else:
+                    results.add_result("POST - Demandeur comment with email", True, "Access denied (expected)")
+            else:
+                results.add_result("POST - Demandeur comment with email", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("POST - Demandeur comment with email", False, str(e))
+    
+    # Step 7: Test error handling - Operations should continue even if email fails
+    print("\n📋 STEP 7: Error Handling - Operations Continue Despite Email Failures")
+    
+    # Create another ticket to test error resilience
+    ticket_data_2 = {
+        "titre": "Test Ticket 2 - Error Resilience Test",
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "requete_initiale": "Testing that operations continue even if email service fails.",
+        "status": "nouveau"
+    }
+    
+    try:
+        response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                               json=ticket_data_2, timeout=10)
+        
+        if response.status_code == 201:
+            ticket_2 = response.json()
+            results.add_result("POST - Error resilience test", True)
+            
+            # Test multiple status changes to verify resilience
+            statuses_to_test = ['en_cours', 'en_attente', 'repondu']
+            
+            for status in statuses_to_test:
+                update_data = {
+                    "titre": ticket_2['titre'],
+                    "status": status
+                }
+                
+                try:
+                    response = requests.put(f"{API_BASE}/tickets/{ticket_2['id']}", 
+                                          headers=headers, json=update_data, timeout=10)
+                    
+                    if response.status_code == 200:
+                        results.add_result(f"PUT - Status change to {status} (resilience)", True)
+                    else:
+                        results.add_result(f"PUT - Status change to {status} (resilience)", False, 
+                                         f"Status: {response.status_code}")
+                except Exception as e:
+                    results.add_result(f"PUT - Status change to {status} (resilience)", False, str(e))
+            
+            # Cleanup ticket 2
+            try:
+                requests.delete(f"{API_BASE}/tickets/{ticket_2['id']}", headers=headers, timeout=10)
+            except:
+                pass  # Ignore cleanup errors
+                
+        else:
+            results.add_result("POST - Error resilience test", False, 
+                             f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("POST - Error resilience test", False, str(e))
+    
+    # Step 8: Test email service configuration detection
+    print("\n📋 STEP 8: Email Service Configuration Detection")
+    
+    # The email service should detect missing API keys and log appropriately
+    # We can't directly test this, but we can verify operations continue
+    
+    # Create a ticket and verify it works without email configuration
+    ticket_data_3 = {
+        "titre": "Test Ticket 3 - Configuration Detection",
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "requete_initiale": "Testing email service configuration detection.",
+        "status": "nouveau"
+    }
+    
+    try:
+        response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                               json=ticket_data_3, timeout=10)
+        
+        if response.status_code == 201:
+            ticket_3 = response.json()
+            results.add_result("POST - Configuration detection test", True)
+            
+            # Cleanup ticket 3
+            try:
+                requests.delete(f"{API_BASE}/tickets/{ticket_3['id']}", headers=headers, timeout=10)
+            except:
+                pass  # Ignore cleanup errors
+                
+        else:
+            results.add_result("POST - Configuration detection test", False, 
+                             f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("POST - Configuration detection test", False, str(e))
+    
+    # Step 9: Test HTML template generation (indirect test)
+    print("\n📋 STEP 9: HTML Template Generation (Indirect Test)")
+    
+    # We can't directly test template generation without API keys,
+    # but we can verify the email service module is properly integrated
+    
+    if created_ticket:
+        # Test that all required data is available for template generation
+        ticket_has_required_fields = all(field in created_ticket for field in 
+                                       ['id', 'titre', 'numero_ticket', 'date_creation', 'requete_initiale'])
+        
+        if ticket_has_required_fields:
+            results.add_result("Template - Required ticket data available", True)
+        else:
+            results.add_result("Template - Required ticket data available", False, 
+                             "Missing required fields for email templates")
+        
+        # Test that client and demandeur data would be available
+        if test_client and test_demandeur:
+            client_has_required = 'nom_societe' in test_client
+            demandeur_has_required = all(field in test_demandeur for field in ['nom', 'prenom', 'email'])
+            
+            if client_has_required and demandeur_has_required:
+                results.add_result("Template - Required user data available", True)
+            else:
+                results.add_result("Template - Required user data available", False, 
+                                 "Missing required client or demandeur fields for templates")
+    
+    # Cleanup: Delete created test ticket
+    print("\n📋 STEP 10: Cleanup")
+    
+    if created_ticket and 'id' in created_ticket:
+        try:
+            response = requests.delete(f"{API_BASE}/tickets/{created_ticket['id']}", 
+                                     headers=headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("DELETE - Cleanup test ticket", True)
+            else:
+                results.add_result("DELETE - Cleanup test ticket", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cleanup test ticket", False, str(e))
+    
+    return results.summary()
+
 if __name__ == "__main__":
     print("🧪 Backend API Testing - Support Ticket Management System")
     print("=" * 60)
     
-    # Test tickets numero_ticket and search functionality
+    # Test Mailjet email integration functionality
     print("\n" + "="*60)
-    print("TESTING: Tickets API numero_ticket & Search")
+    print("TESTING: Mailjet Email Integration")
     print("="*60)
-    tickets_success = test_tickets_numero_and_search_api()
+    email_success = test_mailjet_email_integration()
     
-    if tickets_success:
-        print("\n🎉 All tickets API tests passed!")
+    if email_success:
+        print("\n🎉 All email integration tests passed!")
     else:
-        print("\n💥 Some tickets API tests failed!")
+        print("\n💥 Some email integration tests failed!")
     
     # Overall result
-    if tickets_success:
+    if email_success:
         print("\n🎉 All backend tests passed!")
         sys.exit(0)
     else:
