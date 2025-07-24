@@ -1,9 +1,9 @@
-import { neon } from '@netlify/neon';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
+const { neon } = require('@netlify/neon');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
-const sql = neon();
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -18,41 +18,46 @@ const verifyToken = (authHeader) => {
   }
   
   const token = authHeader.substring(7);
-  return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here');
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
 };
 
-export default async (req, context) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+exports.handler = async (event, context) => {
+  console.log('Demandeurs function called:', event.httpMethod, event.path);
+  
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
   }
 
   try {
     // Verify authentication
-    const authHeader = req.headers.get('authorization');
+    const authHeader = event.headers.authorization || event.headers.Authorization;
     verifyToken(authHeader);
 
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
+    const pathParts = event.path.split('/');
     const demandeurId = pathParts[pathParts.length - 1];
 
-    switch (req.method) {
+    switch (event.httpMethod) {
       case 'GET':
+        console.log('Getting demandeurs...');
         const demandeurs = await sql`
           SELECT id, email, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur 
           FROM demandeurs 
           ORDER BY nom, prenom
         `;
-        return new Response(JSON.stringify(demandeurs), { status: 200, headers });
+        console.log('Demandeurs found:', demandeurs.length);
+        return { statusCode: 200, headers, body: JSON.stringify(demandeurs) };
 
       case 'POST':
-        const newDemandeur = await req.json();
+        console.log('Creating demandeur...');
+        const newDemandeur = JSON.parse(event.body);
         const { nom, prenom, societe, telephone, email, password } = newDemandeur;
         
         if (!nom || !prenom || !societe || !email || !password) {
-          return new Response(JSON.stringify({ detail: 'Tous les champs obligatoires doivent être remplis' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Tous les champs obligatoires doivent être remplis' })
+          };
         }
 
         // Check if email already exists
@@ -63,10 +68,11 @@ export default async (req, context) => {
         `;
         
         if (existingUser.length > 0) {
-          return new Response(JSON.stringify({ detail: 'Cet email est déjà utilisé' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Cet email est déjà utilisé' })
+          };
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,12 +80,19 @@ export default async (req, context) => {
         const createdDemandeur = await sql`
           INSERT INTO demandeurs (id, nom, prenom, societe, telephone, email, password)
           VALUES (${uuidv4()}, ${nom}, ${prenom}, ${societe}, ${telephone}, ${email}, ${hashedPassword})
-          RETURNING id, email, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur
+          RETURNING id, email, nom, prenom, societe, telephone
         `;
-        return new Response(JSON.stringify(createdDemandeur[0]), { status: 201, headers });
+        
+        const responseDemandeur = {
+          ...createdDemandeur[0],
+          type_utilisateur: 'demandeur'
+        };
+        
+        console.log('Demandeur created:', responseDemandeur);
+        return { statusCode: 201, headers, body: JSON.stringify(responseDemandeur) };
 
       case 'PUT':
-        const updateData = await req.json();
+        const updateData = JSON.parse(event.body);
         const { nom: upd_nom, prenom: upd_prenom, societe: upd_societe, telephone: upd_telephone, email: upd_email, password: upd_password } = updateData;
         
         const hashedNewPassword = await bcrypt.hash(upd_password, 10);
@@ -89,50 +102,60 @@ export default async (req, context) => {
           SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
               telephone = ${upd_telephone}, email = ${upd_email}, password = ${hashedNewPassword}
           WHERE id = ${demandeurId}
-          RETURNING id, email, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur
+          RETURNING id, email, nom, prenom, societe, telephone
         `;
         
         if (updatedDemandeur.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Demandeur non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Demandeur non trouvé' })
+          };
         }
-        return new Response(JSON.stringify(updatedDemandeur[0]), { status: 200, headers });
+        
+        const responseUpdatedDemandeur = {
+          ...updatedDemandeur[0],
+          type_utilisateur: 'demandeur'
+        };
+        
+        return { statusCode: 200, headers, body: JSON.stringify(responseUpdatedDemandeur) };
 
       case 'DELETE':
-        const deletedDemandeur = await sql`
-          DELETE FROM demandeurs WHERE id = ${demandeurId} RETURNING id
-        `;
+        const deletedDemandeur = await sql`DELETE FROM demandeurs WHERE id = ${demandeurId} RETURNING id`;
         
         if (deletedDemandeur.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Demandeur non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Demandeur non trouvé' })
+          };
         }
-        return new Response(JSON.stringify({ message: 'Demandeur supprimé avec succès' }), {
-          status: 200,
+        return {
+          statusCode: 200,
           headers,
-        });
+          body: JSON.stringify({ message: 'Demandeur supprimé avec succès' })
+        };
 
       default:
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-          status: 405,
+        return {
+          statusCode: 405,
           headers,
-        });
+          body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
   } catch (error) {
     console.error('Demandeurs API error:', error);
     if (error.name === 'JsonWebTokenError') {
-      return new Response(JSON.stringify({ detail: 'Token invalide' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Token invalide' })
+      };
     }
-    return new Response(JSON.stringify({ detail: 'Erreur serveur' }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers,
-    });
+      body: JSON.stringify({ detail: 'Erreur serveur: ' + error.message })
+    };
   }
 };
