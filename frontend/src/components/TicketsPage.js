@@ -316,8 +316,9 @@ const TicketsPage = () => {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newComment.trim() || sendingComment) return;
 
+    setSendingComment(true);
     try {
       const response = await api.post(`/api/ticket-echanges?ticketId=${viewingTicket.id}`, {
         message: newComment
@@ -346,6 +347,8 @@ const TicketsPage = () => {
       
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de l\'ajout du commentaire');
+    } finally {
+      setSendingComment(false);
     }
   };
 
