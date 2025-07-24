@@ -162,51 +162,54 @@ exports.handler = async (event, context) => {
 
         // Envoyer un email de notification pour le commentaire
         try {
-          // Récupérer les informations du ticket et des utilisateurs
-          const ticketInfo = await sql`
-            SELECT t.*, c.nom_societe as client_nom,
-                   d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.email as demandeur_email,
-                   a.nom as agent_nom, a.prenom as agent_prenom, a.email as agent_email
-            FROM tickets t
-            JOIN clients c ON t.client_id = c.id
-            JOIN demandeurs d ON t.demandeur_id = d.id
-            LEFT JOIN agents a ON t.agent_id = a.id
-            WHERE t.id = ${ticketId}
-          `;
+          const emailService = loadEmailService();
+          if (emailService) {
+            // Récupérer les informations du ticket et des utilisateurs
+            const ticketInfo = await sql`
+              SELECT t.*, c.nom_societe as client_nom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.email as demandeur_email,
+                     a.nom as agent_nom, a.prenom as agent_prenom, a.email as agent_email
+              FROM tickets t
+              JOIN clients c ON t.client_id = c.id
+              JOIN demandeurs d ON t.demandeur_id = d.id
+              LEFT JOIN agents a ON t.agent_id = a.id
+              WHERE t.id = ${ticketId}
+            `;
 
-          if (ticketInfo.length > 0) {
-            const ticket = ticketInfo[0];
-            let recipientEmail, recipientName, authorInfo;
+            if (ticketInfo.length > 0) {
+              const ticket = ticketInfo[0];
+              let recipientEmail, recipientName, authorInfo;
 
-            // Récupérer les informations de l'auteur du commentaire
-            if (auteurType === 'agent') {
-              const agentInfo = await sql`SELECT nom, prenom, email FROM agents WHERE id = ${auteurId}`;
-              authorInfo = agentInfo[0];
-              // Si c'est un agent qui commente, notifier le demandeur
-              recipientEmail = ticket.demandeur_email;
-              recipientName = `${ticket.demandeur_prenom} ${ticket.demandeur_nom}`;
-            } else {
-              const demandeurInfo = await sql`SELECT nom, prenom, email FROM demandeurs WHERE id = ${auteurId}`;
-              authorInfo = demandeurInfo[0];
-              // Si c'est un demandeur qui commente, notifier l'agent (ou contact@voipservices.fr si pas d'agent assigné)
-              if (ticket.agent_email) {
-                recipientEmail = ticket.agent_email;
-                recipientName = `${ticket.agent_prenom} ${ticket.agent_nom}`;
+              // Récupérer les informations de l'auteur du commentaire
+              if (auteurType === 'agent') {
+                const agentInfo = await sql`SELECT nom, prenom, email FROM agents WHERE id = ${auteurId}`;
+                authorInfo = agentInfo[0];
+                // Si c'est un agent qui commente, notifier le demandeur
+                recipientEmail = ticket.demandeur_email;
+                recipientName = `${ticket.demandeur_prenom} ${ticket.demandeur_nom}`;
               } else {
-                recipientEmail = 'contact@voipservices.fr';
-                recipientName = 'Support VoIP Services';
+                const demandeurInfo = await sql`SELECT nom, prenom, email FROM demandeurs WHERE id = ${auteurId}`;
+                authorInfo = demandeurInfo[0];
+                // Si c'est un demandeur qui commente, notifier l'agent (ou contact@voipservices.fr si pas d'agent assigné)
+                if (ticket.agent_email) {
+                  recipientEmail = ticket.agent_email;
+                  recipientName = `${ticket.agent_prenom} ${ticket.agent_nom}`;
+                } else {
+                  recipientEmail = 'contact@voipservices.fr';
+                  recipientName = 'Support VoIP Services';
+                }
               }
-            }
 
-            if (recipientEmail && authorInfo) {
-              await emailService.sendCommentEmail(
-                ticket,
-                echangeWithAuthor[0],
-                authorInfo,
-                recipientEmail,
-                recipientName
-              );
-              console.log('Comment notification email sent successfully');
+              if (recipientEmail && authorInfo) {
+                await emailService.sendCommentEmail(
+                  ticket,
+                  echangeWithAuthor[0],
+                  authorInfo,
+                  recipientEmail,
+                  recipientName
+                );
+                console.log('Comment notification email sent successfully');
+              }
             }
           }
         } catch (emailError) {
