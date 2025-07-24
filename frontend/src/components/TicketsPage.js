@@ -463,12 +463,13 @@ const TicketsPage = () => {
         </h1>
         <div className="flex space-x-3">
           <button
-            onClick={fetchTickets}
+            onClick={() => fetchTickets(true)}
             className="btn-secondary flex items-center"
             title="Actualiser la liste"
+            disabled={refreshingTickets}
           >
-            <RefreshCw className="h-5 w-5 mr-2" />
-            Actualiser
+            <RefreshCw className={`h-5 w-5 mr-2 ${refreshingTickets ? 'animate-spin' : ''}`} />
+            {refreshingTickets ? 'Actualisation...' : 'Actualiser'}
           </button>
           <button
             onClick={() => setShowModal(true)}
