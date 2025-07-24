@@ -519,18 +519,17 @@ const TicketsPage = () => {
           <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
             Filtrer par client
           </label>
-          <select
+          <SearchableSelect
+            options={clientOptions}
             value={clientFilter}
-            onChange={(e) => setClientFilter(e.target.value)}
-            className="input w-64"
-          >
-            <option value="">Tous les clients</option>
-            {clients.map((client) => (
-              <option key={client.id} value={client.id}>
-                {client.nom_societe} - {client.prenom} {client.nom}
-              </option>
-            ))}
-          </select>
+            onChange={setClientFilter}
+            placeholder="Tous les clients"
+            className="w-64"
+            displayKey="label"
+            valueKey="value"
+            searchKeys={["label", "subtitle", "searchText"]}
+            emptyMessage="Aucun client trouvé"
+          />
         </div>
       </div>
 
