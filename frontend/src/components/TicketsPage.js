@@ -658,19 +658,20 @@ const TicketsPage = () => {
                 <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
                   Client *
                 </label>
-                <select
-                  required
+                <SearchableSelect
+                  options={clients.map(client => ({
+                    value: client.id,
+                    label: client.nom_societe,
+                    subtitle: client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : ''
+                  }))}
                   value={formData.client_id}
-                  onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
-                  className="input"
-                >
-                  <option value="">Sélectionner un client</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.nom_societe} - {client.prenom} {client.nom}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setFormData({ ...formData, client_id: value })}
+                  placeholder="Sélectionner un client"
+                  displayKey="label"
+                  valueKey="value"
+                  searchKeys={["label", "subtitle"]}
+                  emptyMessage="Aucun client trouvé"
+                />
               </div>
 
               {isAgent && (
