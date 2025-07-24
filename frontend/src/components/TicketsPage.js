@@ -650,18 +650,25 @@ const TicketsPage = () => {
                     ) : viewingTicketEchanges.length > 0 ? (
                       <div className="space-y-3">
                         {viewingTicketEchanges.map((echange, index) => {
+                          // Déterminer si c'est MON message (utilisateur connecté)
+                          const isMyMessage = user && (
+                            (isAgent && echange.auteur_type === 'agent' && echange.auteur_id === user.id) ||
+                            (!isAgent && echange.auteur_type === 'demandeur' && echange.auteur_id === user.id)
+                          );
+                          
                           const isAgent = echange.auteur_type === 'agent';
+                          
                           return (
                             <div 
                               key={echange.id} 
-                              className={`flex ${isAgent ? 'justify-end' : 'justify-start'} ${
+                              className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} ${
                                 index === viewingTicketEchanges.length - 1 ? 'animate-fade-in' : ''
                               }`}
                             >
-                              <div className={`max-w-xs lg:max-w-md ${isAgent ? 'order-2' : 'order-1'}`}>
+                              <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-2' : 'order-1'}`}>
                                 {/* Message bubble */}
                                 <div className={`rounded-2xl px-4 py-3 shadow-sm ${
-                                  isAgent 
+                                  isMyMessage 
                                     ? 'bg-primary-500 text-white rounded-br-md' 
                                     : 'bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-bl-md border border-gray-200 dark:border-dark-border'
                                 }`}>
@@ -672,16 +679,16 @@ const TicketsPage = () => {
                                 
                                 {/* Metadata */}
                                 <div className={`flex items-center mt-1 text-xs text-gray-500 dark:text-dark-muted ${
-                                  isAgent ? 'justify-end' : 'justify-start'
+                                  isMyMessage ? 'justify-end' : 'justify-start'
                                 }`}>
-                                  <div className={`flex items-center space-x-2 ${isAgent ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                  <div className={`flex items-center space-x-2 ${isMyMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white comment-avatar ${
                                       isAgent ? 'bg-primary-600' : 'bg-green-500'
                                     }`}>
                                       {echange.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                                     </div>
                                     <span className="font-medium">
-                                      {echange.auteur_nom}
+                                      {isMyMessage ? 'Moi' : echange.auteur_nom}
                                     </span>
                                     <span>•</span>
                                     <span>
