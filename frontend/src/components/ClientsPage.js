@@ -207,11 +207,10 @@ const ClientsPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-                    Nom *
+                    Nom
                   </label>
                   <input
                     type="text"
-                    required
                     value={formData.nom}
                     onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
                     className="input"
@@ -220,16 +219,28 @@ const ClientsPage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-                    Prénom *
+                    Prénom
                   </label>
                   <input
                     type="text"
-                    required
                     value={formData.prenom}
                     onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
                     className="input"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Numéro de téléphone
+                </label>
+                <input
+                  type="tel"
+                  value={formData.numero}
+                  onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
+                  className="input"
+                  placeholder="Ex: 01 23 45 67 89"
+                />
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
