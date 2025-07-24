@@ -652,11 +652,11 @@ const TicketsPage = () => {
                         {viewingTicketEchanges.map((echange, index) => {
                           // Déterminer si c'est MON message (utilisateur connecté)
                           const isMyMessage = user && (
-                            (isAgent && echange.auteur_type === 'agent' && echange.auteur_id === user.id) ||
-                            (!isAgent && echange.auteur_type === 'demandeur' && echange.auteur_id === user.id)
+                            (isAgent && echange.auteur_type === 'agent') ||
+                            (!isAgent && echange.auteur_type === 'demandeur')
                           );
                           
-                          const isAgent = echange.auteur_type === 'agent';
+                          const isAgentAuthor = echange.auteur_type === 'agent';
                           
                           return (
                             <div 
@@ -683,7 +683,7 @@ const TicketsPage = () => {
                                 }`}>
                                   <div className={`flex items-center space-x-2 ${isMyMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white comment-avatar ${
-                                      isAgent ? 'bg-primary-600' : 'bg-green-500'
+                                      isAgentAuthor ? 'bg-primary-600' : 'bg-green-500'
                                     }`}>
                                       {echange.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                                     </div>
