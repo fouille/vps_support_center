@@ -35,9 +35,7 @@ const TicketsPage = () => {
 
   useEffect(() => {
     fetchTickets();
-    if (isAgent) {
-      fetchClients();
-    }
+    fetchClients(); // Les clients sont nécessaires pour tous les utilisateurs qui créent des tickets
   }, [isAgent]);
 
   const fetchTickets = async () => {
