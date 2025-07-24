@@ -180,6 +180,25 @@ const TicketsPage = () => {
       };
 
       await api.post(`/api/ticket-fichiers?ticketId=${viewingTicket.id}`, fileData);
+      
+      // Ajouter un commentaire automatique
+      try {
+        const commentResponse = await api.post(`/api/ticket-echanges?ticketId=${viewingTicket.id}`, {
+          message: `A ajouté une pièce jointe ${file.name}`
+        });
+        
+        // Ajouter le commentaire à la liste
+        setViewingTicketEchanges([...viewingTicketEchanges, commentResponse.data]);
+        
+        // Si c'est un agent qui ajoute le fichier, mettre le ticket en "répondu"
+        if (isAgent && viewingTicket.status !== 'repondu') {
+          await handleStatusChange(viewingTicket.id, 'repondu');
+        }
+      } catch (commentError) {
+        console.error('Erreur lors de l\'ajout du commentaire automatique:', commentError);
+        // On continue même si le commentaire échoue
+      }
+      
       fetchTicketFiles(viewingTicket.id);
       event.target.value = ''; // Reset input
     } catch (error) {
