@@ -259,6 +259,28 @@ exports.handler = async (event, context) => {
         `;
         
         console.log('Ticket created:', createdTicket[0]);
+
+        // Récupérer les informations du client et du demandeur pour l'email
+        try {
+          const [clientInfo, demandeurInfo] = await Promise.all([
+            sql`SELECT * FROM clients WHERE id = ${client_id}`,
+            sql`SELECT * FROM demandeurs WHERE id = ${finalDemandeurId}`
+          ]);
+
+          if (clientInfo.length > 0 && demandeurInfo.length > 0) {
+            // Envoyer l'email de création de ticket
+            await emailService.sendTicketCreatedEmail(
+              createdTicket[0], 
+              clientInfo[0], 
+              demandeurInfo[0]
+            );
+            console.log('Ticket creation email sent successfully');
+          }
+        } catch (emailError) {
+          console.error('Error sending ticket creation email:', emailError);
+          // Ne pas faire échouer la création du ticket si l'email échoue
+        }
+
         return { statusCode: 201, headers, body: JSON.stringify(createdTicket[0]) };
 
       case 'PUT':
