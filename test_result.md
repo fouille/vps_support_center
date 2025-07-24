@@ -29,6 +29,21 @@ Finalizing the ticket comment/exchange functionality that's experiencing a 500 e
 - Ask for clarification when requirements are ambiguous
 
 backend:
+  - task: "Tickets API with numero_ticket and search"
+    implemented: true  
+    working: "unknown"
+    file: "netlify/functions/tickets.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history: []
+    changes:
+      - "Added support for numero_ticket field (6-digit random number)"
+      - "Added search functionality by ticket number (search parameter)"
+      - "Updated all ticket queries to include numero_ticket"
+      - "Fixed column naming consistency (client_nom_personne, client_prenom)"
+      - "Added search filter support to both agent and demandeur queries"
+
   - task: "Client API with pagination and search"
     implemented: true  
     working: true
