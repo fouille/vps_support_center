@@ -84,7 +84,7 @@ const ClientsPage = () => {
       } else {
         await api.post('/api/clients', formData);
       }
-      fetchClients();
+      await fetchClients();
       handleCloseModal();
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
@@ -95,11 +95,21 @@ const ClientsPage = () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
       try {
         await api.delete(`/api/clients/${clientId}`);
-        fetchClients();
+        await fetchClients();
       } catch (error) {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
       }
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleEdit = (client) => {
