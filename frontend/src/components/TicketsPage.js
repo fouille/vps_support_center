@@ -556,7 +556,7 @@ const TicketsPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                   <div className="flex items-center text-sm text-gray-600 dark:text-dark-muted">
                     <Building className="h-4 w-4 mr-2" />
-                    <span>Client: {ticket.client_nom}</span>
+                    <span>Client: {formatClientDisplay({ nom_societe: ticket.client_nom, prenom: ticket.client_prenom, nom: ticket.client_nom_personne })}</span>
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-600 dark:text-dark-muted">
