@@ -61,12 +61,12 @@ const TicketsPage = () => {
   // Préparer les options pour le select de clients avec recherche
   const clientOptions = [
     { value: '', label: 'Tous les clients', subtitle: '' },
-    ...clients.map(client => ({
+    ...(Array.isArray(clients) ? clients.map(client => ({
       value: client.id,
       label: client.nom_societe,
       subtitle: client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '',
       searchText: `${client.nom_societe} ${client.prenom || ''} ${client.nom || ''}`.toLowerCase()
-    }))
+    })) : [])
   ];
 
   useEffect(() => {
