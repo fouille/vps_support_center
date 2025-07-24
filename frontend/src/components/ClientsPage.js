@@ -77,7 +77,8 @@ const ClientsPage = () => {
       nom_societe: '',
       adresse: '',
       nom: '',
-      prenom: ''
+      prenom: '',
+      numero: ''
     });
     setError('');
   };
