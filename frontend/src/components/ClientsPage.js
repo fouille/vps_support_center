@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2, Building, AlertCircle, Check } from 'lucide-react';
 
 const ClientsPage = () => {
+  const { api } = useAuth();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,7 +22,7 @@ const ClientsPage = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/clients');
+      const response = await api.get('/api/clients');
       setClients(response.data);
     } catch (error) {
       setError('Erreur lors du chargement des clients');
@@ -34,9 +35,9 @@ const ClientsPage = () => {
     e.preventDefault();
     try {
       if (editingClient) {
-        await axios.put(`/api/clients/${editingClient.id}`, formData);
+        await api.put(`/api/clients/${editingClient.id}`, formData);
       } else {
-        await axios.post('/api/clients', formData);
+        await api.post('/api/clients', formData);
       }
       fetchClients();
       handleCloseModal();
@@ -48,7 +49,7 @@ const ClientsPage = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
       try {
-        await axios.delete(`/api/clients/${clientId}`);
+        await api.delete(`/api/clients/${clientId}`);
         fetchClients();
       } catch (error) {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
