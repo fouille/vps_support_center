@@ -1,8 +1,8 @@
-import { neon } from '@netlify/neon';
-import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
+const { neon } = require('@netlify/neon');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
-const sql = neon();
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -17,40 +17,42 @@ const verifyToken = (authHeader) => {
   }
   
   const token = authHeader.substring(7);
-  return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here');
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
 };
 
-export default async (req, context) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+exports.handler = async (event, context) => {
+  console.log('Clients function called:', event.httpMethod, event.path);
+  
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
   }
 
   try {
     // Verify authentication
-    const authHeader = req.headers.get('authorization');
+    const authHeader = event.headers.authorization || event.headers.Authorization;
     verifyToken(authHeader);
 
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
+    const pathParts = event.path.split('/');
     const clientId = pathParts[pathParts.length - 1];
 
-    switch (req.method) {
+    switch (event.httpMethod) {
       case 'GET':
-        const clients = await sql`
-          SELECT * FROM clients 
-          ORDER BY nom_societe, nom, prenom
-        `;
-        return new Response(JSON.stringify(clients), { status: 200, headers });
+        console.log('Getting clients...');
+        const clients = await sql`SELECT * FROM clients ORDER BY nom_societe, nom, prenom`;
+        console.log('Clients found:', clients.length);
+        return { statusCode: 200, headers, body: JSON.stringify(clients) };
 
       case 'POST':
-        const newClient = await req.json();
+        console.log('Creating client...');
+        const newClient = JSON.parse(event.body);
         const { nom_societe, adresse, nom, prenom } = newClient;
         
         if (!nom_societe || !adresse || !nom || !prenom) {
-          return new Response(JSON.stringify({ detail: 'Tous les champs sont requis' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Tous les champs sont requis' })
+          };
         }
 
         const createdClient = await sql`
@@ -58,10 +60,11 @@ export default async (req, context) => {
           VALUES (${uuidv4()}, ${nom_societe}, ${adresse}, ${nom}, ${prenom})
           RETURNING *
         `;
-        return new Response(JSON.stringify(createdClient[0]), { status: 201, headers });
+        console.log('Client created:', createdClient[0]);
+        return { statusCode: 201, headers, body: JSON.stringify(createdClient[0]) };
 
       case 'PUT':
-        const updateData = await req.json();
+        const updateData = JSON.parse(event.body);
         const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom } = updateData;
         
         const updatedClient = await sql`
@@ -72,46 +75,50 @@ export default async (req, context) => {
         `;
         
         if (updatedClient.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Client non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Client non trouvé' })
+          };
         }
-        return new Response(JSON.stringify(updatedClient[0]), { status: 200, headers });
+        return { statusCode: 200, headers, body: JSON.stringify(updatedClient[0]) };
 
       case 'DELETE':
-        const deletedClient = await sql`
-          DELETE FROM clients WHERE id = ${clientId} RETURNING id
-        `;
+        const deletedClient = await sql`DELETE FROM clients WHERE id = ${clientId} RETURNING id`;
         
         if (deletedClient.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Client non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Client non trouvé' })
+          };
         }
-        return new Response(JSON.stringify({ message: 'Client supprimé avec succès' }), {
-          status: 200,
+        return {
+          statusCode: 200,
           headers,
-        });
+          body: JSON.stringify({ message: 'Client supprimé avec succès' })
+        };
 
       default:
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-          status: 405,
+        return {
+          statusCode: 405,
           headers,
-        });
+          body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
   } catch (error) {
     console.error('Clients API error:', error);
     if (error.name === 'JsonWebTokenError') {
-      return new Response(JSON.stringify({ detail: 'Token invalide' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Token invalide' })
+      };
     }
-    return new Response(JSON.stringify({ detail: 'Erreur serveur' }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers,
-    });
+      body: JSON.stringify({ detail: 'Erreur serveur: ' + error.message })
+    };
   }
 };
