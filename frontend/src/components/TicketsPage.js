@@ -226,6 +226,7 @@ const TicketsPage = () => {
     setViewingTicket(null);
     setViewingTicketEchanges([]);
     setNewComment('');
+    setShowEmojiPicker(false);
   };
 
   const getStatusBadge = (status) => {
