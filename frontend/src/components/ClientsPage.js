@@ -134,7 +134,10 @@ const ClientsPage = () => {
                   </div>
                 </td>
                 <td>
-                  {client.prenom} {client.nom}
+                  {client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '-'}
+                </td>
+                <td>
+                  {client.numero || '-'}
                 </td>
                 <td className="max-w-xs truncate">
                   {client.adresse}
