@@ -525,6 +525,7 @@ const TicketsPage = () => {
                     <option value="nouveau">Nouveau</option>
                     <option value="en_cours">En cours</option>
                     <option value="en_attente">En attente</option>
+                    <option value="repondu">Répondu</option>
                     <option value="resolu">Résolu</option>
                     <option value="ferme">Fermé</option>
                   </select>
