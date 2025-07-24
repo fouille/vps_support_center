@@ -92,6 +92,11 @@ const TicketsPage = () => {
         if (clientFilter) {
           params.client_id = clientFilter;
         }
+        
+        // Ajout du filtre de recherche par numéro de ticket
+        if (searchFilter) {
+          params.search = searchFilter;
+        }
       } else {
         // Filtres pour les demandeurs
         if (statusFilter === 'active') {
