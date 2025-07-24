@@ -131,7 +131,7 @@ const TicketsPage = () => {
   const fetchTicketEchanges = async (ticketId) => {
     setLoadingComments(true);
     try {
-      const response = await api.get(`/api/ticket-echanges/${ticketId}`);
+      const response = await api.get(`/api/ticket-echanges?ticketId=${ticketId}`);
       setViewingTicketEchanges(response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des échanges:', error);
@@ -145,7 +145,7 @@ const TicketsPage = () => {
     if (!newComment.trim()) return;
 
     try {
-      const response = await api.post(`/api/ticket-echanges/${viewingTicket.id}`, {
+      const response = await api.post(`/api/ticket-echanges?ticketId=${viewingTicket.id}`, {
         message: newComment
       });
       
