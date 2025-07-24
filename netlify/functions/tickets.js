@@ -287,6 +287,19 @@ exports.handler = async (event, context) => {
         const updateData = JSON.parse(event.body);
         const { titre: upd_titre, status: upd_status, agent_id, date_fin_prevue: upd_date_fin, date_cloture } = updateData;
         
+        // Récupérer l'ancien statut avant mise à jour
+        const currentTicket = await sql`SELECT * FROM tickets WHERE id = ${ticketId}`;
+        
+        if (currentTicket.length === 0) {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ detail: 'Ticket non trouvé' })
+          };
+        }
+
+        const oldStatus = currentTicket[0].status;
+        
         const updatedTicket = await sql`
           UPDATE tickets 
           SET titre = ${upd_titre}, status = ${upd_status}, agent_id = ${agent_id || null}, 
@@ -302,6 +315,31 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ detail: 'Ticket non trouvé' })
           };
         }
+
+        // Envoyer un email si le statut a changé
+        if (oldStatus !== upd_status) {
+          try {
+            const [clientInfo, demandeurInfo] = await Promise.all([
+              sql`SELECT * FROM clients WHERE id = ${updatedTicket[0].client_id}`,
+              sql`SELECT * FROM demandeurs WHERE id = ${updatedTicket[0].demandeur_id}`
+            ]);
+
+            if (clientInfo.length > 0 && demandeurInfo.length > 0) {
+              await emailService.sendStatusChangeEmail(
+                updatedTicket[0],
+                oldStatus,
+                upd_status,
+                clientInfo[0],
+                demandeurInfo[0]
+              );
+              console.log('Status change email sent successfully');
+            }
+          } catch (emailError) {
+            console.error('Error sending status change email:', emailError);
+            // Ne pas faire échouer la mise à jour si l'email échoue
+          }
+        }
+
         return { statusCode: 200, headers, body: JSON.stringify(updatedTicket[0]) };
 
       case 'DELETE':
