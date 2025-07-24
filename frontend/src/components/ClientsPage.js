@@ -185,12 +185,17 @@ const ClientsPage = () => {
           </div>
           <input
             type="text"
-            placeholder="Rechercher un client..."
-            value={searchTerm}
+            placeholder="Rechercher un client (min. 3 caractères)..."
+            value={searchInput}
             onChange={handleSearchChange}
             className="input pl-10 w-full"
           />
         </div>
+        {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
+          <p className="text-sm text-orange-500 dark:text-orange-400 mt-2">
+            Tapez au moins 3 caractères pour rechercher
+          </p>
+        )}
         {searchTerm && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             {pagination.total} résultat{pagination.total > 1 ? 's' : ''} pour "{searchTerm}"
