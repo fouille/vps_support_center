@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     client_id UUID NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
     demandeur_id UUID NOT NULL REFERENCES demandeurs(id) ON DELETE CASCADE,
     agent_id UUID REFERENCES agents(id) ON DELETE SET NULL,
-    status VARCHAR(50) DEFAULT 'nouveau' CHECK (status IN ('nouveau', 'en_cours', 'en_attente', 'resolu', 'ferme')),
+    status VARCHAR(50) DEFAULT 'nouveau' CHECK (status IN ('nouveau', 'en_cours', 'en_attente', 'repondu', 'resolu', 'ferme')),
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_fin_prevue TIMESTAMP,
