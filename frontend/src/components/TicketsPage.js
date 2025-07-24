@@ -51,13 +51,22 @@ const TicketsPage = () => {
     requete_initiale: ''
   });
 
-  useEffect(() => {
-    fetchTickets();
-    fetchClients(); // Les clients sont nécessaires pour tous les utilisateurs qui créent des tickets
-    if (isAgent) {
-      fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
-    }
-  }, [isAgent, statusFilter, clientFilter]); // Refetch when filters change
+  // Formater l'affichage des clients
+  const formatClientDisplay = (client) => {
+    const contact = client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '';
+    return contact ? `${client.nom_societe} - ${contact}` : client.nom_societe;
+  };
+
+  // Préparer les options pour le select de clients avec recherche
+  const clientOptions = [
+    { value: '', label: 'Tous les clients', subtitle: '' },
+    ...clients.map(client => ({
+      value: client.id,
+      label: client.nom_societe,
+      subtitle: client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '',
+      searchText: `${client.nom_societe} ${client.prenom || ''} ${client.nom || ''}`.toLowerCase()
+    }))
+  ];
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
