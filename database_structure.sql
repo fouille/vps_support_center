@@ -76,6 +76,16 @@ CREATE TABLE IF NOT EXISTS ticket_echanges (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table des échanges/commentaires sur les tickets
+CREATE TABLE IF NOT EXISTS ticket_echanges (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+    auteur_id UUID NOT NULL,
+    auteur_type VARCHAR(20) NOT NULL CHECK (auteur_type IN ('demandeur', 'agent')),
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes pour optimiser les performances
 CREATE INDEX IF NOT EXISTS idx_tickets_client_id ON tickets(client_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_demandeur_id ON tickets(demandeur_id);
