@@ -83,18 +83,9 @@ exports.handler = async (event, context) => {
         return { statusCode: 200, headers, body: JSON.stringify(ticketsQuery) };
 
       case 'POST':
-        // Only demandeurs can create tickets
-        if (decoded.type !== 'demandeur') {
-          return {
-            statusCode: 403,
-            headers,
-            body: JSON.stringify({ detail: 'Seuls les demandeurs peuvent créer des tickets' })
-          };
-        }
-
         console.log('Creating ticket...');
         const newTicket = JSON.parse(event.body);
-        const { titre, client_id, status = 'nouveau', date_fin_prevue, requete_initiale } = newTicket;
+        const { titre, client_id, status = 'nouveau', date_fin_prevue, requete_initiale, demandeur_id } = newTicket;
         
         if (!titre || !client_id || !requete_initiale) {
           return {
@@ -104,22 +95,43 @@ exports.handler = async (event, context) => {
           };
         }
 
-        // Get demandeur ID from email
-        const demandeur = await sql`
-          SELECT id FROM demandeurs WHERE email = ${decoded.sub}
-        `;
+        let finalDemandeurId;
 
-        if (demandeur.length === 0) {
+        if (decoded.type === 'demandeur') {
+          // For demandeurs, use their own ID
+          const demandeur = await sql`
+            SELECT id FROM demandeurs WHERE email = ${decoded.sub}
+          `;
+
+          if (demandeur.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Demandeur non trouvé' })
+            };
+          }
+          finalDemandeurId = demandeur[0].id;
+        } else if (decoded.type === 'agent') {
+          // For agents, they must specify a demandeur_id
+          if (!demandeur_id) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ detail: 'Un agent doit spécifier un demandeur pour le ticket' })
+            };
+          }
+          finalDemandeurId = demandeur_id;
+        } else {
           return {
-            statusCode: 404,
+            statusCode: 403,
             headers,
-            body: JSON.stringify({ detail: 'Demandeur non trouvé' })
+            body: JSON.stringify({ detail: 'Type d\'utilisateur non autorisé' })
           };
         }
 
         const createdTicket = await sql`
           INSERT INTO tickets (id, titre, client_id, demandeur_id, status, date_fin_prevue, requete_initiale)
-          VALUES (${uuidv4()}, ${titre}, ${client_id}, ${demandeur[0].id}, ${status}, ${date_fin_prevue}, ${requete_initiale})
+          VALUES (${uuidv4()}, ${titre}, ${client_id}, ${finalDemandeurId}, ${status}, ${date_fin_prevue}, ${requete_initiale})
           RETURNING *
         `;
         
