@@ -45,19 +45,19 @@ exports.handler = async (event, context) => {
       case 'POST':
         console.log('Creating client...');
         const newClient = JSON.parse(event.body);
-        const { nom_societe, adresse, nom, prenom } = newClient;
+        const { nom_societe, adresse, nom, prenom, numero } = newClient;
         
-        if (!nom_societe || !adresse || !nom || !prenom) {
+        if (!nom_societe || !adresse) {
           return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ detail: 'Tous les champs sont requis' })
+            body: JSON.stringify({ detail: 'Le nom de société et l\'adresse sont requis' })
           };
         }
 
         const createdClient = await sql`
-          INSERT INTO clients (id, nom_societe, adresse, nom, prenom)
-          VALUES (${uuidv4()}, ${nom_societe}, ${adresse}, ${nom}, ${prenom})
+          INSERT INTO clients (id, nom_societe, adresse, nom, prenom, numero)
+          VALUES (${uuidv4()}, ${nom_societe}, ${adresse}, ${nom || null}, ${prenom || null}, ${numero || null})
           RETURNING *
         `;
         console.log('Client created:', createdClient[0]);
