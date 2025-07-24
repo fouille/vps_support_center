@@ -1,8 +1,9 @@
-import { neon } from '@netlify/neon';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+const { neon } = require('@netlify/neon');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
-const sql = neon();
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -11,26 +12,30 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-export default async (req, context) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+exports.handler = async (event, context) => {
+  console.log('Auth function called:', event.httpMethod);
+  
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
   }
 
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
       headers,
-    });
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
   try {
-    const { email, password } = await req.json();
+    const { email, password } = JSON.parse(event.body);
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ detail: 'Email et mot de passe requis' }), {
-        status: 400,
+      return {
+        statusCode: 400,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Email et mot de passe requis' })
+      };
     }
 
     // Check in demandeurs table first
@@ -50,46 +55,50 @@ export default async (req, context) => {
     }
 
     if (user.length === 0) {
-      return new Response(JSON.stringify({ detail: 'Email ou mot de passe incorrect' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Email ou mot de passe incorrect' })
+      };
     }
 
     const userData = user[0];
     const isValidPassword = await bcrypt.compare(password, userData.password);
 
     if (!isValidPassword) {
-      return new Response(JSON.stringify({ detail: 'Email ou mot de passe incorrect' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Email ou mot de passe incorrect' })
+      };
     }
 
     // Create JWT token
     const token = jwt.sign(
       { sub: userData.email, type: userData.type_utilisateur },
-      process.env.JWT_SECRET || 'your-secret-key-here',
+      process.env.JWT_SECRET || 'dev-secret-key',
       { expiresIn: '24h' }
     );
 
     // Remove password from response
     const { password: _, ...userResponse } = userData;
 
-    return new Response(JSON.stringify({
-      access_token: token,
-      token_type: 'bearer',
-      user: userResponse
-    }), {
-      status: 200,
+    return {
+      statusCode: 200,
       headers,
-    });
+      body: JSON.stringify({
+        access_token: token,
+        token_type: 'bearer',
+        user: userResponse
+      })
+    };
 
   } catch (error) {
     console.error('Auth error:', error);
-    return new Response(JSON.stringify({ detail: 'Erreur serveur' }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers,
-    });
+      body: JSON.stringify({ detail: 'Erreur serveur: ' + error.message })
+    };
   }
 };
