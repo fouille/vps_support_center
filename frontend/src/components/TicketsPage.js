@@ -632,11 +632,22 @@ const TicketsPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
                     Échanges et commentaires
                   </h3>
-                  {viewingTicketEchanges.length > 0 && (
-                    <span className="text-sm text-gray-500 dark:text-dark-muted">
-                      {viewingTicketEchanges.length} commentaire{viewingTicketEchanges.length > 1 ? 's' : ''}
-                    </span>
-                  )}
+                  <div className="flex items-center space-x-3">
+                    {viewingTicketEchanges.length > 0 && (
+                      <span className="text-sm text-gray-500 dark:text-dark-muted">
+                        {viewingTicketEchanges.length} commentaire{viewingTicketEchanges.length > 1 ? 's' : ''}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => fetchTicketEchanges(viewingTicket.id)}
+                      className="flex items-center space-x-1 text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                      title="Actualiser les commentaires"
+                      disabled={loadingComments}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${loadingComments ? 'animate-spin' : ''}`} />
+                      <span>Actualiser</span>
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Liste des commentaires avec scroll amélioré */}
