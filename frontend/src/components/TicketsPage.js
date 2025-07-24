@@ -640,56 +640,58 @@ const TicketsPage = () => {
                 
                 {/* Liste des commentaires avec scroll amélioré */}
                 <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg mb-4 bg-gray-50 dark:bg-dark-card relative">
-                  {/* Scroll container optimisé */}
-                  <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 comments-scroll-container">
+                  {/* Container de messagerie avec scroll */}
+                  <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 comments-scroll-container bg-gradient-to-b from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-surface">
                     {loadingComments ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                       </div>
                     ) : viewingTicketEchanges.length > 0 ? (
-                      <div className="space-y-4">
-                        {viewingTicketEchanges.map((echange, index) => (
-                          <div 
-                            key={echange.id} 
-                            className={`bg-white dark:bg-dark-surface rounded-lg p-4 shadow-sm border-l-4 ${
-                              echange.auteur_type === 'agent' 
-                                ? 'border-l-blue-500' 
-                                : 'border-l-green-500'
-                            } ${index === viewingTicketEchanges.length - 1 ? 'animate-fade-in' : ''}`}
-                          >
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center space-x-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white comment-avatar ${
-                                  echange.auteur_type === 'agent' 
-                                    ? 'bg-blue-500' 
-                                    : 'bg-green-500'
+                      <div className="space-y-3">
+                        {viewingTicketEchanges.map((echange, index) => {
+                          const isAgent = echange.auteur_type === 'agent';
+                          return (
+                            <div 
+                              key={echange.id} 
+                              className={`flex ${isAgent ? 'justify-end' : 'justify-start'} ${
+                                index === viewingTicketEchanges.length - 1 ? 'animate-fade-in' : ''
+                              }`}
+                            >
+                              <div className={`max-w-xs lg:max-w-md ${isAgent ? 'order-2' : 'order-1'}`}>
+                                {/* Message bubble */}
+                                <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                                  isAgent 
+                                    ? 'bg-primary-500 text-white rounded-br-md' 
+                                    : 'bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-bl-md border border-gray-200 dark:border-dark-border'
                                 }`}>
-                                  {echange.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                    {echange.message}
+                                  </p>
                                 </div>
-                                <div>
-                                  <span className="font-medium text-gray-900 dark:text-dark-text block">
-                                    {echange.auteur_nom}
-                                  </span>
-                                  <span className={`text-xs px-2 py-1 rounded-full ${
-                                    echange.auteur_type === 'agent' 
-                                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
-                                      : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                                  }`}>
-                                    {echange.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
-                                  </span>
+                                
+                                {/* Metadata */}
+                                <div className={`flex items-center mt-1 text-xs text-gray-500 dark:text-dark-muted ${
+                                  isAgent ? 'justify-end' : 'justify-start'
+                                }`}>
+                                  <div className={`flex items-center space-x-2 ${isAgent ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white comment-avatar ${
+                                      isAgent ? 'bg-primary-600' : 'bg-green-500'
+                                    }`}>
+                                      {echange.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <span className="font-medium">
+                                      {echange.auteur_nom}
+                                    </span>
+                                    <span>•</span>
+                                    <span>
+                                      {format(new Date(echange.created_at), 'HH:mm', { locale: fr })}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                              <span className="text-xs text-gray-500 dark:text-dark-muted">
-                                {format(new Date(echange.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
-                              </span>
                             </div>
-                            <div className="ml-11">
-                              <p className="text-gray-700 dark:text-dark-text whitespace-pre-wrap text-sm leading-relaxed">
-                                {echange.message}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -699,10 +701,10 @@ const TicketsPage = () => {
                           </svg>
                         </div>
                         <p className="text-gray-500 dark:text-dark-muted">
-                          Aucun commentaire pour ce ticket
+                          Aucune conversation pour ce ticket
                         </p>
                         <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
-                          Commencez la conversation en ajoutant un commentaire ci-dessous
+                          Commencez la discussion en envoyant le premier message
                         </p>
                       </div>
                     )}
