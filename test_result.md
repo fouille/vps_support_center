@@ -145,6 +145,21 @@ backend:
         comment: "Database connectivity verified through Neon PostgreSQL. Complex JOIN queries work correctly to fetch author names from agents/demandeurs tables. ticket_echanges table structure is properly implemented with UUID primary keys and foreign key relationships."
 
 frontend:
+  - task: "Fixed client data mapping in TicketsPage"
+    implemented: true
+    working: "unknown"
+    file: "frontend/src/components/TicketsPage.js"
+    stuck_count: 0
+    priority: "high"  
+    needs_retesting: true
+    status_history: []
+    changes:
+      - "Fixed fetchClients to handle pagination response structure"
+      - "Added Array.isArray safety checks for client mapping"
+      - "Fixed clientOptions creation to handle new API format"
+      - "Fixed SearchableSelect options in ticket creation form"
+      - "Added fallback for old API format compatibility"
+
   - task: "Client management interface updates"
     implemented: true
     working: "unknown"
@@ -187,6 +202,7 @@ frontend:
       - "Added formatClientDisplay utility function"
       - "Updated ticket creation form client selection"
       - "Updated client display in ticket cards and modal"
+      - "Added ticket number display and search functionality"
 
   - task: "Comment display UI"
     implemented: true
