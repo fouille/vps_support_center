@@ -38,9 +38,76 @@ exports.handler = async (event, context) => {
     switch (event.httpMethod) {
       case 'GET':
         console.log('Getting clients...');
-        const clients = await sql`SELECT * FROM clients ORDER BY nom_societe, nom, prenom`;
-        console.log('Clients found:', clients.length);
-        return { statusCode: 200, headers, body: JSON.stringify(clients) };
+        
+        // Paramètres de pagination et recherche
+        const queryParams = event.queryStringParameters || {};
+        const page = parseInt(queryParams.page) || 1;
+        const limit = parseInt(queryParams.limit) || 10;
+        const search = queryParams.search || '';
+        const offset = (page - 1) * limit;
+
+        let baseQuery = 'SELECT * FROM clients';
+        let countQuery = 'SELECT COUNT(*) as total FROM clients';
+        let whereClause = '';
+        let orderClause = ' ORDER BY nom_societe, nom, prenom';
+        let paginationClause = ` LIMIT ${limit} OFFSET ${offset}`;
+
+        // Ajouter la recherche si présente
+        if (search) {
+          whereClause = ` WHERE (
+            nom_societe ILIKE ${'%' + search + '%'} OR 
+            COALESCE(nom, '') ILIKE ${'%' + search + '%'} OR 
+            COALESCE(prenom, '') ILIKE ${'%' + search + '%'} OR 
+            COALESCE(numero, '') ILIKE ${'%' + search + '%'}
+          )`;
+        }
+
+        // Construire les requêtes finales
+        const finalQuery = baseQuery + whereClause + orderClause + paginationClause;
+        const finalCountQuery = countQuery + whereClause;
+
+        // Exécuter les requêtes
+        const [clients, countResult] = await Promise.all([
+          search ? 
+            sql`SELECT * FROM clients 
+                WHERE (nom_societe ILIKE ${`%${search}%`} OR 
+                       COALESCE(nom, '') ILIKE ${`%${search}%`} OR 
+                       COALESCE(prenom, '') ILIKE ${`%${search}%`} OR 
+                       COALESCE(numero, '') ILIKE ${`%${search}%`})
+                ORDER BY nom_societe, nom, prenom 
+                LIMIT ${limit} OFFSET ${offset}` :
+            sql`SELECT * FROM clients 
+                ORDER BY nom_societe, nom, prenom 
+                LIMIT ${limit} OFFSET ${offset}`,
+          search ?
+            sql`SELECT COUNT(*) as total FROM clients 
+                WHERE (nom_societe ILIKE ${`%${search}%`} OR 
+                       COALESCE(nom, '') ILIKE ${`%${search}%`} OR 
+                       COALESCE(prenom, '') ILIKE ${`%${search}%`} OR 
+                       COALESCE(numero, '') ILIKE ${`%${search}%`})` :
+            sql`SELECT COUNT(*) as total FROM clients`
+        ]);
+
+        const total = parseInt(countResult[0].total);
+        const totalPages = Math.ceil(total / limit);
+
+        console.log(`Clients found: ${clients.length} of ${total} total, page ${page}/${totalPages}`);
+        
+        return { 
+          statusCode: 200, 
+          headers, 
+          body: JSON.stringify({
+            data: clients,
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages,
+              hasNext: page < totalPages,
+              hasPrev: page > 1
+            }
+          })
+        };
 
       case 'POST':
         console.log('Creating client...');
