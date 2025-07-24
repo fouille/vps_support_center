@@ -19,6 +19,7 @@ const TicketsPage = () => {
   const { isAgent, api } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [clients, setClients] = useState([]);
+  const [demandeurs, setDemandeurs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -28,6 +29,7 @@ const TicketsPage = () => {
   const [formData, setFormData] = useState({
     titre: '',
     client_id: '',
+    demandeur_id: '',
     status: 'nouveau',
     date_fin_prevue: '',
     requete_initiale: ''
