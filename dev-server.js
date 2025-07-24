@@ -31,7 +31,7 @@ const mockDB = {
       societe: 'TechCorp SARL',
       telephone: '0123456789',
       email: 'sophie.martin@techcorp.fr',
-      password: '$2a$10$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYq.9mXR8Xt1n4u' // password123
+      password: '$2a$10$GdyKzfgy3bdkrOsi6weev.8V3msbHhiuRrKM4m3PUwMCf7ShDYv6G' // password123
     }
   ],
   clients: [],
