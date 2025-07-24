@@ -587,6 +587,9 @@ const TicketsPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
                     {ticket.titre}
                   </h3>
+                  <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                    #{ticket.numero_ticket}
+                  </span>
                   {getStatusBadge(ticket.status)}
                 </div>
 
