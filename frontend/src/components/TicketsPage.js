@@ -737,19 +737,28 @@ const TicketsPage = () => {
                       
                       {/* Sélecteur d'émojis */}
                       {showEmojiPicker && (
-                        <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg p-3 shadow-lg z-10 w-full max-w-xs">
+                        <div className="absolute bottom-full left-0 mb-2 emoji-picker border border-gray-200 dark:border-dark-border rounded-lg p-3 shadow-xl z-10 w-full max-w-xs">
                           <div className="grid grid-cols-8 gap-1">
                             {popularEmojis.map((emoji, index) => (
                               <button
                                 key={index}
                                 type="button"
                                 onClick={() => insertEmoji(emoji)}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-card rounded text-lg transition-colors"
+                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-card rounded text-lg emoji-button"
                                 title={`Ajouter ${emoji}`}
                               >
                                 {emoji}
                               </button>
                             ))}
+                          </div>
+                          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-dark-border">
+                            <button
+                              type="button"
+                              onClick={() => setShowEmojiPicker(false)}
+                              className="text-xs text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text w-full text-center py-1"
+                            >
+                              Fermer
+                            </button>
                           </div>
                         </div>
                       )}
