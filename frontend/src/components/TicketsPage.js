@@ -150,8 +150,21 @@ const TicketsPage = () => {
       });
       
       // Add the new comment to the list
-      setViewingTicketEchanges([...viewingTicketEchanges, response.data]);
+      const updatedComments = [...viewingTicketEchanges, response.data];
+      setViewingTicketEchanges(updatedComments);
       setNewComment('');
+      
+      // Auto-scroll to the latest comment after a short delay
+      setTimeout(() => {
+        const commentsContainer = document.querySelector('.comments-scroll-container');
+        if (commentsContainer) {
+          commentsContainer.scrollTo({
+            top: commentsContainer.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+      
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de l\'ajout du commentaire');
     }
