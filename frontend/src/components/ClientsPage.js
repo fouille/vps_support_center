@@ -119,6 +119,7 @@ const ClientsPage = () => {
             <tr>
               <th>Société</th>
               <th>Contact</th>
+              <th>Téléphone</th>
               <th>Adresse</th>
               <th>Actions</th>
             </tr>
