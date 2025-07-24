@@ -121,6 +121,7 @@ const TicketsPage = () => {
     setFormData({
       titre: '',
       client_id: '',
+      demandeur_id: '',
       status: 'nouveau',
       date_fin_prevue: '',
       requete_initiale: ''
