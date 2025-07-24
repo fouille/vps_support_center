@@ -191,6 +191,244 @@ async def login(login_data: LoginRequest):
     finally:
         conn.close()
 
+# Clients CRUD
+@app.get("/api/clients", response_model=List[ClientResponse])
+async def get_clients(email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT * FROM clients ORDER BY nom_societe, nom, prenom")
+            clients = cursor.fetchall()
+            return [ClientResponse(**client) for client in clients]
+    finally:
+        conn.close()
+
+@app.post("/api/clients", response_model=ClientResponse)
+async def create_client(client: ClientCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            client_id = str(uuid.uuid4())
+            cursor.execute(
+                "INSERT INTO clients (id, nom_societe, adresse, nom, prenom) VALUES (%s, %s, %s, %s, %s) RETURNING *",
+                (client_id, client.nom_societe, client.adresse, client.nom, client.prenom)
+            )
+            conn.commit()
+            new_client = cursor.fetchone()
+            return ClientResponse(**new_client)
+    finally:
+        conn.close()
+
+@app.put("/api/clients/{client_id}", response_model=ClientResponse)
+async def update_client(client_id: str, client: ClientCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(
+                "UPDATE clients SET nom_societe = %s, adresse = %s, nom = %s, prenom = %s WHERE id = %s RETURNING *",
+                (client.nom_societe, client.adresse, client.nom, client.prenom, client_id)
+            )
+            conn.commit()
+            updated_client = cursor.fetchone()
+            if not updated_client:
+                raise HTTPException(status_code=404, detail="Client not found")
+            return ClientResponse(**updated_client)
+    finally:
+        conn.close()
+
+@app.delete("/api/clients/{client_id}")
+async def delete_client(client_id: str, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM clients WHERE id = %s", (client_id,))
+            conn.commit()
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Client not found")
+            return {"message": "Client deleted successfully"}
+    finally:
+        conn.close()
+
+# Demandeurs CRUD
+@app.get("/api/demandeurs", response_model=List[UserResponse])
+async def get_demandeurs(email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT id, email, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur FROM demandeurs ORDER BY nom, prenom")
+            demandeurs = cursor.fetchall()
+            return [UserResponse(**demandeur) for demandeur in demandeurs]
+    finally:
+        conn.close()
+
+@app.post("/api/demandeurs", response_model=UserResponse)
+async def create_demandeur(demandeur: UserCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            demandeur_id = str(uuid.uuid4())
+            hashed_password = get_password_hash(demandeur.password)
+            cursor.execute(
+                "INSERT INTO demandeurs (id, nom, prenom, societe, telephone, email, password) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id, email, nom, prenom, societe, telephone",
+                (demandeur_id, demandeur.nom, demandeur.prenom, demandeur.societe, demandeur.telephone, demandeur.email, hashed_password)
+            )
+            conn.commit()
+            new_demandeur = cursor.fetchone()
+            return UserResponse(**new_demandeur, type_utilisateur="demandeur")
+    except psycopg2.IntegrityError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    finally:
+        conn.close()
+
+@app.put("/api/demandeurs/{demandeur_id}", response_model=UserResponse)
+async def update_demandeur(demandeur_id: str, demandeur: UserCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            hashed_password = get_password_hash(demandeur.password)
+            cursor.execute(
+                "UPDATE demandeurs SET nom = %s, prenom = %s, societe = %s, telephone = %s, email = %s, password = %s WHERE id = %s RETURNING id, email, nom, prenom, societe, telephone",
+                (demandeur.nom, demandeur.prenom, demandeur.societe, demandeur.telephone, demandeur.email, hashed_password, demandeur_id)
+            )
+            conn.commit()
+            updated_demandeur = cursor.fetchone()
+            if not updated_demandeur:
+                raise HTTPException(status_code=404, detail="Demandeur not found")
+            return UserResponse(**updated_demandeur, type_utilisateur="demandeur")
+    except psycopg2.IntegrityError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    finally:
+        conn.close()
+
+@app.delete("/api/demandeurs/{demandeur_id}")
+async def delete_demandeur(demandeur_id: str, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM demandeurs WHERE id = %s", (demandeur_id,))
+            conn.commit()
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Demandeur not found")
+            return {"message": "Demandeur deleted successfully"}
+    finally:
+        conn.close()
+
+# Agents CRUD
+@app.get("/api/agents", response_model=List[UserResponse])
+async def get_agents(email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT id, email, nom, prenom, societe, NULL as telephone, 'agent' as type_utilisateur FROM agents ORDER BY nom, prenom")
+            agents = cursor.fetchall()
+            return [UserResponse(**agent) for agent in agents]
+    finally:
+        conn.close()
+
+@app.post("/api/agents", response_model=UserResponse)
+async def create_agent(agent: UserCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            agent_id = str(uuid.uuid4())
+            hashed_password = get_password_hash(agent.password)
+            cursor.execute(
+                "INSERT INTO agents (id, nom, prenom, societe, email, password) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id, email, nom, prenom, societe",
+                (agent_id, agent.nom, agent.prenom, agent.societe, agent.email, hashed_password)
+            )
+            conn.commit()
+            new_agent = cursor.fetchone()
+            return UserResponse(**new_agent, telephone=None, type_utilisateur="agent")
+    except psycopg2.IntegrityError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    finally:
+        conn.close()
+
+@app.put("/api/agents/{agent_id}", response_model=UserResponse)
+async def update_agent(agent_id: str, agent: UserCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            hashed_password = get_password_hash(agent.password)
+            cursor.execute(
+                "UPDATE agents SET nom = %s, prenom = %s, societe = %s, email = %s, password = %s WHERE id = %s RETURNING id, email, nom, prenom, societe",
+                (agent.nom, agent.prenom, agent.societe, agent.email, hashed_password, agent_id)
+            )
+            conn.commit()
+            updated_agent = cursor.fetchone()
+            if not updated_agent:
+                raise HTTPException(status_code=404, detail="Agent not found")
+            return UserResponse(**updated_agent, telephone=None, type_utilisateur="agent")
+    except psycopg2.IntegrityError:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    finally:
+        conn.close()
+
+@app.delete("/api/agents/{agent_id}")
+async def delete_agent(agent_id: str, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("DELETE FROM agents WHERE id = %s", (agent_id,))
+            conn.commit()
+            if cursor.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Agent not found")
+            return {"message": "Agent deleted successfully"}
+    finally:
+        conn.close()
+
+# Tickets CRUD
+@app.get("/api/tickets", response_model=List[TicketResponse])
+async def get_tickets(email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                SELECT t.*, c.nom_societe as client_nom, 
+                       d.nom as demandeur_nom, d.prenom as demandeur_prenom,
+                       a.nom as agent_nom, a.prenom as agent_prenom
+                FROM tickets t 
+                JOIN clients c ON t.client_id = c.id 
+                JOIN demandeurs d ON t.demandeur_id = d.id 
+                LEFT JOIN agents a ON t.agent_id = a.id 
+                ORDER BY t.date_creation DESC
+            """)
+            tickets = cursor.fetchall()
+            
+            result = []
+            for ticket in tickets:
+                ticket_data = dict(ticket)
+                # Remove extra fields that aren't in TicketResponse
+                for key in ['client_nom', 'demandeur_nom', 'demandeur_prenom', 'agent_nom', 'agent_prenom']:
+                    ticket_data.pop(key, None)
+                result.append(TicketResponse(**ticket_data))
+            return result
+    finally:
+        conn.close()
+
+@app.post("/api/tickets", response_model=TicketResponse)
+async def create_ticket(ticket: TicketCreate, email: str = Depends(verify_token)):
+    conn = get_db_connection()
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            # Get demandeur_id from email
+            cursor.execute("SELECT id FROM demandeurs WHERE email = %s", (email,))
+            demandeur = cursor.fetchone()
+            if not demandeur:
+                raise HTTPException(status_code=403, detail="Only demandeurs can create tickets")
+            
+            ticket_id = str(uuid.uuid4())
+            cursor.execute(
+                """INSERT INTO tickets (id, titre, client_id, demandeur_id, status, date_fin_prevue, requete_initiale) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *""",
+                (ticket_id, ticket.titre, ticket.client_id, demandeur['id'], ticket.status, ticket.date_fin_prevue, ticket.requete_initiale)
+            )
+            conn.commit()
+            new_ticket = cursor.fetchone()
+            return TicketResponse(**new_ticket)
+    finally:
+        conn.close()
+
 # Initialize database and create default admin user
 @app.on_event("startup")
 async def startup_event():
