@@ -26,7 +26,9 @@ const TicketsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
-  const [viewingTicket, setViewingTicket] = useState(null);
+  const [viewingTicketEchanges, setViewingTicketEchanges] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [loadingComments, setLoadingComments] = useState(false);
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
