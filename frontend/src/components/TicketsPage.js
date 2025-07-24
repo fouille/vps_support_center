@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
   Plus, 
@@ -17,7 +16,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const TicketsPage = () => {
-  const { isAgent } = useAuth();
+  const { isAgent, api } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,7 +42,7 @@ const TicketsPage = () => {
 
   const fetchTickets = async () => {
     try {
-      const response = await axios.get('/api/tickets');
+      const response = await api.get('/api/tickets');
       setTickets(response.data);
     } catch (error) {
       setError('Erreur lors du chargement des tickets');
@@ -54,7 +53,7 @@ const TicketsPage = () => {
 
   const fetchClients = async () => {
     try {
-      const response = await axios.get('/api/clients');
+      const response = await api.get('/api/clients');
       setClients(response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
@@ -65,9 +64,9 @@ const TicketsPage = () => {
     e.preventDefault();
     try {
       if (editingTicket) {
-        await axios.put(`/api/tickets/${editingTicket.id}`, formData);
+        await api.put(`/api/tickets/${editingTicket.id}`, formData);
       } else {
-        await axios.post('/api/tickets', formData);
+        await api.post('/api/tickets', formData);
       }
       fetchTickets();
       handleCloseModal();
@@ -79,7 +78,7 @@ const TicketsPage = () => {
   const handleDelete = async (ticketId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) {
       try {
-        await axios.delete(`/api/tickets/${ticketId}`);
+        await api.delete(`/api/tickets/${ticketId}`);
         fetchTickets();
       } catch (error) {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
