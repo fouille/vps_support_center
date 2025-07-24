@@ -105,6 +105,11 @@ const TicketsPage = () => {
         if (clientFilter) {
           params.client_id = clientFilter;
         }
+        
+        // Ajout du filtre de recherche par numéro de ticket
+        if (searchFilter) {
+          params.search = searchFilter;
+        }
       }
       
       const queryString = Object.keys(params).length > 0 
