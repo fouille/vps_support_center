@@ -30,19 +30,20 @@ export default async (req, context) => {
     `;
 
     if (existingAdmin.length === 0) {
-      // Create default admin user
+      // Create default admin user: Franck ADMIN
       const adminId = uuidv4();
       const hashedPassword = await bcrypt.hash('admin1234!', 10);
       
       await sql`
         INSERT INTO agents (id, email, password, nom, prenom, societe)
-        VALUES (${adminId}, 'admin@voipservices.fr', ${hashedPassword}, 'Admin', 'System', 'VoIP Services')
+        VALUES (${adminId}, 'admin@voipservices.fr', ${hashedPassword}, 'ADMIN', 'Franck', 'VoIP Services')
       `;
 
       return new Response(JSON.stringify({ 
         message: 'Utilisateur admin créé avec succès',
         email: 'admin@voipservices.fr',
-        password: 'admin1234!'
+        password: 'admin1234!',
+        nom: 'Franck ADMIN'
       }), {
         status: 200,
         headers,
@@ -50,7 +51,8 @@ export default async (req, context) => {
     } else {
       return new Response(JSON.stringify({ 
         message: 'Utilisateur admin existe déjà',
-        email: 'admin@voipservices.fr'
+        email: 'admin@voipservices.fr',
+        nom: 'Franck ADMIN'
       }), {
         status: 200,
         headers,
