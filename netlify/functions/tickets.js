@@ -1,8 +1,8 @@
-import { neon } from '@netlify/neon';
-import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
+const { neon } = require('@netlify/neon');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
-const sql = neon();
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -17,25 +17,27 @@ const verifyToken = (authHeader) => {
   }
   
   const token = authHeader.substring(7);
-  return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here');
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
 };
 
-export default async (req, context) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+exports.handler = async (event, context) => {
+  console.log('Tickets function called:', event.httpMethod, event.path);
+  
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
   }
 
   try {
     // Verify authentication
-    const authHeader = req.headers.get('authorization');
+    const authHeader = event.headers.authorization || event.headers.Authorization;
     const decoded = verifyToken(authHeader);
 
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
+    const pathParts = event.path.split('/');
     const ticketId = pathParts[pathParts.length - 1];
 
-    switch (req.method) {
+    switch (event.httpMethod) {
       case 'GET':
+        console.log('Getting tickets...');
         let ticketsQuery;
         
         if (decoded.type === 'agent') {
@@ -57,10 +59,11 @@ export default async (req, context) => {
           `;
           
           if (demandeur.length === 0) {
-            return new Response(JSON.stringify({ detail: 'Utilisateur non trouvé' }), {
-              status: 404,
+            return {
+              statusCode: 404,
               headers,
-            });
+              body: JSON.stringify({ detail: 'Utilisateur non trouvé' })
+            };
           }
 
           ticketsQuery = await sql`
@@ -76,25 +79,29 @@ export default async (req, context) => {
           `;
         }
 
-        return new Response(JSON.stringify(ticketsQuery), { status: 200, headers });
+        console.log('Tickets found:', ticketsQuery.length);
+        return { statusCode: 200, headers, body: JSON.stringify(ticketsQuery) };
 
       case 'POST':
         // Only demandeurs can create tickets
         if (decoded.type !== 'demandeur') {
-          return new Response(JSON.stringify({ detail: 'Seuls les demandeurs peuvent créer des tickets' }), {
-            status: 403,
+          return {
+            statusCode: 403,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Seuls les demandeurs peuvent créer des tickets' })
+          };
         }
 
-        const newTicket = await req.json();
+        console.log('Creating ticket...');
+        const newTicket = JSON.parse(event.body);
         const { titre, client_id, status = 'nouveau', date_fin_prevue, requete_initiale } = newTicket;
         
         if (!titre || !client_id || !requete_initiale) {
-          return new Response(JSON.stringify({ detail: 'Titre, client et requête initiale sont requis' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Titre, client et requête initiale sont requis' })
+          };
         }
 
         // Get demandeur ID from email
@@ -103,10 +110,11 @@ export default async (req, context) => {
         `;
 
         if (demandeur.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Demandeur non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Demandeur non trouvé' })
+          };
         }
 
         const createdTicket = await sql`
@@ -114,10 +122,12 @@ export default async (req, context) => {
           VALUES (${uuidv4()}, ${titre}, ${client_id}, ${demandeur[0].id}, ${status}, ${date_fin_prevue}, ${requete_initiale})
           RETURNING *
         `;
-        return new Response(JSON.stringify(createdTicket[0]), { status: 201, headers });
+        
+        console.log('Ticket created:', createdTicket[0]);
+        return { statusCode: 201, headers, body: JSON.stringify(createdTicket[0]) };
 
       case 'PUT':
-        const updateData = await req.json();
+        const updateData = JSON.parse(event.body);
         const { titre: upd_titre, status: upd_status, agent_id, date_fin_prevue: upd_date_fin, date_cloture } = updateData;
         
         const updatedTicket = await sql`
@@ -129,46 +139,50 @@ export default async (req, context) => {
         `;
         
         if (updatedTicket.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Ticket non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Ticket non trouvé' })
+          };
         }
-        return new Response(JSON.stringify(updatedTicket[0]), { status: 200, headers });
+        return { statusCode: 200, headers, body: JSON.stringify(updatedTicket[0]) };
 
       case 'DELETE':
-        const deletedTicket = await sql`
-          DELETE FROM tickets WHERE id = ${ticketId} RETURNING id
-        `;
+        const deletedTicket = await sql`DELETE FROM tickets WHERE id = ${ticketId} RETURNING id`;
         
         if (deletedTicket.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Ticket non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Ticket non trouvé' })
+          };
         }
-        return new Response(JSON.stringify({ message: 'Ticket supprimé avec succès' }), {
-          status: 200,
+        return {
+          statusCode: 200,
           headers,
-        });
+          body: JSON.stringify({ message: 'Ticket supprimé avec succès' })
+        };
 
       default:
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-          status: 405,
+        return {
+          statusCode: 405,
           headers,
-        });
+          body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
   } catch (error) {
     console.error('Tickets API error:', error);
     if (error.name === 'JsonWebTokenError') {
-      return new Response(JSON.stringify({ detail: 'Token invalide' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Token invalide' })
+      };
     }
-    return new Response(JSON.stringify({ detail: 'Erreur serveur' }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers,
-    });
+      body: JSON.stringify({ detail: 'Erreur serveur: ' + error.message })
+    };
   }
 };
