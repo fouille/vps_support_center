@@ -30,6 +30,7 @@ const TicketsPage = () => {
   const [viewingTicketEchanges, setViewingTicketEchanges] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
