@@ -189,7 +189,7 @@ exports.handler = async (event, context) => {
           }
 
           ticketsQuery = await sql`
-            SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
+            SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
                    d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
                    a.nom as agent_nom, a.prenom as agent_prenom
             FROM tickets t 
