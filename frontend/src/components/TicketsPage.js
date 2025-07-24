@@ -108,6 +108,7 @@ const TicketsPage = () => {
     setFormData({
       titre: ticket.titre,
       client_id: ticket.client_id,
+      demandeur_id: ticket.demandeur_id || '',
       status: ticket.status,
       date_fin_prevue: ticket.date_fin_prevue ? ticket.date_fin_prevue.split('T')[0] : '',
       requete_initiale: ticket.requete_initiale
