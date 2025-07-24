@@ -41,6 +41,7 @@ const TicketsPage = () => {
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
   const [clientFilter, setClientFilter] = useState('');
+  const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
   
   const [formData, setFormData] = useState({
     titre: '',
