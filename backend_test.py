@@ -751,23 +751,422 @@ def test_clients_pagination_search_api():
     
     return results.summary()
 
+def test_tickets_numero_and_search_api():
+    """Test the new ticket number generation and search functionality"""
+    results = TestResults()
+    
+    print("🚀 Starting Tickets API numero_ticket & Search Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication Tests")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Get existing clients and demandeurs for ticket creation
+    print("\n📋 STEP 2: Get Test Data")
+    
+    # Get a client for ticket creation
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+                results.add_result("Get Test Client", True)
+            else:
+                # Try direct array response format
+                if isinstance(clients_data, list) and len(clients_data) > 0:
+                    test_client_id = clients_data[0]['id']
+                    results.add_result("Get Test Client", True)
+                else:
+                    results.add_result("Get Test Client", False, "No clients found")
+                    return results.summary()
+        else:
+            results.add_result("Get Test Client", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Client", False, str(e))
+        return results.summary()
+    
+    # Get a demandeur for ticket creation
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            if len(demandeurs) > 0:
+                test_demandeur_id = demandeurs[0]['id']
+                results.add_result("Get Test Demandeur", True)
+            else:
+                results.add_result("Get Test Demandeur", False, "No demandeurs found")
+                return results.summary()
+        else:
+            results.add_result("Get Test Demandeur", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Demandeur", False, str(e))
+        return results.summary()
+    
+    # Step 3: Test POST /api/tickets - Verify numero_ticket generation
+    print("\n📋 STEP 3: POST Tickets - numero_ticket Generation")
+    
+    created_tickets = []
+    
+    # Create multiple tickets to test uniqueness
+    for i in range(3):
+        ticket_data = {
+            "titre": f"Test Ticket {i+1} - numero_ticket test",
+            "client_id": test_client_id,
+            "demandeur_id": test_demandeur_id,
+            "requete_initiale": f"Test request for ticket {i+1} to verify numero_ticket generation",
+            "status": "nouveau"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                                   json=ticket_data, timeout=10)
+            
+            if response.status_code == 201:
+                ticket = response.json()
+                created_tickets.append(ticket)
+                
+                # Verify numero_ticket is present and has correct format
+                if 'numero_ticket' in ticket:
+                    numero = ticket['numero_ticket']
+                    if len(numero) == 6 and numero.isdigit():
+                        results.add_result(f"POST - Ticket {i+1} numero_ticket format", True)
+                    else:
+                        results.add_result(f"POST - Ticket {i+1} numero_ticket format", False, 
+                                         f"Expected 6 digits, got: {numero}")
+                else:
+                    results.add_result(f"POST - Ticket {i+1} numero_ticket present", False, 
+                                     "numero_ticket field missing")
+            else:
+                results.add_result(f"POST - Create Ticket {i+1}", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result(f"POST - Create Ticket {i+1}", False, str(e))
+    
+    # Test uniqueness of generated numbers
+    if len(created_tickets) >= 2:
+        numeros = [t.get('numero_ticket') for t in created_tickets if 'numero_ticket' in t]
+        unique_numeros = set(numeros)
+        if len(numeros) == len(unique_numeros):
+            results.add_result("POST - numero_ticket uniqueness", True)
+        else:
+            results.add_result("POST - numero_ticket uniqueness", False, 
+                             f"Duplicate numbers found: {numeros}")
+    
+    # Step 4: Test GET /api/tickets - Verify numero_ticket in responses
+    print("\n📋 STEP 4: GET Tickets - numero_ticket in responses")
+    
+    try:
+        response = requests.get(f"{API_BASE}/tickets", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            tickets = response.json()
+            results.add_result("GET - Tickets retrieval", True)
+            
+            if len(tickets) > 0:
+                # Check if all tickets have numero_ticket field
+                tickets_with_numero = [t for t in tickets if 'numero_ticket' in t and t['numero_ticket']]
+                if len(tickets_with_numero) == len(tickets):
+                    results.add_result("GET - All tickets have numero_ticket", True)
+                else:
+                    results.add_result("GET - All tickets have numero_ticket", False, 
+                                     f"{len(tickets_with_numero)}/{len(tickets)} tickets have numero_ticket")
+                
+                # Verify format of numero_ticket in responses
+                valid_format_count = 0
+                for ticket in tickets:
+                    if 'numero_ticket' in ticket:
+                        numero = ticket['numero_ticket']
+                        if len(numero) == 6 and numero.isdigit():
+                            valid_format_count += 1
+                
+                if valid_format_count == len(tickets):
+                    results.add_result("GET - numero_ticket format validation", True)
+                else:
+                    results.add_result("GET - numero_ticket format validation", False, 
+                                     f"{valid_format_count}/{len(tickets)} tickets have valid format")
+            else:
+                results.add_result("GET - Tickets available for testing", False, "No tickets found")
+        else:
+            results.add_result("GET - Tickets retrieval", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Tickets retrieval", False, str(e))
+    
+    # Step 5: Test search by ticket number
+    print("\n📋 STEP 5: Search by Ticket Number")
+    
+    if created_tickets and len(created_tickets) > 0:
+        test_ticket = created_tickets[0]
+        test_numero = test_ticket.get('numero_ticket')
+        
+        if test_numero:
+            # Test exact search
+            try:
+                response = requests.get(f"{API_BASE}/tickets?search={test_numero}", 
+                                      headers=headers, timeout=10)
+                
+                if response.status_code == 200:
+                    search_results = response.json()
+                    results.add_result("GET - Exact number search", True)
+                    
+                    # Verify the ticket is found
+                    found_ticket = any(t.get('numero_ticket') == test_numero for t in search_results)
+                    if found_ticket:
+                        results.add_result("GET - Search result accuracy", True)
+                    else:
+                        results.add_result("GET - Search result accuracy", False, 
+                                         f"Ticket {test_numero} not found in search results")
+                else:
+                    results.add_result("GET - Exact number search", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("GET - Exact number search", False, str(e))
+            
+            # Test partial search (first 3 digits)
+            partial_numero = test_numero[:3]
+            try:
+                response = requests.get(f"{API_BASE}/tickets?search={partial_numero}", 
+                                      headers=headers, timeout=10)
+                
+                if response.status_code == 200:
+                    search_results = response.json()
+                    results.add_result("GET - Partial number search", True)
+                    
+                    # Verify tickets containing the partial number are found
+                    matching_tickets = [t for t in search_results 
+                                      if t.get('numero_ticket') and partial_numero in t['numero_ticket']]
+                    if len(matching_tickets) > 0:
+                        results.add_result("GET - Partial search results", True)
+                    else:
+                        results.add_result("GET - Partial search results", False, 
+                                         f"No tickets found containing {partial_numero}")
+                else:
+                    results.add_result("GET - Partial number search", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("GET - Partial number search", False, str(e))
+    
+    # Step 6: Test combined search and filters
+    print("\n📋 STEP 6: Combined Search and Filters")
+    
+    if created_tickets and len(created_tickets) > 0:
+        test_numero = created_tickets[0].get('numero_ticket')
+        
+        if test_numero:
+            # Test search + status filter
+            try:
+                response = requests.get(f"{API_BASE}/tickets?search={test_numero}&status_filter=nouveau", 
+                                      headers=headers, timeout=10)
+                
+                if response.status_code == 200:
+                    search_results = response.json()
+                    results.add_result("GET - Search + status filter", True)
+                    
+                    # Verify results match both criteria
+                    matching_tickets = [t for t in search_results 
+                                      if t.get('numero_ticket') == test_numero and t.get('status') == 'nouveau']
+                    if len(matching_tickets) > 0:
+                        results.add_result("GET - Combined filter accuracy", True)
+                    else:
+                        results.add_result("GET - Combined filter accuracy", False, 
+                                         "No tickets match both search and status criteria")
+                else:
+                    results.add_result("GET - Search + status filter", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("GET - Search + status filter", False, str(e))
+            
+            # Test search + client filter
+            try:
+                response = requests.get(f"{API_BASE}/tickets?search={test_numero}&client_id={test_client_id}", 
+                                      headers=headers, timeout=10)
+                
+                if response.status_code == 200:
+                    search_results = response.json()
+                    results.add_result("GET - Search + client filter", True)
+                    
+                    # Verify results match both criteria
+                    matching_tickets = [t for t in search_results 
+                                      if t.get('numero_ticket') == test_numero and t.get('client_id') == test_client_id]
+                    if len(matching_tickets) > 0:
+                        results.add_result("GET - Search + client filter accuracy", True)
+                    else:
+                        results.add_result("GET - Search + client filter accuracy", False, 
+                                         "No tickets match both search and client criteria")
+                else:
+                    results.add_result("GET - Search + client filter", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("GET - Search + client filter", False, str(e))
+    
+    # Step 7: Test PUT /api/tickets - Verify numero_ticket preservation
+    print("\n📋 STEP 7: PUT Tickets - numero_ticket preservation")
+    
+    if created_tickets and len(created_tickets) > 0:
+        test_ticket = created_tickets[0]
+        original_numero = test_ticket.get('numero_ticket')
+        ticket_id = test_ticket.get('id')
+        
+        if original_numero and ticket_id:
+            update_data = {
+                "titre": "Updated ticket title",
+                "status": "en_cours"
+            }
+            
+            try:
+                response = requests.put(f"{API_BASE}/tickets/{ticket_id}", 
+                                      headers=headers, json=update_data, timeout=10)
+                
+                if response.status_code == 200:
+                    updated_ticket = response.json()
+                    results.add_result("PUT - Ticket update", True)
+                    
+                    # Verify numero_ticket is preserved
+                    if updated_ticket.get('numero_ticket') == original_numero:
+                        results.add_result("PUT - numero_ticket preservation", True)
+                    else:
+                        results.add_result("PUT - numero_ticket preservation", False, 
+                                         f"numero_ticket changed from {original_numero} to {updated_ticket.get('numero_ticket')}")
+                else:
+                    results.add_result("PUT - Ticket update", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("PUT - Ticket update", False, str(e))
+    
+    # Step 8: Test with demandeur user (if available)
+    print("\n📋 STEP 8: Demandeur User Tests")
+    
+    if demandeur_token:
+        demandeur_headers = {
+            "Authorization": f"Bearer {demandeur_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Test GET tickets as demandeur
+        try:
+            response = requests.get(f"{API_BASE}/tickets", headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 200:
+                tickets = response.json()
+                results.add_result("GET - Demandeur tickets access", True)
+                
+                # Verify numero_ticket is included for demandeur
+                if len(tickets) > 0:
+                    tickets_with_numero = [t for t in tickets if 'numero_ticket' in t and t['numero_ticket']]
+                    if len(tickets_with_numero) == len(tickets):
+                        results.add_result("GET - Demandeur numero_ticket included", True)
+                    else:
+                        results.add_result("GET - Demandeur numero_ticket included", False, 
+                                         f"{len(tickets_with_numero)}/{len(tickets)} tickets have numero_ticket")
+                else:
+                    results.add_result("GET - Demandeur numero_ticket included", True, "No tickets to verify")
+            else:
+                results.add_result("GET - Demandeur tickets access", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("GET - Demandeur tickets access", False, str(e))
+        
+        # Test search as demandeur
+        if created_tickets and len(created_tickets) > 0:
+            test_numero = created_tickets[0].get('numero_ticket')
+            if test_numero:
+                try:
+                    response = requests.get(f"{API_BASE}/tickets?search={test_numero}", 
+                                          headers=demandeur_headers, timeout=10)
+                    
+                    if response.status_code == 200:
+                        search_results = response.json()
+                        results.add_result("GET - Demandeur search functionality", True)
+                    else:
+                        results.add_result("GET - Demandeur search functionality", False, 
+                                         f"Status: {response.status_code}")
+                except Exception as e:
+                    results.add_result("GET - Demandeur search functionality", False, str(e))
+    
+    # Step 9: Test edge cases
+    print("\n📋 STEP 9: Edge Cases")
+    
+    # Test search with non-existent number
+    try:
+        response = requests.get(f"{API_BASE}/tickets?search=999999", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            search_results = response.json()
+            results.add_result("GET - Non-existent number search", True)
+            
+            if len(search_results) == 0:
+                results.add_result("GET - Empty search results handling", True)
+            else:
+                results.add_result("GET - Empty search results handling", False, 
+                                 f"Expected empty results, got {len(search_results)} tickets")
+        else:
+            results.add_result("GET - Non-existent number search", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Non-existent number search", False, str(e))
+    
+    # Test search with invalid format
+    try:
+        response = requests.get(f"{API_BASE}/tickets?search=abc123", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            results.add_result("GET - Invalid format search", True)
+        else:
+            results.add_result("GET - Invalid format search", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Invalid format search", False, str(e))
+    
+    # Cleanup: Delete created test tickets
+    print("\n📋 STEP 10: Cleanup")
+    
+    for i, ticket in enumerate(created_tickets):
+        if 'id' in ticket:
+            try:
+                response = requests.delete(f"{API_BASE}/tickets/{ticket['id']}", 
+                                         headers=headers, timeout=10)
+                if response.status_code == 200:
+                    results.add_result(f"DELETE - Cleanup ticket {i+1}", True)
+                else:
+                    results.add_result(f"DELETE - Cleanup ticket {i+1}", False, 
+                                     f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result(f"DELETE - Cleanup ticket {i+1}", False, str(e))
+    
+    return results.summary()
+
 if __name__ == "__main__":
     print("🧪 Backend API Testing - Support Ticket Management System")
     print("=" * 60)
     
-    # Test clients pagination and search functionality
+    # Test tickets numero_ticket and search functionality
     print("\n" + "="*60)
-    print("TESTING: Clients API Pagination & Search")
+    print("TESTING: Tickets API numero_ticket & Search")
     print("="*60)
-    clients_success = test_clients_pagination_search_api()
+    tickets_success = test_tickets_numero_and_search_api()
     
-    if clients_success:
-        print("\n🎉 All clients API tests passed!")
+    if tickets_success:
+        print("\n🎉 All tickets API tests passed!")
     else:
-        print("\n💥 Some clients API tests failed!")
+        print("\n💥 Some tickets API tests failed!")
     
     # Overall result
-    if clients_success:
+    if tickets_success:
         print("\n🎉 All backend tests passed!")
         sys.exit(0)
     else:
