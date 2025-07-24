@@ -513,7 +513,7 @@ const TicketsPage = () => {
       {/* Modal de visualisation */}
       {showViewModal && viewingTicket && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
-          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-3xl modal-content max-h-90vh overflow-y-auto">
+          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-4xl modal-content max-h-90vh overflow-y-auto">
             <div className="flex justify-between items-start mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-dark-text">
                 Détail du Ticket
@@ -526,15 +526,16 @@ const TicketsPage = () => {
               </button>
             </div>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
-                  {viewingTicket.titre}
-                </h3>
-                {getStatusBadge(viewingTicket.status)}
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Informations du ticket */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
+                    {viewingTicket.titre}
+                  </h3>
+                  {getStatusBadge(viewingTicket.status)}
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
@@ -553,9 +554,7 @@ const TicketsPage = () => {
                       {viewingTicket.demandeur_prenom} {viewingTicket.demandeur_nom}
                     </p>
                   </div>
-                </div>
 
-                <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
                       Date de création
@@ -576,17 +575,84 @@ const TicketsPage = () => {
                     </div>
                   )}
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+                    Requête initiale
+                  </label>
+                  <div className="bg-gray-50 dark:bg-dark-card p-4 rounded-lg">
+                    <p className="text-gray-900 dark:text-dark-text whitespace-pre-wrap">
+                      {viewingTicket.requete_initiale}
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
-                  Requête initiale
-                </label>
-                <div className="bg-gray-50 dark:bg-dark-card p-4 rounded-lg">
-                  <p className="text-gray-900 dark:text-dark-text whitespace-pre-wrap">
-                    {viewingTicket.requete_initiale}
-                  </p>
+              {/* Section commentaires/échanges */}
+              <div className="flex flex-col h-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-4">
+                  Échanges et commentaires
+                </h3>
+                
+                {/* Liste des commentaires */}
+                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg p-4 mb-4 max-h-96 overflow-y-auto">
+                  {loadingComments ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                    </div>
+                  ) : viewingTicketEchanges.length > 0 ? (
+                    <div className="space-y-4">
+                      {viewingTicketEchanges.map((echange) => (
+                        <div key={echange.id} className="border-b border-gray-200 dark:border-dark-border pb-3 last:border-b-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-medium text-gray-900 dark:text-dark-text">
+                              {echange.auteur_nom}
+                            </span>
+                            <div className="flex items-center space-x-2">
+                              <span className={`text-xs px-2 py-1 rounded ${
+                                echange.auteur_type === 'agent' 
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
+                                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                              }`}>
+                                {echange.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
+                              </span>
+                              <span className="text-xs text-gray-500 dark:text-dark-muted">
+                                {format(new Date(echange.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-gray-700 dark:text-dark-text whitespace-pre-wrap">
+                            {echange.message}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 dark:text-dark-muted text-center py-8">
+                      Aucun commentaire pour ce ticket
+                    </p>
+                  )}
                 </div>
+
+                {/* Formulaire d'ajout de commentaire */}
+                <form onSubmit={handleAddComment} className="space-y-3">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Ajouter un commentaire..."
+                    className="input h-24 resize-none"
+                    required
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="btn-primary"
+                      disabled={!newComment.trim()}
+                    >
+                      Ajouter le commentaire
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
