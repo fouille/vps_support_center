@@ -160,6 +160,27 @@ const ClientsPage = () => {
         </button>
       </div>
 
+      {/* Zone de recherche */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Rechercher un client..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="input pl-10 w-full"
+          />
+        </div>
+        {searchTerm && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            {pagination.total} résultat{pagination.total > 1 ? 's' : ''} pour "{searchTerm}"
+          </p>
+        )}
+      </div>
+
       {error && (
         <div className="mb-4 flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
