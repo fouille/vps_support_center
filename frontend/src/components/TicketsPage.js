@@ -58,7 +58,11 @@ const TicketsPage = () => {
     }
   }, [isAgent, statusFilter, clientFilter]); // Refetch when filters change
 
-  const fetchTickets = async () => {
+  const fetchTickets = async (showLoader = false) => {
+    if (showLoader) {
+      setRefreshingTickets(true);
+    }
+    
     try {
       // Construire les paramètres de filtrage pour les agents
       let params = {};
@@ -89,6 +93,9 @@ const TicketsPage = () => {
       setError('Erreur lors du chargement des tickets');
     } finally {
       setLoading(false);
+      if (showLoader) {
+        setRefreshingTickets(false);
+      }
     }
   };
 
