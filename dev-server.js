@@ -217,7 +217,125 @@ app.post('/api/agents', verifyToken, async (req, res) => {
 
 // Tickets endpoints
 app.get('/api/tickets', (req, res) => {
+  // Add some mock tickets for testing
+  if (mockDB.tickets.length === 0) {
+    const testTicket = {
+      id: uuidv4(),
+      titre: 'Test Ticket',
+      client_id: uuidv4(),
+      demandeur_id: uuidv4(),
+      agent_id: mockDB.agents[0].id,
+      status: 'nouveau',
+      date_creation: new Date().toISOString(),
+      requete_initiale: 'Test ticket for comment testing'
+    };
+    mockDB.tickets.push(testTicket);
+    
+    // Add mock ticket_echanges
+    mockDB.ticket_echanges = [
+      {
+        id: uuidv4(),
+        ticket_id: testTicket.id,
+        auteur_id: mockDB.agents[0].id,
+        auteur_type: 'agent',
+        message: 'Initial comment from agent',
+        created_at: new Date().toISOString(),
+        auteur_nom: 'ADMIN Franck'
+      }
+    ];
+  }
   res.json(mockDB.tickets);
+});
+
+// Ticket-echanges endpoints
+app.get('/api/ticket-echanges', verifyToken, (req, res) => {
+  const ticketId = req.query.ticketId;
+  
+  if (!ticketId) {
+    return res.status(400).json({ detail: 'Paramètre ticketId manquant' });
+  }
+
+  // Initialize mock data if not exists
+  if (!mockDB.ticket_echanges) {
+    mockDB.ticket_echanges = [];
+  }
+
+  // Get exchanges for the ticket
+  const echanges = mockDB.ticket_echanges
+    .filter(e => e.ticket_id === ticketId)
+    .map(e => {
+      // Add author name based on type
+      let auteur_nom = 'Unknown';
+      if (e.auteur_type === 'agent') {
+        const agent = mockDB.agents.find(a => a.id === e.auteur_id);
+        if (agent) auteur_nom = `${agent.nom} ${agent.prenom}`;
+      } else if (e.auteur_type === 'demandeur') {
+        const demandeur = mockDB.demandeurs.find(d => d.id === e.auteur_id);
+        if (demandeur) auteur_nom = `${demandeur.nom} ${demandeur.prenom}`;
+      }
+      
+      return { ...e, auteur_nom };
+    })
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  res.json(echanges);
+});
+
+app.post('/api/ticket-echanges', verifyToken, (req, res) => {
+  const ticketId = req.query.ticketId;
+  
+  if (!ticketId) {
+    return res.status(400).json({ detail: 'Paramètre ticketId manquant' });
+  }
+
+  const { message } = req.body;
+  
+  if (!message || !message.trim()) {
+    return res.status(400).json({ detail: 'Le message ne peut pas être vide' });
+  }
+
+  // Initialize mock data if not exists
+  if (!mockDB.ticket_echanges) {
+    mockDB.ticket_echanges = [];
+  }
+
+  // Get user info based on token
+  let auteurId, auteurType, auteur_nom;
+  
+  if (req.user.type === 'agent') {
+    const agent = mockDB.agents.find(a => a.email === req.user.sub);
+    if (!agent) {
+      return res.status(404).json({ detail: 'Agent non trouvé' });
+    }
+    auteurId = agent.id;
+    auteurType = 'agent';
+    auteur_nom = `${agent.nom} ${agent.prenom}`;
+  } else if (req.user.type === 'demandeur') {
+    const demandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    if (!demandeur) {
+      return res.status(404).json({ detail: 'Demandeur non trouvé' });
+    }
+    auteurId = demandeur.id;
+    auteurType = 'demandeur';
+    auteur_nom = `${demandeur.nom} ${demandeur.prenom}`;
+  } else {
+    return res.status(403).json({ detail: 'Type d\'utilisateur non autorisé' });
+  }
+
+  // Create new exchange
+  const newEchange = {
+    id: uuidv4(),
+    ticket_id: ticketId,
+    auteur_id: auteurId,
+    auteur_type: auteurType,
+    message: message.trim(),
+    created_at: new Date().toISOString(),
+    auteur_nom
+  };
+
+  mockDB.ticket_echanges.push(newEchange);
+  
+  res.status(201).json(newEchange);
 });
 
 app.listen(PORT, () => {
