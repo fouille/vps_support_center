@@ -124,3 +124,93 @@
 .status-ferme {
   @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300;
 }
+
+/* Styles pour le scroll personnalisé des commentaires */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300 {
+  scrollbar-color: rgb(209 213 219) transparent;
+}
+
+.dark .scrollbar-thumb-gray-600 {
+  scrollbar-color: rgb(75 85 99) transparent;
+}
+
+.scrollbar-track-transparent {
+  scrollbar-color: transparent transparent;
+}
+
+/* Webkit scrollbar styling for better cross-browser support */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(209 213 219);
+  border-radius: 3px;
+  border: none;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(75 85 99);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(156 163 175);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107 114 128);
+}
+
+/* Animation pour les nouveaux commentaires */
+.animate-fade-in {
+  animation: commentFadeIn 0.5s ease-in-out;
+}
+
+@keyframes commentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    scale: 0.95;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    scale: 1;
+  }
+}
+
+/* Styles pour le compteur de caractères */
+.character-counter {
+  transition: color 0.2s ease-in-out;
+}
+
+.character-counter.warning {
+  color: rgb(234 179 8);
+}
+
+.character-counter.danger {
+  color: rgb(239 68 68);
+}
+
+/* Amélioration du focus pour l'accessibilité */
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Style pour les avatars des commentaires */
+.comment-avatar {
+  transition: transform 0.2s ease-in-out;
+}
+
+.comment-avatar:hover {
+  transform: scale(1.05);
+}
