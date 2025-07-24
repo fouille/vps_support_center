@@ -282,36 +282,169 @@ app.post('/api/agents', verifyToken, async (req, res) => {
   res.status(201).json(response);
 });
 
+// Function to generate unique 6-digit ticket number
+const generateTicketNumber = () => {
+  let numero;
+  let attempts = 0;
+  do {
+    numero = Math.floor(100000 + Math.random() * 900000).toString();
+    attempts++;
+    if (attempts > 100) break; // Prevent infinite loop
+  } while (mockDB.tickets.some(t => t.numero_ticket === numero));
+  return numero;
+};
+
 // Tickets endpoints
-app.get('/api/tickets', (req, res) => {
-  // Add some mock tickets for testing
-  if (mockDB.tickets.length === 0) {
-    const testTicket = {
-      id: uuidv4(),
-      titre: 'Test Ticket',
-      client_id: uuidv4(),
-      demandeur_id: uuidv4(),
-      agent_id: mockDB.agents[0].id,
-      status: 'nouveau',
-      date_creation: new Date().toISOString(),
-      requete_initiale: 'Test ticket for comment testing'
-    };
-    mockDB.tickets.push(testTicket);
+app.get('/api/tickets', verifyToken, (req, res) => {
+  try {
+    // Parse query parameters for filtering
+    const statusFilter = req.query.status_filter;
+    const clientIdFilter = req.query.client_id;
+    const searchFilter = req.query.search; // New parameter for ticket number search
     
-    // Add mock ticket_echanges
-    mockDB.ticket_echanges = [
-      {
-        id: uuidv4(),
-        ticket_id: testTicket.id,
-        auteur_id: mockDB.agents[0].id,
-        auteur_type: 'agent',
-        message: 'Initial comment from agent',
-        created_at: new Date().toISOString(),
-        auteur_nom: 'ADMIN Franck'
-      }
-    ];
+    let filteredTickets = mockDB.tickets;
+    
+    // Apply filters
+    if (statusFilter) {
+      const statuses = statusFilter.split(',');
+      filteredTickets = filteredTickets.filter(t => statuses.includes(t.status));
+    }
+    
+    if (clientIdFilter) {
+      filteredTickets = filteredTickets.filter(t => t.client_id === clientIdFilter);
+    }
+    
+    if (searchFilter) {
+      filteredTickets = filteredTickets.filter(t => 
+        t.numero_ticket && t.numero_ticket.includes(searchFilter)
+      );
+    }
+    
+    // Add client and demandeur information to tickets
+    const enrichedTickets = filteredTickets.map(ticket => {
+      const client = mockDB.clients.find(c => c.id === ticket.client_id);
+      const demandeur = mockDB.demandeurs.find(d => d.id === ticket.demandeur_id);
+      const agent = mockDB.agents.find(a => a.id === ticket.agent_id);
+      
+      return {
+        ...ticket,
+        client_nom: client?.nom_societe || 'Unknown Client',
+        client_nom_personne: client?.nom || null,
+        client_prenom: client?.prenom || null,
+        demandeur_nom: demandeur?.nom || 'Unknown',
+        demandeur_prenom: demandeur?.prenom || 'Unknown',
+        demandeur_societe: demandeur?.societe || 'Unknown',
+        agent_nom: agent?.nom || null,
+        agent_prenom: agent?.prenom || null
+      };
+    });
+    
+    // Sort by creation date (newest first)
+    enrichedTickets.sort((a, b) => new Date(b.date_creation) - new Date(a.date_creation));
+    
+    res.json(enrichedTickets);
+  } catch (error) {
+    console.error('Tickets GET error:', error);
+    res.status(500).json({ detail: 'Erreur serveur: ' + error.message });
   }
-  res.json(mockDB.tickets);
+});
+
+app.post('/api/tickets', verifyToken, (req, res) => {
+  try {
+    const { titre, client_id, status = 'nouveau', date_fin_prevue, requete_initiale, demandeur_id } = req.body;
+    
+    if (!titre || !client_id || !requete_initiale) {
+      return res.status(400).json({ detail: 'Titre, client et requête initiale sont requis' });
+    }
+
+    let finalDemandeurId;
+
+    if (req.user.type === 'demandeur') {
+      // For demandeurs, use their own ID
+      const demandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+      if (!demandeur) {
+        return res.status(404).json({ detail: 'Demandeur non trouvé' });
+      }
+      finalDemandeurId = demandeur.id;
+    } else if (req.user.type === 'agent') {
+      // For agents, they must specify a demandeur_id
+      if (!demandeur_id) {
+        return res.status(400).json({ detail: 'Un agent doit spécifier un demandeur pour le ticket' });
+      }
+      finalDemandeurId = demandeur_id;
+    } else {
+      return res.status(403).json({ detail: 'Type d\'utilisateur non autorisé' });
+    }
+
+    // Generate unique ticket number
+    const numero_ticket = generateTicketNumber();
+
+    const newTicket = {
+      id: uuidv4(),
+      numero_ticket,
+      titre,
+      client_id,
+      demandeur_id: finalDemandeurId,
+      status,
+      date_fin_prevue: date_fin_prevue || null,
+      requete_initiale,
+      date_creation: new Date().toISOString(),
+      agent_id: null,
+      date_cloture: null
+    };
+
+    mockDB.tickets.push(newTicket);
+    
+    console.log('Ticket created:', newTicket);
+    res.status(201).json(newTicket);
+  } catch (error) {
+    console.error('Tickets POST error:', error);
+    res.status(500).json({ detail: 'Erreur serveur: ' + error.message });
+  }
+});
+
+app.put('/api/tickets/:id', verifyToken, (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const { titre, status, agent_id, date_fin_prevue, date_cloture } = req.body;
+    
+    const ticketIndex = mockDB.tickets.findIndex(t => t.id === ticketId);
+    if (ticketIndex === -1) {
+      return res.status(404).json({ detail: 'Ticket non trouvé' });
+    }
+    
+    // Update ticket while preserving numero_ticket
+    mockDB.tickets[ticketIndex] = {
+      ...mockDB.tickets[ticketIndex],
+      titre: titre || mockDB.tickets[ticketIndex].titre,
+      status: status || mockDB.tickets[ticketIndex].status,
+      agent_id: agent_id !== undefined ? agent_id : mockDB.tickets[ticketIndex].agent_id,
+      date_fin_prevue: date_fin_prevue !== undefined ? date_fin_prevue : mockDB.tickets[ticketIndex].date_fin_prevue,
+      date_cloture: date_cloture !== undefined ? date_cloture : mockDB.tickets[ticketIndex].date_cloture
+    };
+    
+    res.json(mockDB.tickets[ticketIndex]);
+  } catch (error) {
+    console.error('Tickets PUT error:', error);
+    res.status(500).json({ detail: 'Erreur serveur: ' + error.message });
+  }
+});
+
+app.delete('/api/tickets/:id', verifyToken, (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const ticketIndex = mockDB.tickets.findIndex(t => t.id === ticketId);
+    
+    if (ticketIndex === -1) {
+      return res.status(404).json({ detail: 'Ticket non trouvé' });
+    }
+    
+    mockDB.tickets.splice(ticketIndex, 1);
+    res.json({ message: 'Ticket supprimé avec succès' });
+  } catch (error) {
+    console.error('Tickets DELETE error:', error);
+    res.status(500).json({ detail: 'Erreur serveur: ' + error.message });
+  }
 });
 
 // Ticket-echanges endpoints
