@@ -35,7 +35,8 @@ const mockDB = {
     }
   ],
   clients: [],
-  tickets: []
+  tickets: [],
+  ticket_echanges: []
 };
 
 // JWT Secret
