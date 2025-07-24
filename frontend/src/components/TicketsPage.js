@@ -511,7 +511,7 @@ const TicketsPage = () => {
       </div>
 
       {/* Filtres pour les agents ET demandeurs */}
-      <div className="mb-6 flex space-x-4 items-center">
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
             Statut des tickets
@@ -519,7 +519,7 @@ const TicketsPage = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="input w-48"
+            className="input w-full"
           >
             <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
             <option value="all">Tous les tickets</option>
@@ -535,12 +535,38 @@ const TicketsPage = () => {
             value={clientFilter}
             onChange={setClientFilter}
             placeholder="Tous les clients"
-            className="w-64"
+            className="w-full"
             displayKey="label"
             valueKey="value"
             searchKeys={["label", "subtitle", "searchText"]}
             emptyMessage="Aucun client trouvé"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Rechercher par numéro
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Ex: 123456"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              className="input w-full pr-10"
+              maxLength={6}
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+          {searchFilter && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Recherche par numéro de ticket
+            </p>
+          )}
         </div>
       </div>
 
