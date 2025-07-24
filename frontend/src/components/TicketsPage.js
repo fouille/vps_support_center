@@ -187,6 +187,8 @@ const TicketsPage = () => {
   const handleCloseViewModal = () => {
     setShowViewModal(false);
     setViewingTicket(null);
+    setViewingTicketEchanges([]);
+    setNewComment('');
   };
 
   const getStatusBadge = (status) => {
