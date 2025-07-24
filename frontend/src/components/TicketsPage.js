@@ -260,6 +260,7 @@ const TicketsPage = () => {
       'nouveau': 'status-nouveau',
       'en_cours': 'status-en-cours',
       'en_attente': 'status-en-attente',
+      'repondu': 'status-repondu',
       'resolu': 'status-resolu',
       'ferme': 'status-ferme'
     };
@@ -268,6 +269,7 @@ const TicketsPage = () => {
       'nouveau': 'Nouveau',
       'en_cours': 'En cours',
       'en_attente': 'En attente',
+      'repondu': 'Répondu',
       'resolu': 'Résolu',
       'ferme': 'Fermé'
     };
