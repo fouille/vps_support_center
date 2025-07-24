@@ -704,7 +704,14 @@ const TicketsPage = () => {
                         required
                         maxLength={1000}
                       />
-                      <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500">
+                      <div className={`absolute bottom-2 right-2 text-xs ${
+                        newComment.length > 900 ? 'text-red-500' : 
+                        newComment.length > 800 ? 'text-yellow-500' : 
+                        'text-gray-400 dark:text-gray-500'
+                      } character-counter ${
+                        newComment.length > 900 ? 'danger' : 
+                        newComment.length > 800 ? 'warning' : ''
+                      }`}>
                         {newComment.length}/1000
                       </div>
                     </div>
