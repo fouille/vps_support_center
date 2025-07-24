@@ -173,6 +173,7 @@ Les variables suivantes doivent être configurées dans votre dashboard Netlify 
 ### Compte administrateur par défaut
 - **Email** : admin@voipservices.fr
 - **Mot de passe** : admin1234!
+- **Nom** : Franck ADMIN
 
 ## Déploiement sur Netlify
 
