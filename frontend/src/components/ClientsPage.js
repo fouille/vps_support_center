@@ -198,8 +198,13 @@ const ClientsPage = () => {
             placeholder="Rechercher un client (min. 3 caractères)..."
             value={searchInput}
             onChange={handleSearchChange}
-            className="input pl-10 w-full"
+            className="input pl-10 pr-10 w-full"
           />
+          {isSearching && (
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+            </div>
+          )}
         </div>
         {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
           <p className="text-sm text-orange-500 dark:text-orange-400 mt-2">
