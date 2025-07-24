@@ -157,9 +157,9 @@ VALUES ('TechCorp SARL', '123 Avenue des Champs, 75008 Paris', 'Dupont', 'Jean')
 ON CONFLICT DO NOTHING;
 
 -- Insertion de l'utilisateur admin par défaut
--- Mot de passe : admin1234! (hashé avec bcrypt, coût 12)
+-- Mot de passe : admin1234! (hashé avec bcrypt, coût 10)
 INSERT INTO agents (nom, prenom, email, password, societe)
-VALUES ('ADMIN', 'Franck', 'admin@voipservices.fr', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYq.9mXR8Xt1n4u', 'VoIP Services')
+VALUES ('ADMIN', 'Franck', 'admin@voipservices.fr', '$2a$10$dmRNBo8wCcE3.5HCGMf3Le/tTIUcwdLDaSLtugn/JZFq9GwHcF/We', 'VoIP Services')
 ON CONFLICT (email) DO NOTHING;
 ```
 
