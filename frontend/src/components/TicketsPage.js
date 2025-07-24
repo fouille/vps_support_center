@@ -38,6 +38,9 @@ const TicketsPage = () => {
   useEffect(() => {
     fetchTickets();
     fetchClients(); // Les clients sont nécessaires pour tous les utilisateurs qui créent des tickets
+    if (isAgent) {
+      fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
+    }
   }, [isAgent]);
 
   const fetchTickets = async () => {
@@ -57,6 +60,15 @@ const TicketsPage = () => {
       setClients(response.data);
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
+    }
+  };
+
+  const fetchDemandeurs = async () => {
+    try {
+      const response = await api.get('/api/demandeurs');
+      setDemandeurs(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des demandeurs:', error);
     }
   };
 
