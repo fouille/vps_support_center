@@ -214,3 +214,81 @@
 .comment-avatar:hover {
   transform: scale(1.05);
 }
+
+/* Styles pour les bulles de messages de style chat */
+.message-bubble-agent {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.message-bubble-user {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dark .message-bubble-user {
+  background: linear-gradient(135deg, #374151, #4b5563);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation pour les nouvelles bulles de messages */
+.animate-message-in {
+  animation: messageSlideIn 0.4s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Styles pour le sélecteur d'émojis */
+.emoji-picker {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.dark .emoji-picker {
+  background: rgba(55, 65, 81, 0.95);
+}
+
+.emoji-button {
+  transition: all 0.15s ease-in-out;
+}
+
+.emoji-button:hover {
+  transform: scale(1.2);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Amélioration de l'indicateur de scroll pour le chat */
+.chat-scroll-indicator {
+  animation: pulse 2s infinite;
+  opacity: 0.7;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive design pour les bulles de messages */
+@media (max-width: 640px) {
+  .message-bubble-container {
+    max-width: 85%;
+  }
+}
+
+/* Style pour la barre de séparation du chat */
+.chat-divider {
+  background: linear-gradient(90deg, transparent, rgba(156, 163, 175, 0.3), transparent);
+}
