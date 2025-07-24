@@ -1067,8 +1067,9 @@ const TicketsPage = () => {
                         className="input h-20 resize-none pr-12 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         required
                         maxLength={1000}
+                        disabled={sendingComment}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
+                          if (e.key === 'Enter' && !e.shiftKey && !sendingComment) {
                             e.preventDefault();
                             handleAddComment(e);
                           }
