@@ -1,9 +1,9 @@
-import { neon } from '@netlify/neon';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
+const { neon } = require('@netlify/neon');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { v4: uuidv4 } = require('uuid');
 
-const sql = neon();
+const sql = neon(process.env.NETLIFY_DATABASE_URL);
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -18,41 +18,46 @@ const verifyToken = (authHeader) => {
   }
   
   const token = authHeader.substring(7);
-  return jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here');
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
 };
 
-export default async (req, context) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+exports.handler = async (event, context) => {
+  console.log('Agents function called:', event.httpMethod, event.path);
+  
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers };
   }
 
   try {
     // Verify authentication
-    const authHeader = req.headers.get('authorization');
+    const authHeader = event.headers.authorization || event.headers.Authorization;
     verifyToken(authHeader);
 
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
+    const pathParts = event.path.split('/');
     const agentId = pathParts[pathParts.length - 1];
 
-    switch (req.method) {
+    switch (event.httpMethod) {
       case 'GET':
+        console.log('Getting agents...');
         const agents = await sql`
           SELECT id, email, nom, prenom, societe, NULL as telephone, 'agent' as type_utilisateur 
           FROM agents 
           ORDER BY nom, prenom
         `;
-        return new Response(JSON.stringify(agents), { status: 200, headers });
+        console.log('Agents found:', agents.length);
+        return { statusCode: 200, headers, body: JSON.stringify(agents) };
 
       case 'POST':
-        const newAgent = await req.json();
+        console.log('Creating agent...');
+        const newAgent = JSON.parse(event.body);
         const { nom, prenom, societe, email, password } = newAgent;
         
         if (!nom || !prenom || !societe || !email || !password) {
-          return new Response(JSON.stringify({ detail: 'Tous les champs obligatoires doivent être remplis' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Tous les champs obligatoires doivent être remplis' })
+          };
         }
 
         // Check if email already exists
@@ -63,10 +68,11 @@ export default async (req, context) => {
         `;
         
         if (existingUser.length > 0) {
-          return new Response(JSON.stringify({ detail: 'Cet email est déjà utilisé' }), {
-            status: 400,
+          return {
+            statusCode: 400,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Cet email est déjà utilisé' })
+          };
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -74,12 +80,20 @@ export default async (req, context) => {
         const createdAgent = await sql`
           INSERT INTO agents (id, nom, prenom, societe, email, password)
           VALUES (${uuidv4()}, ${nom}, ${prenom}, ${societe}, ${email}, ${hashedPassword})
-          RETURNING id, email, nom, prenom, societe, NULL as telephone, 'agent' as type_utilisateur
+          RETURNING id, email, nom, prenom, societe
         `;
-        return new Response(JSON.stringify(createdAgent[0]), { status: 201, headers });
+        
+        const responseAgent = {
+          ...createdAgent[0],
+          telephone: null,
+          type_utilisateur: 'agent'
+        };
+        
+        console.log('Agent created:', responseAgent);
+        return { statusCode: 201, headers, body: JSON.stringify(responseAgent) };
 
       case 'PUT':
-        const updateData = await req.json();
+        const updateData = JSON.parse(event.body);
         const { nom: upd_nom, prenom: upd_prenom, societe: upd_societe, email: upd_email, password: upd_password } = updateData;
         
         const hashedNewPassword = await bcrypt.hash(upd_password, 10);
@@ -89,50 +103,61 @@ export default async (req, context) => {
           SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
               email = ${upd_email}, password = ${hashedNewPassword}
           WHERE id = ${agentId}
-          RETURNING id, email, nom, prenom, societe, NULL as telephone, 'agent' as type_utilisateur
+          RETURNING id, email, nom, prenom, societe
         `;
         
         if (updatedAgent.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Agent non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Agent non trouvé' })
+          };
         }
-        return new Response(JSON.stringify(updatedAgent[0]), { status: 200, headers });
+        
+        const responseUpdatedAgent = {
+          ...updatedAgent[0],
+          telephone: null,
+          type_utilisateur: 'agent'
+        };
+        
+        return { statusCode: 200, headers, body: JSON.stringify(responseUpdatedAgent) };
 
       case 'DELETE':
-        const deletedAgent = await sql`
-          DELETE FROM agents WHERE id = ${agentId} RETURNING id
-        `;
+        const deletedAgent = await sql`DELETE FROM agents WHERE id = ${agentId} RETURNING id`;
         
         if (deletedAgent.length === 0) {
-          return new Response(JSON.stringify({ detail: 'Agent non trouvé' }), {
-            status: 404,
+          return {
+            statusCode: 404,
             headers,
-          });
+            body: JSON.stringify({ detail: 'Agent non trouvé' })
+          };
         }
-        return new Response(JSON.stringify({ message: 'Agent supprimé avec succès' }), {
-          status: 200,
+        return {
+          statusCode: 200,
           headers,
-        });
+          body: JSON.stringify({ message: 'Agent supprimé avec succès' })
+        };
 
       default:
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-          status: 405,
+        return {
+          statusCode: 405,
           headers,
-        });
+          body: JSON.stringify({ error: 'Method not allowed' })
+        };
     }
   } catch (error) {
     console.error('Agents API error:', error);
     if (error.name === 'JsonWebTokenError') {
-      return new Response(JSON.stringify({ detail: 'Token invalide' }), {
-        status: 401,
+      return {
+        statusCode: 401,
         headers,
-      });
+        body: JSON.stringify({ detail: 'Token invalide' })
+      };
     }
-    return new Response(JSON.stringify({ detail: 'Erreur serveur' }), {
-      status: 500,
+    return {
+      statusCode: 500,
       headers,
-    });
+      body: JSON.stringify({ detail: 'Erreur serveur: ' + error.message })
+    };
   }
 };
