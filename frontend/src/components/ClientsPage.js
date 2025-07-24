@@ -32,6 +32,22 @@ const ClientsPage = () => {
     fetchClients();
   }, [currentPage, searchTerm]);
 
+  // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Déclencher la recherche seulement si au moins 3 caractères ou si vide (pour reset)
+      if (searchInput.length >= 3 || searchInput.length === 0) {
+        setSearchTerm(searchInput);
+        // Remettre à la page 1 lors d'une nouvelle recherche
+        if (currentPage !== 1) {
+          setCurrentPage(1);
+        }
+      }
+    }, 1000); // Temporisation de 1 seconde
+
+    return () => clearTimeout(timer);
+  }, [searchInput, currentPage]);
+
   useEffect(() => {
     // Reset to page 1 when search term changes
     if (currentPage !== 1 && searchTerm) {
