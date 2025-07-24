@@ -106,7 +106,55 @@ const verifyToken = (req, res, next) => {
 
 // Clients endpoints
 app.get('/api/clients', verifyToken, (req, res) => {
-  res.json(mockDB.clients);
+  // Paramètres de pagination et recherche
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || '';
+  const offset = (page - 1) * limit;
+
+  let filteredClients = mockDB.clients;
+
+  // Ajouter la recherche si présente
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredClients = mockDB.clients.filter(client => {
+      return (
+        (client.nom_societe && client.nom_societe.toLowerCase().includes(searchLower)) ||
+        (client.nom && client.nom.toLowerCase().includes(searchLower)) ||
+        (client.prenom && client.prenom.toLowerCase().includes(searchLower)) ||
+        (client.numero && client.numero.toLowerCase().includes(searchLower))
+      );
+    });
+  }
+
+  // Trier les résultats
+  filteredClients.sort((a, b) => {
+    if (a.nom_societe < b.nom_societe) return -1;
+    if (a.nom_societe > b.nom_societe) return 1;
+    if ((a.nom || '') < (b.nom || '')) return -1;
+    if ((a.nom || '') > (b.nom || '')) return 1;
+    if ((a.prenom || '') < (b.prenom || '')) return -1;
+    if ((a.prenom || '') > (b.prenom || '')) return 1;
+    return 0;
+  });
+
+  // Appliquer la pagination
+  const total = filteredClients.length;
+  const totalPages = Math.ceil(total / limit);
+  const paginatedClients = filteredClients.slice(offset, offset + limit);
+
+  // Retourner la structure attendue
+  res.json({
+    data: paginatedClients,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
+    }
+  });
 });
 
 app.post('/api/clients', verifyToken, (req, res) => {
