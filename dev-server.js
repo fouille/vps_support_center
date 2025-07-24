@@ -110,12 +110,21 @@ app.get('/api/clients', verifyToken, (req, res) => {
 });
 
 app.post('/api/clients', verifyToken, (req, res) => {
-  const { nom_societe, adresse, nom, prenom } = req.body;
-  if (!nom_societe || !adresse || !nom || !prenom) {
-    return res.status(400).json({ detail: 'Tous les champs sont requis' });
+  const { nom_societe, adresse, nom, prenom, numero } = req.body;
+  
+  // Only nom_societe and adresse are required
+  if (!nom_societe || !adresse) {
+    return res.status(400).json({ detail: 'Le nom de société et l\'adresse sont requis' });
   }
   
-  const client = { id: uuidv4(), ...req.body };
+  const client = { 
+    id: uuidv4(), 
+    nom_societe,
+    adresse,
+    nom: nom || null,
+    prenom: prenom || null,
+    numero: numero || null
+  };
   mockDB.clients.push(client);
   res.status(201).json(client);
 });
