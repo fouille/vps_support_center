@@ -252,13 +252,6 @@ const TicketsPage = () => {
     setShowViewModal(true);
     fetchTicketEchanges(ticket.id);
     fetchTicketFiles(ticket.id);
-    
-    // Démarrer l'actualisation automatique des commentaires toutes les 30 secondes
-    const interval = setInterval(() => {
-      fetchTicketEchanges(ticket.id);
-      fetchTicketFiles(ticket.id);
-    }, 30000);
-    setCommentsRefreshInterval(interval);
   };
 
   // Émojis populaires pour les commentaires
