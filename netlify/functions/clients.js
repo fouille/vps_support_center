@@ -65,11 +65,11 @@ exports.handler = async (event, context) => {
 
       case 'PUT':
         const updateData = JSON.parse(event.body);
-        const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom } = updateData;
+        const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom, numero: upd_numero } = updateData;
         
         const updatedClient = await sql`
           UPDATE clients 
-          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom}, prenom = ${upd_prenom}
+          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}
           WHERE id = ${clientId}
           RETURNING *
         `;
