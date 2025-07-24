@@ -75,7 +75,8 @@ export const AuthProvider = ({ children }) => {
     loading,
     isAuthenticated: !!user,
     isAgent: user?.type_utilisateur === 'agent',
-    isDemandeur: user?.type_utilisateur === 'demandeur'
+    isDemandeur: user?.type_utilisateur === 'demandeur',
+    api
   };
 
   return (
