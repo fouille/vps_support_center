@@ -266,8 +266,8 @@ exports.handler = async (event, context) => {
         
         const updatedTicket = await sql`
           UPDATE tickets 
-          SET titre = ${upd_titre}, status = ${upd_status}, agent_id = ${agent_id}, 
-              date_fin_prevue = ${upd_date_fin}, date_cloture = ${date_cloture}
+          SET titre = ${upd_titre}, status = ${upd_status}, agent_id = ${agent_id || null}, 
+              date_fin_prevue = ${upd_date_fin || null}, date_cloture = ${date_cloture || null}
           WHERE id = ${ticketId}
           RETURNING *
         `;
