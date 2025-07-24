@@ -29,14 +29,48 @@ const ClientsPage = () => {
 
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    // Reset to page 1 when search term changes
+    if (currentPage !== 1 && searchTerm) {
+      setCurrentPage(1);
+    }
+  }, [searchTerm]);
 
   const fetchClients = async () => {
     try {
-      const response = await api.get('/api/clients');
-      setClients(response.data);
+      setLoading(true);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '10'
+      });
+      
+      if (searchTerm.trim()) {
+        params.append('search', searchTerm.trim());
+      }
+
+      const response = await api.get(`/api/clients?${params}`);
+      
+      // Check if response has pagination structure (new API) or is just array (old API)
+      if (response.data.data && response.data.pagination) {
+        setClients(response.data.data);
+        setPagination(response.data.pagination);
+      } else {
+        // Fallback for old API format
+        setClients(response.data);
+        setPagination({
+          page: 1,
+          limit: response.data.length,
+          total: response.data.length,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false
+        });
+      }
     } catch (error) {
       setError('Erreur lors du chargement des clients');
+      console.error('Error fetching clients:', error);
     } finally {
       setLoading(false);
     }
