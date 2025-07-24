@@ -129,6 +129,17 @@ const TicketsPage = () => {
     fetchTicketEchanges(ticket.id);
   };
 
+  // Émojis populaires pour les commentaires
+  const popularEmojis = [
+    '😊', '👍', '👎', '❤️', '😢', '😂', '🔥', '💡', 
+    '✅', '❌', '⚠️', '🤔', '👌', '🙏', '💪', '🎉'
+  ];
+
+  const insertEmoji = (emoji) => {
+    setNewComment(newComment + emoji);
+    setShowEmojiPicker(false);
+  };
+
   const fetchTicketEchanges = async (ticketId) => {
     setLoadingComments(true);
     try {
