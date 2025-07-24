@@ -31,7 +31,6 @@ const TicketsPage = () => {
   const [newComment, setNewComment] = useState('');
   const [loadingComments, setLoadingComments] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [commentsRefreshInterval, setCommentsRefreshInterval] = useState(null);
   const [ticketFiles, setTicketFiles] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
