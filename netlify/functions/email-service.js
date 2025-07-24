@@ -1,10 +1,21 @@
-const mailjet = require('node-mailjet');
+// Import conditionnel de mailjet seulement quand nécessaire
+let mj = null;
 
-// Initialize Mailjet with environment variables
-const mj = mailjet.connect(
-  process.env.MJ_APIKEY_PUBLIC,
-  process.env.MJ_APIKEY_PRIVATE
-);
+const initializeMailjet = () => {
+  if (mj) return mj;
+  
+  try {
+    const mailjet = require('node-mailjet');
+    mj = mailjet.connect(
+      process.env.MJ_APIKEY_PUBLIC,
+      process.env.MJ_APIKEY_PRIVATE
+    );
+    return mj;
+  } catch (error) {
+    console.error('Failed to initialize Mailjet:', error);
+    return null;
+  }
+};
 
 // Email templates
 const createEmailTemplate = {
