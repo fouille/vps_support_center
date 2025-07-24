@@ -679,25 +679,39 @@ const TicketsPage = () => {
                   )}
                 </div>
 
-                {/* Formulaire d'ajout de commentaire */}
-                <form onSubmit={handleAddComment} className="space-y-3">
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Ajouter un commentaire..."
-                    className="input h-24 resize-none"
-                    required
-                  />
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      className="btn-primary"
-                      disabled={!newComment.trim()}
-                    >
-                      Ajouter le commentaire
-                    </button>
-                  </div>
-                </form>
+                {/* Formulaire d'ajout de commentaire amélioré */}
+                <div className="border-t border-gray-200 dark:border-dark-border pt-4">
+                  <form onSubmit={handleAddComment} className="space-y-3">
+                    <div className="relative">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Tapez votre commentaire ici..."
+                        className="input h-24 resize-none pr-12 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        required
+                        maxLength={1000}
+                      />
+                      <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500">
+                        {newComment.length}/1000
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-dark-muted">
+                        💡 Utilisez Shift+Entrée pour des sauts de ligne
+                      </span>
+                      <button
+                        type="submit"
+                        className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={!newComment.trim()}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                        <span>Envoyer</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
