@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+  const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || '';
 
   // Configure axios defaults
   axios.defaults.baseURL = API_BASE_URL;
