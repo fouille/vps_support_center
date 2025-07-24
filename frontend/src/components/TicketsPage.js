@@ -27,6 +27,11 @@ const TicketsPage = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
   const [viewingTicket, setViewingTicket] = useState(null);
+  
+  // Filtres pour la supervision (agents seulement)
+  const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
+  const [clientFilter, setClientFilter] = useState('');
+  
   const [formData, setFormData] = useState({
     titre: '',
     client_id: '',
