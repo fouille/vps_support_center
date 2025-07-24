@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Support Ticket Management System
-Testing ticket-echanges (comments) functionality
+Testing clients API with new structure and ticket-echanges functionality
 """
 
 import requests
@@ -10,8 +10,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration
-BACKEND_URL = "http://localhost:8001"
+# Configuration - Use production URL from frontend/.env
+BACKEND_URL = "https://27432197-1a2e-4d0e-9186-abc2be5bb2cc.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
