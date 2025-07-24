@@ -11,6 +11,7 @@ const ClientsPage = () => {
   const [editingClient, setEditingClient] = useState(null);
   const [searchInput, setSearchInput] = useState(''); // Valeur de l'input
   const [searchTerm, setSearchTerm] = useState(''); // Terme de recherche réel envoyé à l'API
+  const [isSearching, setIsSearching] = useState(false); // Indicateur de recherche en cours
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
