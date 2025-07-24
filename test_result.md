@@ -29,6 +29,23 @@ Finalizing the ticket comment/exchange functionality that's experiencing a 500 e
 - Ask for clarification when requirements are ambiguous
 
 backend:
+  - task: "Mailjet email integration"
+    implemented: true  
+    working: "unknown"
+    file: "netlify/functions/email-service.js, tickets.js, ticket-echanges.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history: []
+    changes:
+      - "Added node-mailjet package integration"
+      - "Created email-service.js with HTML templates"
+      - "Integrated email sending in ticket creation"
+      - "Integrated email sending for status changes"
+      - "Integrated email sending for new comments"
+      - "Added styled HTML email templates"
+      - "Configured Mailjet with environment variables"
+
   - task: "Tickets API with numero_ticket and search"
     implemented: true  
     working: true
