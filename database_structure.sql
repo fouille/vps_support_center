@@ -101,7 +101,7 @@ CREATE TRIGGER update_demandeurs_updated_at BEFORE UPDATE ON demandeurs FOR EACH
 CREATE TRIGGER update_agents_updated_at BEFORE UPDATE ON agents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_tickets_updated_at BEFORE UPDATE ON tickets FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Données de test (optionnel)
+-- Données de test et utilisateur admin par défaut
 -- Insertion d'un client de test
 INSERT INTO clients (nom_societe, adresse, nom, prenom) 
 VALUES ('TechCorp SARL', '123 Avenue des Champs, 75008 Paris', 'Dupont', 'Jean')
@@ -111,3 +111,9 @@ ON CONFLICT DO NOTHING;
 INSERT INTO demandeurs (nom, prenom, societe, telephone, email, password)
 VALUES ('Martin', 'Sophie', 'TechCorp SARL', '0123456789', 'sophie.martin@techcorp.fr', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYq.9mXR8Xt1n4u')
 ON CONFLICT DO NOTHING;
+
+-- Insertion de l'utilisateur admin par défaut
+-- Mot de passe : admin1234! (hashé avec bcrypt, coût 12)
+INSERT INTO agents (nom, prenom, email, password, societe)
+VALUES ('ADMIN', 'Franck', 'admin@voipservices.fr', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYq.9mXR8Xt1n4u', 'VoIP Services')
+ON CONFLICT (email) DO NOTHING;
