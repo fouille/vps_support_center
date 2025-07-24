@@ -807,6 +807,87 @@ const TicketsPage = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Section fichiers joints */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-dark-text">
+                      Fichiers joints
+                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="file"
+                        id="fileUpload"
+                        className="hidden"
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx"
+                        onChange={handleFileUpload}
+                        disabled={uploadingFile}
+                      />
+                      <label
+                        htmlFor="fileUpload"
+                        className={`text-sm px-3 py-1 rounded border transition-colors cursor-pointer ${
+                          uploadingFile
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-primary-500 text-white hover:bg-primary-600 border-primary-500'
+                        }`}
+                      >
+                        {uploadingFile ? 'Upload...' : '+ Ajouter un fichier'}
+                      </label>
+                    </div>
+                  </div>
+                  
+                  {loadingFiles ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                    </div>
+                  ) : ticketFiles.length > 0 ? (
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {ticketFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-dark-card rounded border">
+                          <div className="flex items-center space-x-3 flex-1">
+                            <span className="text-lg">{getFileIcon(file.type_fichier)}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 dark:text-dark-text truncate">
+                                {file.nom_fichier}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-dark-muted">
+                                {formatFileSize(file.taille_fichier)} • {file.uploaded_by_name} • {format(new Date(file.uploaded_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => downloadFile(file)}
+                              className="p-1 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
+                              title="Télécharger"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </button>
+                            {(isAgent || file.uploaded_by_type === 'demandeur') && (
+                              <button
+                                onClick={() => handleFileDelete(file.id)}
+                                className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                title="Supprimer"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-dark-muted italic py-2">
+                      Aucun fichier joint pour le moment
+                    </p>
+                  )}
+                  
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC) • Taille max: 10MB
+                  </p>
+                </div>
               </div>
 
               {/* Section commentaires/échanges */}
