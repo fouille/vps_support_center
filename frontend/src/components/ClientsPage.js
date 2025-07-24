@@ -126,7 +126,7 @@ const ClientsPage = () => {
   };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchInput(e.target.value);
   };
 
   const handleEdit = (client) => {
