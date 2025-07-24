@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for Support Ticket Management System
-Testing clients API with new structure and ticket-echanges functionality
+Testing Mailjet email diagnostic functionality
 """
 
 import requests
