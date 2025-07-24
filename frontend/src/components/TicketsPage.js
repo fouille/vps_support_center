@@ -134,6 +134,119 @@ const TicketsPage = () => {
     }
   };
 
+  const fetchTicketFiles = async (ticketId) => {
+    setLoadingFiles(true);
+    try {
+      const response = await api.get(`/api/ticket-fichiers?ticketId=${ticketId}`);
+      setTicketFiles(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des fichiers:', error);
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Vérifications côté client
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError('Fichier trop volumineux (limite: 10MB)');
+      return;
+    }
+
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'audio/wav', 'audio/wave', 'audio/x-wav',
+      'text/plain', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC');
+      return;
+    }
+
+    setUploadingFile(true);
+    try {
+      // Convertir le fichier en base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const fileData = {
+        nom_fichier: file.name,
+        type_fichier: file.type,
+        taille_fichier: file.size,
+        contenu_base64: base64
+      };
+
+      await api.post(`/api/ticket-fichiers?ticketId=${viewingTicket.id}`, fileData);
+      fetchTicketFiles(viewingTicket.id);
+      event.target.value = ''; // Reset input
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors de l\'upload du fichier');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleFileDelete = async (fileId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) return;
+
+    try {
+      await api.delete(`/api/ticket-fichiers?ticketId=${viewingTicket.id}&fileId=${fileId}`);
+      fetchTicketFiles(viewingTicket.id);
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors de la suppression du fichier');
+    }
+  };
+
+  const downloadFile = (file) => {
+    try {
+      const byteCharacters = atob(file.contenu_base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: file.type_fichier });
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.nom_fichier;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setError('Erreur lors du téléchargement du fichier');
+    }
+  };
+
+  const getFileIcon = (mimeType) => {
+    if (mimeType?.startsWith('image/')) return '🖼️';
+    if (mimeType === 'application/pdf') return '📄';
+    if (mimeType?.startsWith('audio/')) return '🎵';
+    if (mimeType?.includes('word')) return '📝';
+    return '📎';
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const handleView = (ticket) => {
     setViewingTicket(ticket);
     setShowViewModal(true);
