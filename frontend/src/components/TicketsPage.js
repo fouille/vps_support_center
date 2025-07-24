@@ -321,6 +321,27 @@ const TicketsPage = () => {
                 </select>
               </div>
 
+              {isAgent && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                    Demandeur *
+                  </label>
+                  <select
+                    required
+                    value={formData.demandeur_id}
+                    onChange={(e) => setFormData({ ...formData, demandeur_id: e.target.value })}
+                    className="input"
+                  >
+                    <option value="">Sélectionner un demandeur</option>
+                    {demandeurs.map((demandeur) => (
+                      <option key={demandeur.id} value={demandeur.id}>
+                        {demandeur.prenom} {demandeur.nom} - {demandeur.societe}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
