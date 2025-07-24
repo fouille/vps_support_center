@@ -331,20 +331,23 @@ exports.handler = async (event, context) => {
         // Envoyer un email si le statut a changé
         if (oldStatus !== upd_status) {
           try {
-            const [clientInfo, demandeurInfo] = await Promise.all([
-              sql`SELECT * FROM clients WHERE id = ${updatedTicket[0].client_id}`,
-              sql`SELECT * FROM demandeurs WHERE id = ${updatedTicket[0].demandeur_id}`
-            ]);
+            const emailService = loadEmailService();
+            if (emailService) {
+              const [clientInfo, demandeurInfo] = await Promise.all([
+                sql`SELECT * FROM clients WHERE id = ${updatedTicket[0].client_id}`,
+                sql`SELECT * FROM demandeurs WHERE id = ${updatedTicket[0].demandeur_id}`
+              ]);
 
-            if (clientInfo.length > 0 && demandeurInfo.length > 0) {
-              await emailService.sendStatusChangeEmail(
-                updatedTicket[0],
-                oldStatus,
-                upd_status,
-                clientInfo[0],
-                demandeurInfo[0]
-              );
-              console.log('Status change email sent successfully');
+              if (clientInfo.length > 0 && demandeurInfo.length > 0) {
+                await emailService.sendStatusChangeEmail(
+                  updatedTicket[0],
+                  oldStatus,
+                  upd_status,
+                  clientInfo[0],
+                  demandeurInfo[0]
+                );
+                console.log('Status change email sent successfully');
+              }
             }
           } catch (emailError) {
             console.error('Error sending status change email:', emailError);
