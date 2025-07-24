@@ -17,7 +17,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const TicketsPage = () => {
-  const { isAgent, api } = useAuth();
+  const { isAgent, api, user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [clients, setClients] = useState([]);
   const [demandeurs, setDemandeurs] = useState([]);
