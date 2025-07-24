@@ -131,7 +131,14 @@ const TicketsPage = () => {
   const fetchClients = async () => {
     try {
       const response = await api.get('/api/clients');
-      setClients(response.data);
+      
+      // Check if response has pagination structure (new API) or is just array (old API)
+      if (response.data.data && response.data.pagination) {
+        setClients(response.data.data);
+      } else {
+        // Fallback for old API format
+        setClients(response.data);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
     }
