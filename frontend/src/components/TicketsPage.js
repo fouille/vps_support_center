@@ -458,42 +458,40 @@ const TicketsPage = () => {
         </div>
       </div>
 
-      {/* Filtres pour les agents */}
-      {isAgent && (
-        <div className="mb-6 flex space-x-4 items-center">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-              Statut des tickets
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="input w-48"
-            >
-              <option value="active">Actifs (Nouveau, En cours, En attente)</option>
-              <option value="all">Tous les tickets</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-              Filtrer par client
-            </label>
-            <select
-              value={clientFilter}
-              onChange={(e) => setClientFilter(e.target.value)}
-              className="input w-64"
-            >
-              <option value="">Tous les clients</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>
-                  {client.nom_societe} - {client.prenom} {client.nom}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Filtres pour les agents ET demandeurs */}
+      <div className="mb-6 flex space-x-4 items-center">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Statut des tickets
+          </label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="input w-48"
+          >
+            <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
+            <option value="all">Tous les tickets</option>
+          </select>
         </div>
-      )}
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Filtrer par client
+          </label>
+          <select
+            value={clientFilter}
+            onChange={(e) => setClientFilter(e.target.value)}
+            className="input w-64"
+          >
+            <option value="">Tous les clients</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.nom_societe} - {client.prenom} {client.nom}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {error && (
         <div className="mb-4 flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
