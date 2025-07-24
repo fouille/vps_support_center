@@ -260,6 +260,12 @@ const TicketsPage = () => {
     setViewingTicketEchanges([]);
     setNewComment('');
     setShowEmojiPicker(false);
+    
+    // Arrêter l'actualisation automatique
+    if (commentsRefreshInterval) {
+      clearInterval(commentsRefreshInterval);
+      setCommentsRefreshInterval(null);
+    }
   };
 
   const getStatusBadge = (status) => {
