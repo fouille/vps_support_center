@@ -539,6 +539,199 @@ app.post('/api/ticket-echanges', verifyToken, (req, res) => {
   res.status(201).json(newEchange);
 });
 
+// Email diagnostic endpoints
+app.get('/api/email-diagnostic', (req, res) => {
+  console.log('Email diagnostic function called');
+  
+  try {
+    const diagnostics = {
+      environment: {
+        MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC ? 'SET' : 'NOT SET',
+        MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE ? 'SET' : 'NOT SET',
+        NODE_ENV: process.env.NODE_ENV || 'not set',
+        NETLIFY: process.env.NETLIFY || 'not set'
+      },
+      mailjetTest: null,
+      emailServiceTest: null
+    };
+
+    // Test Mailjet initialization
+    try {
+      // In dev environment, we don't have node-mailjet, so simulate the test
+      if (process.env.MJ_APIKEY_PUBLIC && process.env.MJ_APIKEY_PRIVATE) {
+        diagnostics.mailjetTest = {
+          status: 'SUCCESS',
+          message: 'Mailjet would be initialized successfully (dev mode)',
+          hasKeys: true,
+          apiTest: {
+            status: 'SIMULATED',
+            message: 'Mailjet API connection would be tested (dev mode)'
+          }
+        };
+      } else {
+        diagnostics.mailjetTest = {
+          status: 'WARNING',
+          message: 'Mailjet API keys not configured',
+          hasKeys: false
+        };
+      }
+    } catch (mailjetError) {
+      diagnostics.mailjetTest = {
+        status: 'ERROR',
+        message: 'Failed to initialize Mailjet',
+        error: mailjetError.message
+      };
+    }
+
+    // Test email service loading (simulate)
+    diagnostics.emailServiceTest = {
+      status: 'SIMULATED',
+      message: 'Email service would be loaded (dev mode)',
+      methods: ['sendTicketCreatedEmail', 'sendCommentEmail', 'sendStatusChangeEmail']
+    };
+
+    // Test database connection (simulate)
+    diagnostics.database = {
+      status: 'SIMULATED',
+      message: 'Database connection simulated (dev mode using mock data)'
+    };
+
+    res.json({
+      message: 'Email diagnostic complete (dev mode)',
+      timestamp: new Date().toISOString(),
+      diagnostics
+    });
+
+  } catch (error) {
+    console.error('Diagnostic error:', error);
+    res.status(500).json({
+      error: 'Diagnostic failed',
+      message: error.message,
+      stack: error.stack
+    });
+  }
+});
+
+app.post('/api/email-test', verifyToken, (req, res) => {
+  console.log('Email test function called');
+  
+  if (req.user.type !== 'agent') {
+    return res.status(403).json({ detail: 'Seuls les agents peuvent tester l\'envoi d\'emails' });
+  }
+
+  try {
+    const { testType, recipient } = req.body;
+
+    console.log('Testing email sending with type:', testType);
+    console.log('Recipient:', recipient);
+
+    let result;
+
+    switch (testType) {
+      case 'simple':
+        // Test simple email sending (simulate)
+        try {
+          console.log('Attempting to send simple test email...');
+          
+          if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
+            return res.status(400).json({ 
+              error: 'Mailjet not configured',
+              detail: 'API keys not found in environment variables',
+              keys: {
+                public: process.env.MJ_APIKEY_PUBLIC ? 'SET' : 'NOT SET',
+                private: process.env.MJ_APIKEY_PRIVATE ? 'SET' : 'NOT SET'
+              }
+            });
+          }
+
+          // Simulate email sending in dev mode
+          result = {
+            status: 'SIMULATED',
+            message: 'Email would be sent successfully via Mailjet (dev mode)',
+            details: {
+              recipient: recipient || 'contact@voipservices.fr',
+              subject: 'Test d\'envoi d\'email - Système de tickets',
+              timestamp: new Date().toISOString()
+            }
+          };
+
+        } catch (emailError) {
+          console.error('Email sending error:', emailError);
+          result = {
+            status: 'ERROR',
+            message: 'Failed to send email',
+            error: emailError.message,
+            stack: emailError.stack
+          };
+        }
+        break;
+
+      case 'ticket':
+        // Test ticket creation email (simulate)
+        try {
+          // Check if we have test data
+          if (mockDB.clients.length === 0 || mockDB.demandeurs.length === 0) {
+            return res.status(400).json({ 
+              error: 'Test data not available',
+              detail: 'Need at least one client and one demandeur for ticket email test'
+            });
+          }
+
+          const mockTicket = {
+            id: 'test-ticket-id',
+            numero_ticket: '123456',
+            titre: 'Test Ticket - Email Integration',
+            status: 'nouveau',
+            date_creation: new Date().toISOString(),
+            requete_initiale: 'Ceci est un ticket de test pour vérifier l\'envoi d\'emails.'
+          };
+
+          console.log('Testing ticket creation email...');
+          result = {
+            status: 'SIMULATED',
+            message: 'Ticket creation email would be sent successfully (dev mode)',
+            details: {
+              ticket: mockTicket,
+              client: mockDB.clients[0],
+              demandeur: mockDB.demandeurs[0]
+            }
+          };
+
+        } catch (testError) {
+          console.error('Ticket email test error:', testError);
+          result = {
+            status: 'ERROR',
+            message: 'Failed to test ticket email',
+            error: testError.message
+          };
+        }
+        break;
+
+      default:
+        return res.status(400).json({ 
+          error: 'Invalid test type',
+          validTypes: ['simple', 'ticket']
+        });
+    }
+
+    res.json({
+      message: 'Email test completed (dev mode)',
+      testType,
+      recipient: recipient || 'contact@voipservices.fr',
+      timestamp: new Date().toISOString(),
+      result
+    });
+
+  } catch (error) {
+    console.error('Email test error:', error);
+    res.status(500).json({
+      error: 'Email test failed',
+      message: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Dev server running on http://localhost:${PORT}`);
 });
