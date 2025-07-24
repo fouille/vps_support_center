@@ -589,48 +589,93 @@ const TicketsPage = () => {
               </div>
 
               {/* Section commentaires/échanges */}
-              <div className="flex flex-col h-full">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-4">
-                  Échanges et commentaires
-                </h3>
+              <div className="flex flex-col h-full min-h-[500px]">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
+                    Échanges et commentaires
+                  </h3>
+                  {viewingTicketEchanges.length > 0 && (
+                    <span className="text-sm text-gray-500 dark:text-dark-muted">
+                      {viewingTicketEchanges.length} commentaire{viewingTicketEchanges.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
                 
-                {/* Liste des commentaires */}
-                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg p-4 mb-4 max-h-96 overflow-y-auto">
-                  {loadingComments ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                    </div>
-                  ) : viewingTicketEchanges.length > 0 ? (
-                    <div className="space-y-4">
-                      {viewingTicketEchanges.map((echange) => (
-                        <div key={echange.id} className="border-b border-gray-200 dark:border-dark-border pb-3 last:border-b-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-gray-900 dark:text-dark-text">
-                              {echange.auteur_nom}
-                            </span>
-                            <div className="flex items-center space-x-2">
-                              <span className={`text-xs px-2 py-1 rounded ${
-                                echange.auteur_type === 'agent' 
-                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' 
-                                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                              }`}>
-                                {echange.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
-                              </span>
+                {/* Liste des commentaires avec scroll amélioré */}
+                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg mb-4 bg-gray-50 dark:bg-dark-card relative">
+                  {/* Scroll container optimisé */}
+                  <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4">
+                    {loadingComments ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                      </div>
+                    ) : viewingTicketEchanges.length > 0 ? (
+                      <div className="space-y-4">
+                        {viewingTicketEchanges.map((echange, index) => (
+                          <div 
+                            key={echange.id} 
+                            className={`bg-white dark:bg-dark-surface rounded-lg p-4 shadow-sm border-l-4 ${
+                              echange.auteur_type === 'agent' 
+                                ? 'border-l-blue-500' 
+                                : 'border-l-green-500'
+                            } ${index === viewingTicketEchanges.length - 1 ? 'animate-fade-in' : ''}`}
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center space-x-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white ${
+                                  echange.auteur_type === 'agent' 
+                                    ? 'bg-blue-500' 
+                                    : 'bg-green-500'
+                                }`}>
+                                  {echange.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-900 dark:text-dark-text block">
+                                    {echange.auteur_nom}
+                                  </span>
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    echange.auteur_type === 'agent' 
+                                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                                      : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                                  }`}>
+                                    {echange.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
+                                  </span>
+                                </div>
+                              </div>
                               <span className="text-xs text-gray-500 dark:text-dark-muted">
                                 {format(new Date(echange.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
                               </span>
                             </div>
+                            <div className="ml-11">
+                              <p className="text-gray-700 dark:text-dark-text whitespace-pre-wrap text-sm leading-relaxed">
+                                {echange.message}
+                              </p>
+                            </div>
                           </div>
-                          <p className="text-gray-700 dark:text-dark-text whitespace-pre-wrap">
-                            {echange.message}
-                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
                         </div>
-                      ))}
+                        <p className="text-gray-500 dark:text-dark-muted">
+                          Aucun commentaire pour ce ticket
+                        </p>
+                        <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
+                          Commencez la conversation en ajoutant un commentaire ci-dessous
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Indicateur de scroll si nécessaire */}
+                  {viewingTicketEchanges.length > 3 && (
+                    <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-dark-surface px-2 py-1 rounded shadow">
+                      Faire défiler pour voir plus
                     </div>
-                  ) : (
-                    <p className="text-gray-500 dark:text-dark-muted text-center py-8">
-                      Aucun commentaire pour ce ticket
-                    </p>
                   )}
                 </div>
 
