@@ -44,6 +44,7 @@ exports.handler = async (event, context) => {
         const queryParams = new URLSearchParams(event.rawUrl?.split('?')[1] || '');
         const statusFilter = queryParams.get('status_filter');
         const clientIdFilter = queryParams.get('client_id');
+        const searchFilter = queryParams.get('search'); // Nouveau paramètre pour recherche par numéro
         
         if (decoded.type === 'agent') {
           // Base query for agents (can see all tickets)
