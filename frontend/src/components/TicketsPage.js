@@ -718,17 +718,56 @@ const TicketsPage = () => {
                   )}
                 </div>
 
-                {/* Formulaire d'ajout de commentaire amélioré */}
+                {/* Formulaire d'ajout de commentaire amélioré avec émojis */}
                 <div className="border-t border-gray-200 dark:border-dark-border pt-4">
                   <form onSubmit={handleAddComment} className="space-y-3">
+                    {/* Barre d'émojis */}
+                    <div className="relative">
+                      <div className="flex items-center justify-between mb-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          className="text-sm text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text flex items-center space-x-1"
+                        >
+                          <span className="text-lg">😊</span>
+                          <span>Émojis</span>
+                        </button>
+                      </div>
+                      
+                      {/* Sélecteur d'émojis */}
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg p-3 shadow-lg z-10 w-full max-w-xs">
+                          <div className="grid grid-cols-8 gap-1">
+                            {popularEmojis.map((emoji, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() => insertEmoji(emoji)}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-dark-card rounded text-lg transition-colors"
+                                title={`Ajouter ${emoji}`}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="relative">
                       <textarea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Tapez votre commentaire ici..."
-                        className="input h-24 resize-none pr-12 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        placeholder="Tapez votre message..."
+                        className="input h-20 resize-none pr-12 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         required
                         maxLength={1000}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddComment(e);
+                          }
+                        }}
                       />
                       <div className={`absolute bottom-2 right-2 text-xs ${
                         newComment.length > 900 ? 'text-red-500' : 
@@ -743,18 +782,29 @@ const TicketsPage = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-dark-muted">
-                        💡 Utilisez Shift+Entrée pour des sauts de ligne
+                        💡 Appuyez sur Entrée pour envoyer • Shift+Entrée pour saut de ligne
                       </span>
-                      <button
-                        type="submit"
-                        className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!newComment.trim()}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                        <span>Envoyer</span>
-                      </button>
+                      <div className="flex space-x-2">
+                        {showEmojiPicker && (
+                          <button
+                            type="button"
+                            onClick={() => setShowEmojiPicker(false)}
+                            className="text-xs text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text px-2 py-1"
+                          >
+                            Fermer
+                          </button>
+                        )}
+                        <button
+                          type="submit"
+                          className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={!newComment.trim()}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          <span>Envoyer</span>
+                        </button>
+                      </div>
                     </div>
                   </form>
                 </div>
