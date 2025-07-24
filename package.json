@@ -8,7 +8,7 @@
     "dev:functions": "netlify dev"
   },
   "dependencies": {
-    "@netlify/neon": "^0.11.0",
+    "@netlify/neon": "^0.10.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "uuid": "^9.0.1"
