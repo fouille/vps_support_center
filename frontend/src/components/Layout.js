@@ -36,7 +36,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
       {/* Sidebar mobile backdrop */}
       {sidebarOpen && (
         <div 
@@ -46,9 +46,11 @@ const Layout = ({ children, currentPage, onNavigate }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-dark-surface shadow-lg transform transition-transform duration-300 ease-in-out ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-dark-surface shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:z-0 lg:shadow-none ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } lg:translate-x-0 lg:static lg:inset-0`}>
+      }`}>
+        
+        {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
           <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
             Support Tickets
@@ -61,7 +63,8 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           </button>
         </div>
 
-        <nav className="mt-6 px-3">
+        {/* Navigation */}
+        <nav className="flex-1 mt-6 px-3">
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
@@ -70,8 +73,8 @@ const Layout = ({ children, currentPage, onNavigate }) => {
                   onNavigate(item.key);
                   setSidebarOpen(false);
                 }}
-                className={`nav-item w-full text-left ${
-                  currentPage === item.key ? 'active' : ''
+                className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
+                  currentPage === item.key ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
               >
                 <item.icon className="h-5 w-5 mr-3" />
@@ -81,7 +84,8 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           </div>
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-dark-border">
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 dark:border-dark-border">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm text-gray-600 dark:text-dark-muted">Thème</span>
             <button
@@ -121,7 +125,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="h-16 bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-dark-border flex items-center justify-between px-6">
           <button
@@ -139,7 +143,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         </div>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>
       </div>
