@@ -125,6 +125,36 @@ const TicketsPage = () => {
   const handleView = (ticket) => {
     setViewingTicket(ticket);
     setShowViewModal(true);
+    fetchTicketEchanges(ticket.id);
+  };
+
+  const fetchTicketEchanges = async (ticketId) => {
+    setLoadingComments(true);
+    try {
+      const response = await api.get(`/api/ticket-echanges/${ticketId}`);
+      setViewingTicketEchanges(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des échanges:', error);
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    try {
+      const response = await api.post(`/api/ticket-echanges/${viewingTicket.id}`, {
+        message: newComment
+      });
+      
+      // Add the new comment to the list
+      setViewingTicketEchanges([...viewingTicketEchanges, response.data]);
+      setNewComment('');
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors de l\'ajout du commentaire');
+    }
   };
 
   const handleEdit = (ticket) => {
