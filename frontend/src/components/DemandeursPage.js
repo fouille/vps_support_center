@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2, UserCheck, AlertCircle, Check, Mail, Phone } from 'lucide-react';
 
 const DemandeursPage = () => {
+  const { api } = useAuth();
   const [demandeurs, setDemandeurs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,7 +24,7 @@ const DemandeursPage = () => {
 
   const fetchDemandeurs = async () => {
     try {
-      const response = await axios.get('/api/demandeurs');
+      const response = await api.get('/api/demandeurs');
       setDemandeurs(response.data);
     } catch (error) {
       setError('Erreur lors du chargement des demandeurs');
@@ -36,9 +37,9 @@ const DemandeursPage = () => {
     e.preventDefault();
     try {
       if (editingDemandeur) {
-        await axios.put(`/api/demandeurs/${editingDemandeur.id}`, formData);
+        await api.put(`/api/demandeurs/${editingDemandeur.id}`, formData);
       } else {
-        await axios.post('/api/demandeurs', formData);
+        await api.post('/api/demandeurs', formData);
       }
       fetchDemandeurs();
       handleCloseModal();
@@ -50,7 +51,7 @@ const DemandeursPage = () => {
   const handleDelete = async (demandeurId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce demandeur ?')) {
       try {
-        await axios.delete(`/api/demandeurs/${demandeurId}`);
+        await api.delete(`/api/demandeurs/${demandeurId}`);
         fetchDemandeurs();
       } catch (error) {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
