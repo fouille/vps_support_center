@@ -68,6 +68,14 @@ const TicketsPage = () => {
     }))
   ];
 
+  useEffect(() => {
+    fetchTickets();
+    fetchClients(); // Les clients sont nécessaires pour tous les utilisateurs qui créent des tickets
+    if (isAgent) {
+      fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
+    }
+  }, [isAgent, statusFilter, clientFilter]); // Refetch when filters change
+
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
       setRefreshingTickets(true);
