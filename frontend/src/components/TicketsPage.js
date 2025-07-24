@@ -352,18 +352,23 @@ const TicketsPage = () => {
     }
   };
 
-  const handleStatusChange = async (ticketId, newStatus) => {
+  const handleStatusChange = async (ticketId, newStatus, ticketData = null) => {
     try {
+      // Utiliser ticketData si fourni, sinon viewingTicket
+      const currentTicket = ticketData || viewingTicket;
+      
       await api.put(`/api/tickets/${ticketId}`, {
-        ...viewingTicket,
+        ...currentTicket,
         status: newStatus
       });
       
-      // Mettre à jour le ticket dans la modal
-      setViewingTicket({
-        ...viewingTicket,
-        status: newStatus
-      });
+      // Mettre à jour le ticket dans la modal si viewingTicket existe
+      if (viewingTicket) {
+        setViewingTicket({
+          ...viewingTicket,
+          status: newStatus
+        });
+      }
       
       // Actualiser la liste des tickets
       fetchTickets();
