@@ -35,6 +35,11 @@ const ClientsPage = () => {
 
   // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
   useEffect(() => {
+    // Montrer l'indicateur de recherche si on a au moins 3 caractères
+    if (searchInput.length >= 3) {
+      setIsSearching(true);
+    }
+    
     const timer = setTimeout(() => {
       // Déclencher la recherche seulement si au moins 3 caractères ou si vide (pour reset)
       if (searchInput.length >= 3 || searchInput.length === 0) {
@@ -44,9 +49,13 @@ const ClientsPage = () => {
           setCurrentPage(1);
         }
       }
+      setIsSearching(false);
     }, 1000); // Temporisation de 1 seconde
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setIsSearching(false);
+    };
   }, [searchInput, currentPage]);
 
   useEffect(() => {
