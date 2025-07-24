@@ -51,7 +51,22 @@ const TicketsPage = () => {
 
   const fetchTickets = async () => {
     try {
-      const response = await api.get('/api/tickets');
+      // Construire les paramètres de filtrage pour les agents
+      let params = {};
+      if (isAgent) {
+        if (statusFilter === 'active') {
+          params.status_filter = 'nouveau,en_cours,en_attente';
+        }
+        if (clientFilter) {
+          params.client_id = clientFilter;
+        }
+      }
+      
+      const queryString = Object.keys(params).length > 0 
+        ? '?' + new URLSearchParams(params).toString() 
+        : '';
+      
+      const response = await api.get(`/api/tickets${queryString}`);
       setTickets(response.data);
     } catch (error) {
       setError('Erreur lors du chargement des tickets');
