@@ -48,44 +48,49 @@ exports.handler = async (event, context) => {
         
         if (decoded.type === 'agent') {
           // Base query for agents (can see all tickets)
-          let baseQuery = `
-            SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
-                   d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                   a.nom as agent_nom, a.prenom as agent_prenom
-            FROM tickets t 
-            JOIN clients c ON t.client_id = c.id 
-            JOIN demandeurs d ON t.demandeur_id = d.id 
-            LEFT JOIN agents a ON t.agent_id = a.id 
-          `;
-          
           let conditions = [];
           let params = [];
           
           // Filter by status if specified
           if (statusFilter) {
             const statuses = statusFilter.split(',');
-            const statusPlaceholders = statuses.map(() => '?').join(',');
-            conditions.push(`t.status IN (${statusPlaceholders})`);
-            params.push(...statuses);
+            conditions.push(`t.status = ANY($${params.length + 1})`);
+            params.push(statuses);
           }
           
           // Filter by client if specified
           if (clientIdFilter) {
-            conditions.push('t.client_id = ?');
+            conditions.push(`t.client_id = $${params.length + 1}`);
             params.push(clientIdFilter);
           }
           
-          if (conditions.length > 0) {
-            baseQuery += ' WHERE ' + conditions.join(' AND ');
+          // Filter by ticket number search if specified
+          if (searchFilter) {
+            conditions.push(`t.numero_ticket ILIKE $${params.length + 1}`);
+            params.push(`%${searchFilter}%`);
           }
           
-          baseQuery += ' ORDER BY t.date_creation DESC';
+          // Build the complete query with conditions
+          let whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
           
-          // For now, we'll use template literals with neon (safer than dynamic SQL)
-          if (statusFilter && clientIdFilter) {
+          // Execute query with all filters
+          if (statusFilter && clientIdFilter && searchFilter) {
             const statuses = statusFilter.split(',');
             ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.status = ANY(${statuses}) AND t.client_id = ${clientIdFilter} AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (statusFilter && clientIdFilter) {
+            const statuses = statusFilter.split(',');
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
                      d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
                      a.nom as agent_nom, a.prenom as agent_prenom
               FROM tickets t 
@@ -95,10 +100,35 @@ exports.handler = async (event, context) => {
               WHERE t.status = ANY(${statuses}) AND t.client_id = ${clientIdFilter}
               ORDER BY t.date_creation DESC
             `;
+          } else if (statusFilter && searchFilter) {
+            const statuses = statusFilter.split(',');
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.status = ANY(${statuses}) AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (clientIdFilter && searchFilter) {
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.client_id = ${clientIdFilter} AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
           } else if (statusFilter) {
             const statuses = statusFilter.split(',');
             ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
                      d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
                      a.nom as agent_nom, a.prenom as agent_prenom
               FROM tickets t 
@@ -110,7 +140,7 @@ exports.handler = async (event, context) => {
             `;
           } else if (clientIdFilter) {
             ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
                      d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
                      a.nom as agent_nom, a.prenom as agent_prenom
               FROM tickets t 
@@ -120,9 +150,21 @@ exports.handler = async (event, context) => {
               WHERE t.client_id = ${clientIdFilter}
               ORDER BY t.date_creation DESC
             `;
+          } else if (searchFilter) {
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
           } else {
             ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_contact, c.prenom as client_prenom_contact,
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
                      d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
                      a.nom as agent_nom, a.prenom as agent_prenom
               FROM tickets t 
