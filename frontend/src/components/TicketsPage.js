@@ -157,15 +157,13 @@ const TicketsPage = () => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
           {isAgent ? 'Supervision des Tickets' : 'Mes Tickets'}
         </h1>
-        {!isAgent && (
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn-primary flex items-center"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Nouveau Ticket
-          </button>
-        )}
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn-primary flex items-center"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Nouveau Ticket
+        </button>
       </div>
 
       {error && (
