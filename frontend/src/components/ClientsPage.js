@@ -63,8 +63,9 @@ const ClientsPage = () => {
     setFormData({
       nom_societe: client.nom_societe,
       adresse: client.adresse,
-      nom: client.nom,
-      prenom: client.prenom
+      nom: client.nom || '',
+      prenom: client.prenom || '',
+      numero: client.numero || ''
     });
     setShowModal(true);
   };
