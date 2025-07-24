@@ -808,7 +808,7 @@ const TicketsPage = () => {
                       Client
                     </label>
                     <p className="text-gray-900 dark:text-dark-text">
-                      {viewingTicket.client_nom}
+                      {formatClientDisplay({ nom_societe: viewingTicket.client_nom, prenom: viewingTicket.client_prenom, nom: viewingTicket.client_nom_personne })}
                     </p>
                   </div>
 
