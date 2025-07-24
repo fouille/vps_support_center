@@ -75,7 +75,7 @@ const TicketsPage = () => {
     if (isAgent) {
       fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
     }
-  }, [isAgent, statusFilter, clientFilter]); // Refetch when filters change
+  }, [isAgent, statusFilter, clientFilter, searchFilter]); // Refetch when filters change
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
