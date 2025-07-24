@@ -2,7 +2,7 @@ const { neon } = require('@netlify/neon');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 
-const sql = neon(process.env.NETLIFY_DATABASE_URL);
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
