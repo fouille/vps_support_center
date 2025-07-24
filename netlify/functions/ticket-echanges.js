@@ -21,7 +21,7 @@ const verifyToken = (authHeader) => {
 };
 
 exports.handler = async (event, context) => {
-  console.log('Ticket-echanges function called:', event.httpMethod, event.path);
+  console.log('Ticket-echanges function called:', event.httpMethod, event.queryStringParameters);
   
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers };
@@ -32,9 +32,16 @@ exports.handler = async (event, context) => {
     const authHeader = event.headers.authorization || event.headers.Authorization;
     const decoded = verifyToken(authHeader);
 
-    const pathParts = event.path.split('/');
-    const ticketId = pathParts[pathParts.length - 2]; // .../ticket-echanges/[ticketId]/...
-    const echangeId = pathParts[pathParts.length - 1];
+    // Get ticketId from query parameters
+    const ticketId = event.queryStringParameters?.ticketId;
+    
+    if (!ticketId) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ detail: 'Paramètre ticketId manquant' })
+      };
+    }
 
     switch (event.httpMethod) {
       case 'GET':
