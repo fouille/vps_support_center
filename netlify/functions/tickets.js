@@ -253,7 +253,7 @@ exports.handler = async (event, context) => {
 
         const createdTicket = await sql`
           INSERT INTO tickets (id, titre, client_id, demandeur_id, status, date_fin_prevue, requete_initiale)
-          VALUES (${uuidv4()}, ${titre}, ${client_id}, ${finalDemandeurId}, ${status}, ${date_fin_prevue}, ${requete_initiale})
+          VALUES (${uuidv4()}, ${titre}, ${client_id}, ${finalDemandeurId}, ${status}, ${date_fin_prevue || null}, ${requete_initiale})
           RETURNING *
         `;
         
