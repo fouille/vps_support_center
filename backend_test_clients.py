@@ -10,8 +10,8 @@ import uuid
 import sys
 from datetime import datetime
 
-# Configuration - Use production URL from frontend/.env
-BACKEND_URL = "https://27432197-1a2e-4d0e-9186-abc2be5bb2cc.preview.emergentagent.com"
+# Configuration - Use localhost for dev server
+BACKEND_URL = "http://localhost:8001"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
