@@ -178,6 +178,11 @@ const TicketsPage = () => {
       setViewingTicketEchanges(updatedComments);
       setNewComment('');
       
+      // Si c'est un agent qui répond, mettre le ticket en "répondu"
+      if (isAgent && viewingTicket.status !== 'repondu') {
+        await handleStatusChange(viewingTicket.id, 'repondu');
+      }
+      
       // Auto-scroll to the latest comment after a short delay
       setTimeout(() => {
         const commentsContainer = document.querySelector('.comments-scroll-container');
@@ -191,6 +196,27 @@ const TicketsPage = () => {
       
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de l\'ajout du commentaire');
+    }
+  };
+
+  const handleStatusChange = async (ticketId, newStatus) => {
+    try {
+      await api.put(`/api/tickets/${ticketId}`, {
+        ...viewingTicket,
+        status: newStatus
+      });
+      
+      // Mettre à jour le ticket dans la modal
+      setViewingTicket({
+        ...viewingTicket,
+        status: newStatus
+      });
+      
+      // Actualiser la liste des tickets
+      fetchTickets();
+      
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors de la mise à jour du statut');
     }
   };
 
