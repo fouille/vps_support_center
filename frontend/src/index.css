@@ -59,15 +59,6 @@
   .table tbody tr:hover {
     @apply bg-gray-50 dark:bg-dark-card;
   }
-  
-  /* Styles pour la navigation */
-  .nav-item {
-    @apply flex items-center px-4 py-2 text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200;
-  }
-  
-  .nav-item.active {
-    @apply bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300;
-  }
 }
 
 /* Scrollbar personnalisé pour le thème sombre */
