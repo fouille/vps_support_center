@@ -54,99 +54,159 @@ exports.handler = async (event, context) => {
     const portabiliteId = pathParts[pathParts.length - 1];
 
     if (method === 'GET') {
-      // Récupération des portabilités
-      const { queryStringParameters } = event;
-      const page = parseInt(queryStringParameters?.page) || 1;
-      const limit = parseInt(queryStringParameters?.limit) || 10;
-      const offset = (page - 1) * limit;
-      const status = queryStringParameters?.status;
-      const clientId = queryStringParameters?.client;
-      const search = queryStringParameters?.search;
+      // Vérifier si c'est une demande pour une portabilité spécifique
+      const isSpecificPortabilite = portabiliteId && 
+        portabiliteId !== 'portabilites' && 
+        portabiliteId.length > 10; // UUID plus long que 10 caractères
 
-      let baseQuery = `
-        SELECT 
-          p.*,
-          c.nom_societe,
-          c.nom as client_nom,
-          c.prenom as client_prenom,
-          d.nom as demandeur_nom,
-          d.prenom as demandeur_prenom,
-          a.nom as agent_nom,
-          a.prenom as agent_prenom
-        FROM portabilites p
-        LEFT JOIN clients c ON p.client_id = c.id
-        LEFT JOIN demandeurs d ON p.demandeur_id = d.id
-        LEFT JOIN agents a ON p.agent_id = a.id
-        WHERE 1=1
-      `;
+      if (isSpecificPortabilite) {
+        // Requête pour une portabilité spécifique
+        const specificQuery = `
+          SELECT 
+            p.*,
+            c.nom_societe,
+            c.nom as client_nom,
+            c.prenom as client_prenom,
+            d.nom as demandeur_nom,
+            d.prenom as demandeur_prenom,
+            a.nom as agent_nom,
+            a.prenom as agent_prenom
+          FROM portabilites p
+          LEFT JOIN clients c ON p.client_id = c.id
+          LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+          LEFT JOIN agents a ON p.agent_id = a.id
+          WHERE p.id = $1
+        `;
 
-      let queryParams = [];
-      let paramCount = 0;
+        let queryParams = [portabiliteId];
 
-      // Filtrage par utilisateur selon le type
-      if (decoded.type === 'demandeur') {
-        paramCount++;
-        baseQuery += ` AND p.demandeur_id = $${paramCount}`;
-        queryParams.push(decoded.id);
+        // Vérification des permissions pour les demandeurs
+        if (decoded.type === 'demandeur') {
+          specificQuery += ` AND p.demandeur_id = $2`;
+          queryParams.push(decoded.id);
+        }
+
+        const result = await sql(specificQuery, queryParams);
+
+        if (result.length === 0) {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: 'Portabilité non trouvée' })
+          };
+        }
+
+        // Formatage du résultat unique
+        const portabilite = {
+          ...result[0],
+          client_display: formatClientDisplay({
+            nom_societe: result[0].nom_societe,
+            nom: result[0].client_nom,
+            prenom: result[0].client_prenom
+          })
+        };
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify(portabilite) // Retourner l'objet directement, pas dans un tableau
+        };
+
+      } else {
+        // Récupération de la liste des portabilités (logique existante)
+        const { queryStringParameters } = event;
+        const page = parseInt(queryStringParameters?.page) || 1;
+        const limit = parseInt(queryStringParameters?.limit) || 10;
+        const offset = (page - 1) * limit;
+        const status = queryStringParameters?.status;
+        const clientId = queryStringParameters?.client;
+        const search = queryStringParameters?.search;
+
+        let baseQuery = `
+          SELECT 
+            p.*,
+            c.nom_societe,
+            c.nom as client_nom,
+            c.prenom as client_prenom,
+            d.nom as demandeur_nom,
+            d.prenom as demandeur_prenom,
+            a.nom as agent_nom,
+            a.prenom as agent_prenom
+          FROM portabilites p
+          LEFT JOIN clients c ON p.client_id = c.id
+          LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+          LEFT JOIN agents a ON p.agent_id = a.id
+          WHERE 1=1
+        `;
+
+        let queryParams = [];
+        let paramCount = 0;
+
+        // Filtrage par utilisateur selon le type
+        if (decoded.type === 'demandeur') {
+          paramCount++;
+          baseQuery += ` AND p.demandeur_id = $${paramCount}`;
+          queryParams.push(decoded.id);
+        }
+
+        // Filtrage par statut
+        if (status) {
+          paramCount++;
+          baseQuery += ` AND p.status = $${paramCount}`;
+          queryParams.push(status);
+        }
+
+        // Filtrage par client
+        if (clientId) {
+          paramCount++;
+          baseQuery += ` AND p.client_id = $${paramCount}`;
+          queryParams.push(clientId);
+        }
+
+        // Recherche par numéro de portabilité
+        if (search) {
+          paramCount++;
+          baseQuery += ` AND p.numero_portabilite ILIKE $${paramCount}`;
+          queryParams.push(`%${search}%`);
+        }
+
+        // Récupération du total
+        const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as subquery`;
+        const totalResult = await sql(countQuery, queryParams);
+        const total = parseInt(totalResult[0].total);
+
+        // Récupération des données paginées
+        baseQuery += ` ORDER BY p.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+        queryParams.push(limit, offset);
+
+        const result = await sql(baseQuery, queryParams);
+        
+        // Formatage des résultats
+        const portabilites = result.map(row => ({
+          ...row,
+          client_display: formatClientDisplay({
+            nom_societe: row.nom_societe,
+            nom: row.client_nom,
+            prenom: row.client_prenom
+          })
+        }));
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            data: portabilites,
+            pagination: {
+              page,
+              limit,
+              total,
+              pages: Math.ceil(total / limit),
+              hasNext: page < Math.ceil(total / limit),
+              hasPrev: page > 1
+            }
+          })
+        };
       }
-
-      // Filtrage par statut
-      if (status) {
-        paramCount++;
-        baseQuery += ` AND p.status = $${paramCount}`;
-        queryParams.push(status);
-      }
-
-      // Filtrage par client
-      if (clientId) {
-        paramCount++;
-        baseQuery += ` AND p.client_id = $${paramCount}`;
-        queryParams.push(clientId);
-      }
-
-      // Recherche par numéro de portabilité
-      if (search) {
-        paramCount++;
-        baseQuery += ` AND p.numero_portabilite ILIKE $${paramCount}`;
-        queryParams.push(`%${search}%`);
-      }
-
-      // Récupération du total
-      const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as subquery`;
-      const totalResult = await sql(countQuery, queryParams);
-      const total = parseInt(totalResult[0].total);
-
-      // Récupération des données paginées
-      baseQuery += ` ORDER BY p.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
-      queryParams.push(limit, offset);
-
-      const result = await sql(baseQuery, queryParams);
-      
-      // Formatage des résultats
-      const portabilites = result.map(row => ({
-        ...row,
-        client_display: formatClientDisplay({
-          nom_societe: row.nom_societe,
-          nom: row.client_nom,
-          prenom: row.client_prenom
-        })
-      }));
-
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          data: portabilites,
-          pagination: {
-            page,
-            limit,
-            total,
-            pages: Math.ceil(total / limit),
-            hasNext: page < Math.ceil(total / limit),
-            hasPrev: page > 1
-          }
-        })
-      };
 
     } else if (method === 'POST') {
       // Création d'une nouvelle portabilité
