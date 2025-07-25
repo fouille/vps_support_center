@@ -177,7 +177,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       
       setSuccess(true);
       setTimeout(() => {
-        navigate('/portabilites');
+        onNavigate('portabilites');
       }, 1500);
       
     } catch (err) {
