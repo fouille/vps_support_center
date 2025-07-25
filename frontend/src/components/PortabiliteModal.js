@@ -231,7 +231,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
                 )}
               </div>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
               {user.type_utilisateur === 'agent' && (
                 <>
                   <button
@@ -279,9 +279,14 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
                   )}
                 </button>
               )}
+              
+              {/* Séparateur visuel */}
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-4"></div>
+              
+              {/* Bouton de fermeture espacé */}
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
