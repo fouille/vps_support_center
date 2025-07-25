@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useParams, useNavigate } from 'react-router-dom';
 
-const PortabiliteDetail = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
   const { user, api } = useContext(AuthContext);
   const [portabilite, setPortabilite] = useState(null);
   const [commentaires, setCommentaires] = useState([]);
