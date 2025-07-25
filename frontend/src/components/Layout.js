@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   UserCheck, 
@@ -10,11 +11,14 @@ import {
   Menu, 
   X,
   Sun,
-  Moon
+  Moon,
+  Phone
 } from 'lucide-react';
 
-const Layout = ({ children, currentPage, onNavigate }) => {
+const Layout = ({ children }) => {
   const { user, logout, isAgent } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
@@ -25,15 +29,25 @@ const Layout = ({ children, currentPage, onNavigate }) => {
 
   const navigation = [
     ...(isAgent ? [
-      { name: 'Supervision Tickets', icon: Ticket, key: 'tickets' },
-      { name: 'Clients', icon: Users, key: 'clients' },
-      { name: 'Demandeurs', icon: UserCheck, key: 'demandeurs' },
-      { name: 'Agents', icon: Shield, key: 'agents' },
+      { name: 'Supervision Tickets', icon: Ticket, path: '/tickets' },
+      { name: 'Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Clients', icon: Users, path: '/clients' },
+      { name: 'Demandeurs', icon: UserCheck, path: '/demandeurs' },
+      { name: 'Agents', icon: Shield, path: '/agents' },
     ] : [
-      { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
-      { name: 'Nouveau Ticket', icon: FileText, key: 'nouveau-ticket' },
+      { name: 'Mes Tickets', icon: Ticket, path: '/tickets' },
+      { name: 'Mes Portabilités', icon: Phone, path: '/portabilites' },
     ])
   ];
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    setSidebarOpen(false);
+  };
+
+  const isCurrentPage = (path) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
@@ -53,7 +67,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
           <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-            Support Tickets
+            Support & Portabilités
           </h1>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -68,13 +82,10 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
-                key={item.key}
-                onClick={() => {
-                  onNavigate(item.key);
-                  setSidebarOpen(false);
-                }}
+                key={item.path}
+                onClick={() => handleNavigate(item.path)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
-                  currentPage === item.key ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
+                  isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
               >
                 <item.icon className="h-5 w-5 mr-3" />
@@ -143,7 +154,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
       </div>
