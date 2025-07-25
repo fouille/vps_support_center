@@ -65,7 +65,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
     setCommentLoading(true);
     try {
       const response = await api.post(`/api/portabilite-echanges`, {
-        portabiliteId: id,
+        portabiliteId: portabiliteId,
         message: newComment.trim()
       });
 
