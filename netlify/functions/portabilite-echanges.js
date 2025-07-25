@@ -82,7 +82,7 @@ exports.handler = async (event, context) => {
         )
       `;
       
-      const accessResult = await client(accessQuery, [
+      const accessResult = await sql(accessQuery, [
         portabiliteId, 
         decoded.id, 
         decoded.type
