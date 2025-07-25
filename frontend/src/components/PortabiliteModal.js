@@ -40,7 +40,12 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     try {
       const response = await api.get(`/api/portabilites/${portabiliteId}`);
       console.log('Portabilité data received:', response.data);
-      setPortabilite(response.data);
+      
+      // L'API retourne un tableau avec un objet, prendre le premier élément
+      const portabiliteData = Array.isArray(response.data) ? response.data[0] : response.data;
+      console.log('Portabilité object:', portabiliteData);
+      
+      setPortabilite(portabiliteData);
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
       console.error('Erreur:', err);
