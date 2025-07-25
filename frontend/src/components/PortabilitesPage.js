@@ -20,7 +20,7 @@ const PortabilitesPage = () => {
   });
   const [searchDebounce, setSearchDebounce] = useState(null);
   
-  const { user } = useContext(AuthContext);
+  const { user, api } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const statusLabels = {
