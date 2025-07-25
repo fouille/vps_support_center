@@ -57,7 +57,139 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     }
   };
 
-  // Fonction pour récupérer les commentaires
+  // Fonction pour récupérer les fichiers
+  const fetchFichiers = async () => {
+    setLoadingFiles(true);
+    try {
+      const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabiliteId}`);
+      setFichiers(response.data);
+    } catch (err) {
+      console.error('Erreur lors du chargement des fichiers:', err);
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
+
+  // Fonction pour gérer l'upload de fichier
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Vérifications côté client
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError('Le fichier est trop volumineux (limite: 10MB)');
+      return;
+    }
+
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'audio/wav', 'audio/wave', 'audio/x-wav',
+      'text/plain', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC');
+      return;
+    }
+
+    setUploadingFile(true);
+    try {
+      // Convertir le fichier en base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const fileData = {
+        nom_fichier: file.name,
+        type_fichier: file.type,
+        taille_fichier: file.size,
+        contenu_base64: base64
+      };
+
+      await api.post(`/api/portabilite-fichiers?portabiliteId=${portabiliteId}`, fileData);
+      
+      // Ajouter un commentaire automatique
+      try {
+        const commentResponse = await api.post(`/api/portabilite-echanges`, {
+          portabiliteId: portabiliteId,
+          message: `A ajouté une pièce jointe ${file.name}`
+        });
+        
+        setCommentaires([...commentaires, commentResponse.data]);
+      } catch (commentError) {
+        console.error('Erreur lors de l\'ajout du commentaire automatique:', commentError);
+      }
+      
+      fetchFichiers();
+      event.target.value = ''; // Reset input
+    } catch (error) {
+      setError(error.response?.data?.error || 'Erreur lors de l\'upload du fichier');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  // Fonction pour supprimer un fichier
+  const handleFileDelete = async (fileId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) return;
+
+    try {
+      await api.delete(`/api/portabilite-fichiers?portabiliteId=${portabiliteId}&fileId=${fileId}`);
+      fetchFichiers();
+    } catch (error) {
+      setError(error.response?.data?.error || 'Erreur lors de la suppression du fichier');
+    }
+  };
+
+  // Fonction pour télécharger un fichier
+  const downloadFile = (file) => {
+    try {
+      const byteCharacters = atob(file.contenu_base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: file.type_fichier });
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.nom_fichier;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      setError('Erreur lors du téléchargement du fichier');
+      console.error('Download error:', error);
+    }
+  };
+
+  // Fonction pour obtenir l'icône du fichier
+  const getFileIcon = (type) => {
+    if (type.startsWith('image/')) return '🖼️';
+    if (type === 'application/pdf') return '📄';
+    if (type.startsWith('audio/')) return '🎵';
+    if (type === 'text/plain') return '📝';
+    if (type.includes('word') || type.includes('document')) return '📄';
+    return '📎';
+  };
+
+  // Fonction pour formater la taille du fichier
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
   const fetchCommentaires = async () => {
     try {
       const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabiliteId}`);
