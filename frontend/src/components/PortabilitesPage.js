@@ -69,8 +69,14 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
         setPortabilites(response.data);
       }
     } catch (err) {
-      setError('Erreur lors du chargement des portabilités');
-      console.error('Erreur:', err);
+      console.error('Erreur lors du chargement des portabilités:', err);
+      
+      // Vérifier si c'est une erreur 401 ou 404 (endpoint non trouvé)
+      if (err.response?.status === 401 || err.response?.status === 404) {
+        setError('Les tables de portabilités ne sont pas encore créées. Veuillez exécuter le script SQL fourni dans votre base de données Neon.');
+      } else {
+        setError('Erreur lors du chargement des portabilités');
+      }
     } finally {
       setLoading(false);
       setSearchLoading(false);
