@@ -90,7 +90,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
 
     setStatusLoading(true);
     try {
-      const response = await api.put(`/api/portabilites/${id}`, {
+      const response = await api.put(`/api/portabilites/${portabiliteId}`, {
         status: newStatus
       });
 
