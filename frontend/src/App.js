@@ -30,6 +30,7 @@ const AppContent = () => {
   }
 
   const renderPage = () => {
+    console.log('Rendering page:', currentPage);
     switch (currentPage) {
       case 'clients':
         return <ClientsPage />;
