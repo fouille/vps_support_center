@@ -180,7 +180,7 @@ exports.handler = async (event, context) => {
         RETURNING *
       `;
 
-      const result = await client(insertQuery, [
+      const result = await sql(insertQuery, [
         portabiliteId,
         decoded.id,
         decoded.type,
