@@ -610,7 +610,8 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                   </button>
                 ) : (
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleSubmit}
                     disabled={loading}
                     className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 transition-colors font-medium flex items-center space-x-2"
                   >
