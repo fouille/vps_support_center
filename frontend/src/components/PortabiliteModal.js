@@ -7,8 +7,11 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
   const { user, api } = useContext(AuthContext);
   const [portabilite, setPortabilite] = useState(null);
   const [commentaires, setCommentaires] = useState([]);
+  const [fichiers, setFichiers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingFiles, setLoadingFiles] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [error, setError] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
