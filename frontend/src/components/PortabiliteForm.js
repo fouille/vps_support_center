@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate, useParams } from 'react-router-dom';
 import SearchableSelect from './SearchableSelect';
 
-const PortabiliteForm = () => {
-  const { id } = useParams();
-  const isEdit = Boolean(id);
-  const navigate = useNavigate();
+const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
+  const isEdit = Boolean(portabiliteId);
   const { user, api } = useContext(AuthContext);
   
   const [loading, setLoading] = useState(false);
