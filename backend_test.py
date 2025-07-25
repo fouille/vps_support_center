@@ -2037,20 +2037,333 @@ def test_portabilite_apis():
     
     return results.summary()
 
+def test_portabilite_single_id_endpoint_fix():
+    """Test the specific fix for single portability ID endpoint returning object instead of array"""
+    results = TestResults()
+    
+    print("🚀 Starting Portabilité Single ID Endpoint Fix Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication Tests")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Test GET /api/portabilites (general list) - Should return paginated format
+    print("\n📋 STEP 2: GET Portabilités List - Verify Paginated Format")
+    try:
+        response = requests.get(f"{API_BASE}/portabilites", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results.add_result("GET - List endpoint accessible", True)
+            
+            # Validate response structure (should have data array and pagination object)
+            if 'data' in data and 'pagination' in data:
+                results.add_result("GET - List returns paginated format", True)
+                
+                # Verify data is an array
+                if isinstance(data['data'], list):
+                    results.add_result("GET - List data is array", True)
+                    print(f"   Found {len(data['data'])} portabilités in paginated format")
+                else:
+                    results.add_result("GET - List data is array", False, f"data field is not array: {type(data['data'])}")
+                
+                # Verify pagination object structure
+                pagination = data['pagination']
+                required_pagination_fields = ['page', 'limit', 'total', 'pages', 'hasNext', 'hasPrev']
+                missing_pagination_fields = [field for field in required_pagination_fields if field not in pagination]
+                
+                if not missing_pagination_fields:
+                    results.add_result("GET - List pagination structure valid", True)
+                else:
+                    results.add_result("GET - List pagination structure valid", False, 
+                                     f"Missing pagination fields: {missing_pagination_fields}")
+            else:
+                results.add_result("GET - List returns paginated format", False, "Missing 'data' or 'pagination' fields")
+                
+        elif response.status_code == 404:
+            results.add_result("GET - List endpoint accessible", False, "404 - Database tables likely don't exist")
+            print("   ❌ Database tables (portabilites, portabilite_echanges) appear to be missing")
+            print("   ⚠️  Cannot test the single ID endpoint fix without database tables")
+            return results.summary()
+        else:
+            results.add_result("GET - List endpoint accessible", False, f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+            
+    except Exception as e:
+        results.add_result("GET - List endpoint accessible", False, str(e))
+        return results.summary()
+    
+    # Step 3: Create a test portabilité to test the single ID endpoint
+    print("\n📋 STEP 3: Create Test Portabilité for Single ID Testing")
+    
+    # Get test data first
+    try:
+        clients_response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+        demandeurs_response = requests.get(f"{API_BASE}/demandeurs", headers=headers, timeout=10)
+        
+        if clients_response.status_code == 200 and demandeurs_response.status_code == 200:
+            clients_data = clients_response.json()
+            demandeurs_data = demandeurs_response.json()
+            
+            # Handle both paginated and direct array responses
+            if 'data' in clients_data:
+                test_client_id = clients_data['data'][0]['id']
+            else:
+                test_client_id = clients_data[0]['id']
+            
+            test_demandeur_id = demandeurs_data[0]['id']
+            results.add_result("Get Test Data", True)
+        else:
+            results.add_result("Get Test Data", False, "Failed to get clients or demandeurs")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Data", False, str(e))
+        return results.summary()
+    
+    # Create test portabilité
+    portabilite_data = {
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "numeros_portes": "0123456789, 0987654321",
+        "nom_client": "Test Single ID",
+        "prenom_client": "Endpoint",
+        "email_client": "test.singleid@example.com",
+        "siret_client": "12345678901234",
+        "adresse": "123 Test Single ID Street",
+        "code_postal": "75001",
+        "ville": "Paris",
+        "date_portabilite_demandee": "2025-02-01"
+    }
+    
+    test_portabilite_id = None
+    try:
+        response = requests.post(f"{API_BASE}/portabilites", headers=headers, 
+                               json=portabilite_data, timeout=10)
+        
+        if response.status_code == 201:
+            test_portabilite = response.json()
+            test_portabilite_id = test_portabilite['id']
+            results.add_result("Create Test Portabilité", True)
+            print(f"   Created test portabilité with ID: {test_portabilite_id}")
+        else:
+            results.add_result("Create Test Portabilité", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Create Test Portabilité", False, str(e))
+        return results.summary()
+    
+    # Step 4: Test GET /api/portabilites/{id} - THE MAIN FIX TEST
+    print("\n📋 STEP 4: GET Single Portabilité - CRITICAL FIX TEST")
+    print("   🎯 Testing that /api/portabilites/{id} returns SINGLE OBJECT, not array")
+    
+    try:
+        response = requests.get(f"{API_BASE}/portabilites/{test_portabilite_id}", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            portabilite_response = response.json()
+            results.add_result("GET - Single ID endpoint accessible", True)
+            
+            # CRITICAL TEST: Verify response is a single object, NOT an array
+            if isinstance(portabilite_response, dict):
+                results.add_result("GET - Single ID returns OBJECT (not array)", True)
+                print("   ✅ CRITICAL FIX VERIFIED: Single ID endpoint returns object, not array")
+                
+                # Verify it's the correct portabilité
+                if portabilite_response.get('id') == test_portabilite_id:
+                    results.add_result("GET - Single ID returns correct portabilité", True)
+                else:
+                    results.add_result("GET - Single ID returns correct portabilité", False, 
+                                     f"Expected ID {test_portabilite_id}, got {portabilite_response.get('id')}")
+                
+                # Verify it has all joined data (client info, demandeur info, etc.)
+                expected_joined_fields = ['client_display', 'nom_societe', 'demandeur_nom', 'demandeur_prenom']
+                joined_fields_present = [field for field in expected_joined_fields if field in portabilite_response]
+                
+                if len(joined_fields_present) > 0:
+                    results.add_result("GET - Single ID includes joined data", True)
+                    print(f"   ✅ Joined data fields present: {joined_fields_present}")
+                else:
+                    results.add_result("GET - Single ID includes joined data", False, 
+                                     "No joined data fields found")
+                
+                # Verify required portabilité fields
+                required_fields = ['id', 'client_id', 'demandeur_id', 'numeros_portes', 'status', 'created_at']
+                missing_fields = [field for field in required_fields if field not in portabilite_response]
+                
+                if not missing_fields:
+                    results.add_result("GET - Single ID has required fields", True)
+                else:
+                    results.add_result("GET - Single ID has required fields", False, 
+                                     f"Missing fields: {missing_fields}")
+                
+            elif isinstance(portabilite_response, list):
+                results.add_result("GET - Single ID returns OBJECT (not array)", False, 
+                                 "❌ CRITICAL BUG: Single ID endpoint still returns array instead of object")
+                print("   ❌ CRITICAL BUG DETECTED: /api/portabilites/{id} returns array instead of single object")
+                
+                # Additional analysis if it's still returning an array
+                if len(portabilite_response) == 1:
+                    print("   📊 Array contains 1 item (should be returned as object directly)")
+                else:
+                    print(f"   📊 Array contains {len(portabilite_response)} items (unexpected)")
+                    
+            else:
+                results.add_result("GET - Single ID returns OBJECT (not array)", False, 
+                                 f"Unexpected response type: {type(portabilite_response)}")
+                
+        elif response.status_code == 404:
+            results.add_result("GET - Single ID endpoint accessible", False, 
+                             "404 - Portabilité not found (unexpected for just-created portabilité)")
+        else:
+            results.add_result("GET - Single ID endpoint accessible", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            
+    except Exception as e:
+        results.add_result("GET - Single ID endpoint accessible", False, str(e))
+    
+    # Step 5: Test with demandeur authentication (if available)
+    print("\n📋 STEP 5: Test Single ID Endpoint with Demandeur Authentication")
+    
+    if demandeur_token:
+        demandeur_headers = {
+            "Authorization": f"Bearer {demandeur_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = requests.get(f"{API_BASE}/portabilites/{test_portabilite_id}", 
+                                  headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 200:
+                portabilite_response = response.json()
+                results.add_result("GET - Single ID demandeur access", True)
+                
+                # Verify it's still returning object format for demandeur
+                if isinstance(portabilite_response, dict):
+                    results.add_result("GET - Single ID demandeur gets object", True)
+                else:
+                    results.add_result("GET - Single ID demandeur gets object", False, 
+                                     f"Demandeur gets {type(portabilite_response)} instead of object")
+                    
+            elif response.status_code == 403:
+                results.add_result("GET - Single ID demandeur access", True, 
+                                 "403 - Access denied (expected if demandeur doesn't own this portabilité)")
+            elif response.status_code == 404:
+                results.add_result("GET - Single ID demandeur access", True, 
+                                 "404 - Not found (expected if demandeur doesn't have access)")
+            else:
+                results.add_result("GET - Single ID demandeur access", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("GET - Single ID demandeur access", False, str(e))
+    
+    # Step 6: Test with non-existent ID
+    print("\n📋 STEP 6: Test Single ID Endpoint with Non-existent ID")
+    
+    fake_id = "56e9bfcb-f19a-4628-b143-d22bc17d0cec"  # From review request
+    try:
+        response = requests.get(f"{API_BASE}/portabilites/{fake_id}", headers=headers, timeout=10)
+        
+        if response.status_code == 404:
+            results.add_result("GET - Single ID non-existent returns 404", True)
+            
+            # Verify 404 response is still object format (error object)
+            error_response = response.json()
+            if isinstance(error_response, dict) and 'error' in error_response:
+                results.add_result("GET - Single ID 404 returns error object", True)
+            else:
+                results.add_result("GET - Single ID 404 returns error object", False, 
+                                 "404 response is not proper error object")
+        else:
+            results.add_result("GET - Single ID non-existent returns 404", False, 
+                             f"Expected 404, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Single ID non-existent returns 404", False, str(e))
+    
+    # Step 7: Compare list vs single ID response formats
+    print("\n📋 STEP 7: Compare List vs Single ID Response Formats")
+    
+    try:
+        # Get list response
+        list_response = requests.get(f"{API_BASE}/portabilites", headers=headers, timeout=10)
+        single_response = requests.get(f"{API_BASE}/portabilites/{test_portabilite_id}", headers=headers, timeout=10)
+        
+        if list_response.status_code == 200 and single_response.status_code == 200:
+            list_data = list_response.json()
+            single_data = single_response.json()
+            
+            # Verify list has pagination structure
+            list_has_pagination = 'data' in list_data and 'pagination' in list_data
+            # Verify single response is direct object
+            single_is_object = isinstance(single_data, dict) and 'data' not in single_data and 'pagination' not in single_data
+            
+            if list_has_pagination and single_is_object:
+                results.add_result("Format Comparison - List vs Single", True)
+                print("   ✅ FORMATS CORRECT:")
+                print("      - List endpoint: { data: [...], pagination: {...} }")
+                print("      - Single endpoint: { id: ..., client_id: ..., ... }")
+            else:
+                results.add_result("Format Comparison - List vs Single", False, 
+                                 f"List has pagination: {list_has_pagination}, Single is object: {single_is_object}")
+        else:
+            results.add_result("Format Comparison - List vs Single", False, 
+                             f"List status: {list_response.status_code}, Single status: {single_response.status_code}")
+    except Exception as e:
+        results.add_result("Format Comparison - List vs Single", False, str(e))
+    
+    # Cleanup: Delete test portabilité
+    print("\n📋 STEP 8: Cleanup")
+    
+    if test_portabilite_id:
+        try:
+            response = requests.delete(f"{API_BASE}/portabilites/{test_portabilite_id}", 
+                                     headers=headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("Cleanup - Delete test portabilité", True)
+            else:
+                results.add_result("Cleanup - Delete test portabilité", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("Cleanup - Delete test portabilité", False, str(e))
+    
+    return results.summary()
+
 if __name__ == "__main__":
-    print("🧪 Backend API Testing - Support Ticket Management System")
+    print("🧪 Backend API Testing - Portabilité Single ID Endpoint Fix")
     print("=" * 60)
     
-    # Test: Corrected Portabilité APIs (Priority Test from Review Request)
+    # Test: Specific fix for single portability ID endpoint
     print("\n" + "="*60)
-    print("TEST: CORRECTED PORTABILITÉ APIs - FIXES VERIFICATION")
+    print("TEST: PORTABILITÉ SINGLE ID ENDPOINT FIX")
     print("="*60)
-    portabilite_success = test_portabilite_apis()
+    portabilite_fix_success = test_portabilite_single_id_endpoint_fix()
     
     # Overall result
-    if portabilite_success:
-        print("\n🎉 Portabilité API tests passed!")
+    if portabilite_fix_success:
+        print("\n🎉 Portabilité single ID endpoint fix tests passed!")
         sys.exit(0)
     else:
-        print("\n💥 Portabilité API tests failed!")
+        print("\n💥 Portabilité single ID endpoint fix tests failed!")
         sys.exit(1)
