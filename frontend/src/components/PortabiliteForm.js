@@ -201,7 +201,32 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     fetchClients();
     fetchDemandeurs();
     fetchPortabilite();
-  }, []);
+    
+    // Si l'utilisateur est un demandeur, l'ajouter par défaut dans le formulaire
+    if (user.type_utilisateur === 'demandeur' && !isEdit) {
+      setFormData(prev => ({
+        ...prev,
+        demandeur_id: user.id
+      }));
+    }
+  }, [user]);
+
+  // Fonctions pour la navigation des steps
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const goToStep = (step) => {
+    setCurrentStep(step);
+  };
 
   if (loading && isEdit) {
     return (
