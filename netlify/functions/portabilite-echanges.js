@@ -252,7 +252,7 @@ exports.handler = async (event, context) => {
         RETURNING *
       `;
 
-      const result = await client(deleteQuery, [commentId]);
+      const result = await sql(deleteQuery, [commentId]);
 
       if (result.length === 0) {
         return {
