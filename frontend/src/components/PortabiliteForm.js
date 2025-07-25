@@ -205,13 +205,13 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     fetchPortabilite();
     
     // Si l'utilisateur est un demandeur, l'ajouter par défaut dans le formulaire
-    if (user.type_utilisateur === 'demandeur' && !isEdit) {
+    if (user && user.type_utilisateur === 'demandeur' && !isEdit) {
       setFormData(prev => ({
         ...prev,
         demandeur_id: user.id
       }));
     }
-  }, [user]);
+  }, [user, isEdit]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fonctions pour la navigation des steps
   const nextStep = () => {
