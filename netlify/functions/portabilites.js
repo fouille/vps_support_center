@@ -183,6 +183,18 @@ exports.handler = async (event, context) => {
       let finalDemandeurId = demandeur_id;
       if (decoded.type === 'demandeur') {
         finalDemandeurId = decoded.id;
+      } else if (decoded.type === 'agent') {
+        // Pour les agents, si demandeur_id est vide, utiliser null
+        finalDemandeurId = demandeur_id && demandeur_id.trim() !== '' ? demandeur_id : null;
+      }
+
+      // Validation : un demandeur doit être spécifié
+      if (!finalDemandeurId) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ error: 'Un demandeur doit être sélectionné' })
+        };
       }
 
       // Insertion de la portabilité
