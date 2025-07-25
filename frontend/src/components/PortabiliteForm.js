@@ -34,17 +34,12 @@ const PortabiliteForm = () => {
     fichier_pdf_contenu: ''
   });
 
-  const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = '';
 
   // Fonction pour récupérer les clients
   const fetchClients = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/clients?limit=100`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/clients?limit=100`);
       
       let clientsData = response.data;
       if (response.data.data && Array.isArray(response.data.data)) {
