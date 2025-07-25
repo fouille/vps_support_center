@@ -172,7 +172,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       const method = isEdit ? 'PUT' : 'POST';
       
       const response = isEdit ? 
-        await api.put(`/api/portabilites/${id}`, formData) :
+        await api.put(`/api/portabilites/${portabiliteId}`, formData) :
         await api.post(`/api/portabilites`, formData);
       
       setSuccess(true);
