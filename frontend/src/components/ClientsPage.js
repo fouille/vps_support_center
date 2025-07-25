@@ -31,7 +31,7 @@ const ClientsPage = () => {
   });
 
   useEffect(() => {
-    fetchClients();
+    fetchClients(true); // Chargement initial
   }, [currentPage, searchTerm]);
 
   // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
@@ -66,9 +66,14 @@ const ClientsPage = () => {
     }
   }, [searchTerm]);
 
-  const fetchClients = async () => {
+  const fetchClients = async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setSearchLoading(true);
+      }
+      
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '10'
@@ -100,7 +105,11 @@ const ClientsPage = () => {
       setError('Erreur lors du chargement des clients');
       console.error('Error fetching clients:', error);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setInitialLoading(false);
+      } else {
+        setSearchLoading(false);
+      }
     }
   };
 
