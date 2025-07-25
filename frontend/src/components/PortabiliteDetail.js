@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 const PortabiliteDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, api } = useContext(AuthContext);
   const [portabilite, setPortabilite] = useState(null);
   const [commentaires, setCommentaires] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const PortabiliteDetail = () => {
   const [statusLoading, setStatusLoading] = useState(false);
   
   const commentsEndRef = useRef(null);
-  const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = '';
 
   const statusLabels = {
     'nouveau': 'Nouveau',
