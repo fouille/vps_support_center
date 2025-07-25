@@ -110,7 +110,7 @@ exports.handler = async (event, context) => {
         ORDER BY pe.created_at ASC
       `;
 
-      const result = await client.query(commentsQuery, [portabiliteId]);
+      const result = await client(commentsQuery, [portabiliteId]);
 
       return {
         statusCode: 200,
