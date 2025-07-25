@@ -373,90 +373,158 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
               </div>
             </div>
 
-            {/* Système de commentaires */}
+            {/* Système de commentaires - Style moderne des tickets */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                Commentaires ({commentaires.length})
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Échanges et commentaires
+                </h3>
+                <div className="flex items-center space-x-3">
+                  {commentaires.length > 0 && (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {commentaires.length} commentaire{commentaires.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </div>
               
-              {/* Liste des commentaires */}
-              <div className="h-64 overflow-y-auto mb-4 space-y-3 border rounded-lg p-4 bg-white dark:bg-gray-700">
-                {commentaires.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                    Aucun commentaire pour le moment
-                  </p>
-                ) : (
-                  commentaires.map((commentaire) => (
-                    <div
-                      key={commentaire.id}
-                      className={`p-3 rounded-lg border-l-4 ${
-                        commentaire.auteur_type === 'agent' 
-                          ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' 
-                          : 'bg-green-50 dark:bg-green-900/20 border-green-500'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                            commentaire.auteur_type === 'agent' ? 'bg-blue-500' : 'bg-green-500'
-                          }`}>
-                            {commentaire.auteur_nom ? commentaire.auteur_nom.split(' ').map(n => n[0]).join('') : 'A'}
+              {/* Liste des commentaires avec scroll amélioré */}
+              <div className="border border-gray-200 dark:border-gray-600 rounded-lg mb-4 bg-gray-50 dark:bg-gray-700 relative">
+                {/* Container de messagerie avec scroll et padding bottom */}
+                <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 pb-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
+                  {commentaires.length > 0 ? (
+                    <div className="space-y-3">
+                      {commentaires.map((commentaire, index) => {
+                        // Déterminer si c'est MON message (utilisateur connecté)
+                        const isMyMessage = user && (
+                          (user.type_utilisateur === 'agent' && commentaire.auteur_type === 'agent') ||
+                          (user.type_utilisateur === 'demandeur' && commentaire.auteur_type === 'demandeur')
+                        );
+                        
+                        const isAgentAuthor = commentaire.auteur_type === 'agent';
+                        
+                        return (
+                          <div 
+                            key={commentaire.id} 
+                            className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} ${
+                              index === commentaires.length - 1 ? 'animate-fade-in' : ''
+                            }`}
+                          >
+                            <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-2' : 'order-1'}`}>
+                              {/* Message bubble */}
+                              <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                                isMyMessage 
+                                  ? 'bg-purple-500 text-white rounded-br-md' 
+                                  : 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white rounded-bl-md border border-gray-200 dark:border-gray-500'
+                              }`}>
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                                  {commentaire.message}
+                                </p>
+                              </div>
+                              
+                              {/* Metadata */}
+                              <div className={`flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400 ${
+                                isMyMessage ? 'justify-end' : 'justify-start'
+                              }`}>
+                                <div className={`flex items-center space-x-2 ${isMyMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white ${
+                                    isAgentAuthor ? 'bg-purple-600' : 'bg-green-500'
+                                  }`}>
+                                    {commentaire.auteur_nom ? commentaire.auteur_nom.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'A'}
+                                  </div>
+                                  <span className="font-medium">
+                                    {isMyMessage ? 'Moi' : (commentaire.auteur_nom || 'Utilisateur')}
+                                  </span>
+                                  <span>•</span>
+                                  <span>
+                                    {formatDate(commentaire.created_at)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <span className="font-medium text-gray-900 dark:text-white">
-                            {commentaire.auteur_nom || 'Utilisateur'}
-                          </span>
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {formatDate(commentaire.created_at)}
-                        </span>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mb-4">
+                        <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
                       </div>
-                      <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                        {commentaire.message}
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Aucune conversation pour cette portabilité
+                      </p>
+                      <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                        Commencez la discussion en envoyant le premier message
                       </p>
                     </div>
-                  ))
+                  )}
+                  <div ref={commentsEndRef} />
+                </div>
+                
+                {/* Indicateur de scroll si nécessaire */}
+                {commentaires.length > 3 && (
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-600 px-2 py-1 rounded shadow">
+                    Faire défiler pour voir plus
+                  </div>
                 )}
-                <div ref={commentsEndRef} />
               </div>
 
-              {/* Formulaire de commentaire */}
-              <form onSubmit={handleSubmitComment} className="space-y-3">
-                <div>
-                  <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Ajouter un commentaire..."
-                    rows="3"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
-                    disabled={commentLoading}
-                  />
-                  <div className="flex justify-between items-center mt-2">
-                    <span className={`text-sm ${
-                      newComment.length > 800 ? 'text-red-500' : 
-                      newComment.length > 700 ? 'text-yellow-500' : 'text-gray-500'
+              {/* Formulaire de commentaire amélioré */}
+              <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+                <form onSubmit={handleSubmitComment} className="space-y-3">
+                  <div className="relative">
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Tapez votre message..."
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-600 dark:text-white h-20 resize-none pr-12"
+                      required
+                      maxLength={1000}
+                      disabled={commentLoading}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && !commentLoading) {
+                          e.preventDefault();
+                          handleSubmitComment(e);
+                        }
+                      }}
+                    />
+                    <div className={`absolute bottom-2 right-2 text-xs ${
+                      newComment.length > 900 ? 'text-red-500' : 
+                      newComment.length > 800 ? 'text-yellow-500' : 
+                      'text-gray-400 dark:text-gray-500'
                     }`}>
-                      {newComment.length}/1000 caractères
-                    </span>
+                      {newComment.length}/1000
+                    </div>
                   </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={commentLoading || !newComment.trim() || newComment.length > 1000}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                >
-                  {commentLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                      <span>Envoi...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Envoyer</span>
-                      <span>📩</span>
-                    </>
-                  )}
-                </button>
-              </form>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      💡 Appuyez sur Entrée pour envoyer • Shift+Entrée pour saut de ligne
+                    </span>
+                    <button
+                      type="submit"
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      disabled={!newComment.trim() || commentLoading}
+                    >
+                      {commentLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span>Envoi...</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          </svg>
+                          <span>Envoyer</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
