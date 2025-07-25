@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
-import { useNavigate } from 'react-router-dom';
 
-const PortabilitesPage = () => {
+const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
   const [portabilites, setPortabilites] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +19,6 @@ const PortabilitesPage = () => {
   const [searchDebounce, setSearchDebounce] = useState(null);
   
   const { user, api } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const statusLabels = {
     'nouveau': 'Nouveau',
