@@ -17,6 +17,12 @@ const AppContent = () => {
   const [currentPage, setCurrentPage] = useState('tickets');
   const [currentPortabiliteId, setCurrentPortabiliteId] = useState(null);
 
+  // Debug navigation
+  const handleNavigate = (page) => {
+    console.log('App.js - setCurrentPage called with:', page);
+    setCurrentPage(page);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center">
