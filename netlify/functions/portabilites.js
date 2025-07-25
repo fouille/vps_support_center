@@ -1,18 +1,24 @@
-const { Client } = require('@netlify/neon');
+const { neon } = require('@netlify/neon');
 const jwt = require('jsonwebtoken');
 const emailService = require('./email-service');
 
-// Configuration JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
 
-// Fonction pour vérifier le token JWT
-function verifyToken(token) {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    return null;
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Content-Type': 'application/json',
+};
+
+const verifyToken = (authHeader) => {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('Token manquant');
   }
-}
+  
+  const token = authHeader.substring(7);
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
+};
 
 // Fonction pour obtenir le nom du client formaté
 function formatClientDisplay(client) {
