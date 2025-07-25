@@ -17,8 +17,6 @@ const AppContent = () => {
   const [currentPage, setCurrentPage] = useState('tickets');
   const [currentPortabiliteId, setCurrentPortabiliteId] = useState(null);
 
-
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-dark-bg flex items-center justify-center">
