@@ -173,7 +173,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       return;
     }
     
-    if (user.type === 'agent' && !formData.demandeur_id) {
+    if (user.type_utilisateur === 'agent' && !formData.demandeur_id) {
       setError('Veuillez sélectionner un demandeur');
       setLoading(false);
       return;
