@@ -174,15 +174,9 @@ const PortabiliteForm = () => {
       
       const method = isEdit ? 'PUT' : 'POST';
       
-      const response = await axios({
-        method,
-        url,
-        data: formData,
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = isEdit ? 
+        await api.put(`/api/portabilites/${id}`, formData) :
+        await api.post(`/api/portabilites`, formData);
       
       setSuccess(true);
       setTimeout(() => {
