@@ -54,7 +54,7 @@ const AppContent = () => {
   };
 
   return (
-    <Layout currentPage={currentPage} onNavigate={handleNavigate}>
+    <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
       {renderPage()}
     </Layout>
   );
