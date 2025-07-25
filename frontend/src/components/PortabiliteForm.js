@@ -57,6 +57,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       const response = await api.get(`/api/demandeurs`);
       
       setDemandeurs(Array.isArray(response.data) ? response.data : []);
+      console.log('Demandeurs chargés:', response.data); // Debug
     } catch (err) {
       console.error('Erreur lors du chargement des demandeurs:', err);
     }
