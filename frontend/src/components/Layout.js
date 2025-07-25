@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   UserCheck, 
@@ -15,10 +14,8 @@ import {
   Phone
 } from 'lucide-react';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, currentPage, onNavigate }) => {
   const { user, logout, isAgent } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
@@ -29,24 +26,24 @@ const Layout = ({ children }) => {
 
   const navigation = [
     ...(isAgent ? [
-      { name: 'Supervision Tickets', icon: Ticket, path: '/tickets' },
-      { name: 'Portabilités', icon: Phone, path: '/portabilites' },
-      { name: 'Clients', icon: Users, path: '/clients' },
-      { name: 'Demandeurs', icon: UserCheck, path: '/demandeurs' },
-      { name: 'Agents', icon: Shield, path: '/agents' },
+      { name: 'Supervision Tickets', icon: Ticket, key: 'tickets' },
+      { name: 'Portabilités', icon: Phone, key: 'portabilites' },
+      { name: 'Clients', icon: Users, key: 'clients' },
+      { name: 'Demandeurs', icon: UserCheck, key: 'demandeurs' },
+      { name: 'Agents', icon: Shield, key: 'agents' },
     ] : [
-      { name: 'Mes Tickets', icon: Ticket, path: '/tickets' },
-      { name: 'Mes Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
+      { name: 'Mes Portabilités', icon: Phone, key: 'portabilites' },
     ])
   ];
 
-  const handleNavigate = (path) => {
-    navigate(path);
+  const handleNavigate = (key) => {
+    onNavigate(key);
     setSidebarOpen(false);
   };
 
-  const isCurrentPage = (path) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+  const isCurrentPage = (key) => {
+    return currentPage === key || currentPage.startsWith(key + '-');
   };
 
   return (
@@ -82,10 +79,10 @@ const Layout = ({ children }) => {
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
-                key={item.path}
-                onClick={() => handleNavigate(item.path)}
+                key={item.key}
+                onClick={() => handleNavigate(item.key)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
-                  isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
+                  isCurrentPage(item.key) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
               >
                 <item.icon className="h-5 w-5 mr-3" />
