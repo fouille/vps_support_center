@@ -315,7 +315,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchPortabilite(), fetchCommentaires()]);
+      await Promise.all([fetchPortabilite(), fetchCommentaires(), fetchFichiers()]);
       setLoading(false);
     };
     
