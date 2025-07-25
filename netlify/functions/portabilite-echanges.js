@@ -169,7 +169,7 @@ exports.handler = async (event, context) => {
         };
       }
 
-      const portabiliteInfo = accessResult.rows[0];
+      const portabiliteInfo = accessResult[0];
 
       // Insertion du commentaire
       const insertQuery = `
