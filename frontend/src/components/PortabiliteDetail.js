@@ -110,7 +110,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette portabilité ?')) return;
 
     try {
-      await api.delete(`/api/portabilites/${id}`);
+      await api.delete(`/api/portabilites/${portabiliteId}`);
 
       navigate('/portabilites');
     } catch (err) {
