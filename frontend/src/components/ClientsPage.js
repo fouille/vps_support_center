@@ -32,17 +32,7 @@ const ClientsPage = () => {
   });
 
   useEffect(() => {
-    // Premier chargement seulement
-    if (clients.length === 0 && !searchTerm && currentPage === 1) {
-      fetchClients(true);
-    }
-  }, []); // Seulement au montage du composant
-
-  useEffect(() => {
-    // Recherches et changements de page (pas initial)
-    if (searchTerm || currentPage > 1) {
-      fetchClients(false);
-    }
+    fetchClients();
   }, [currentPage, searchTerm]);
 
   // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
@@ -77,9 +67,10 @@ const ClientsPage = () => {
     }
   }, [searchTerm]);
 
-  const fetchClients = async (isInitial = false) => {
+  const fetchClients = async () => {
     try {
-      if (isInitial) {
+      // Utiliser initialLoading seulement pour le tout premier chargement
+      if (isFirstLoad) {
         setInitialLoading(true);
       } else {
         setSearchLoading(true);
@@ -116,8 +107,9 @@ const ClientsPage = () => {
       setError('Erreur lors du chargement des clients');
       console.error('Error fetching clients:', error);
     } finally {
-      if (isInitial) {
+      if (isFirstLoad) {
         setInitialLoading(false);
+        setIsFirstLoad(false); // Plus jamais de chargement initial
       } else {
         setSearchLoading(false);
       }
