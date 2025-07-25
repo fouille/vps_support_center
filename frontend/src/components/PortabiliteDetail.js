@@ -203,7 +203,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
               {user.type === 'agent' && (
                 <>
                   <button
-                    onClick={() => navigate(`/portabilites/${id}/edit`)}
+                    onClick={() => onNavigate('portabilites-edit')}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Modifier
