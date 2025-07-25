@@ -165,13 +165,20 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     setLoading(true);
     setError(null);
     
+    // Validation côté client
+    if (!formData.client_id || !formData.numeros_portes.trim()) {
+      setError('Veuillez sélectionner un client et saisir les numéros à porter');
+      setLoading(false);
+      return;
+    }
+    
+    if (user.type === 'agent' && !formData.demandeur_id) {
+      setError('Veuillez sélectionner un demandeur');
+      setLoading(false);
+      return;
+    }
+    
     try {
-      const url = isEdit ? 
-        `/api/portabilites/${portabiliteId}` : 
-        `/api/portabilites`;
-      
-      const method = isEdit ? 'PUT' : 'POST';
-      
       const response = isEdit ? 
         await api.put(`/api/portabilites/${portabiliteId}`, formData) :
         await api.post(`/api/portabilites`, formData);
