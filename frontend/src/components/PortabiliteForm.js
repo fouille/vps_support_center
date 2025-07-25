@@ -211,7 +211,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
               {isEdit ? 'Modifier la portabilité' : 'Nouvelle portabilité'}
             </h1>
             <button
-              onClick={() => navigate('/portabilites')}
+              onClick={() => onNavigate('portabilites')}
               className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
             >
               ← Retour
