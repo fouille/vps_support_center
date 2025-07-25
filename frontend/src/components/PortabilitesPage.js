@@ -47,12 +47,19 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
   // Fonction pour récupérer les portabilités
   const fetchPortabilites = async (page = 1, newFilters = filters) => {
     try {
+      console.log('fetchPortabilites called');
       if (isFirstLoad) {
         setLoading(true);
       } else {
         setSearchLoading(true);
       }
       
+      // Temporairement désactiver l'appel API pour tester la navigation
+      setError('Configuration requise - Tables de portabilités non créées');
+      setPortabilites([]);
+      setTotalPages(1);
+      
+      /*
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '10'
@@ -70,6 +77,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
       } else {
         setPortabilites(response.data);
       }
+      */
     } catch (err) {
       console.error('Erreur lors du chargement des portabilités:', err);
       
