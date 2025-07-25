@@ -45,7 +45,6 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
   // Fonction pour récupérer les portabilités
   const fetchPortabilites = async (page = 1, newFilters = filters) => {
     try {
-      console.log('fetchPortabilites called');
       if (isFirstLoad) {
         setLoading(true);
       } else {
