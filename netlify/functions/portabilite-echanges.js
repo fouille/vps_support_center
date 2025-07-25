@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const emailService = require('./email-service');
 
 // Configuration JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 
 // Fonction pour vérifier le token JWT
 function verifyToken(token) {
