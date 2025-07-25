@@ -3,8 +3,6 @@ import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 
 const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
-  console.log('PortabilitesPage rendered');
-  
   const [portabilites, setPortabilites] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
