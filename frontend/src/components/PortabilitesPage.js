@@ -43,7 +43,7 @@ const PortabilitesPage = () => {
     'termine': 'bg-gray-100 text-gray-800'
   };
 
-  const backendUrl = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+  const backendUrl = '';
 
   // Fonction pour récupérer les portabilités
   const fetchPortabilites = async (page = 1, newFilters = filters) => {
@@ -63,12 +63,7 @@ const PortabilitesPage = () => {
       if (newFilters.client) params.append('client', newFilters.client);
       if (newFilters.search) params.append('search', newFilters.search);
 
-      const response = await axios.get(`${backendUrl}/api/portabilites?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/portabilites?${params}`);
 
       if (response.data.data) {
         setPortabilites(response.data.data);
@@ -89,12 +84,7 @@ const PortabilitesPage = () => {
   // Fonction pour récupérer les clients
   const fetchClients = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/clients?limit=100`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/clients?limit=100`);
       
       let clientsData = response.data;
       if (response.data.data && Array.isArray(response.data.data)) {
