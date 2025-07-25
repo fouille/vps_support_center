@@ -71,12 +71,7 @@ const PortabiliteForm = () => {
     
     try {
       setLoading(true);
-      const response = await axios.get(`${backendUrl}/api/portabilites/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/portabilites/${id}`);
       
       const portabilite = response.data;
       setFormData({
