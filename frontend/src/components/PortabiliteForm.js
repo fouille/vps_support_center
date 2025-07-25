@@ -200,18 +200,22 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   };
 
   useEffect(() => {
-    fetchClients();
-    fetchDemandeurs();
-    fetchPortabilite();
+    const loadData = async () => {
+      await fetchClients();
+      await fetchDemandeurs();
+      await fetchPortabilite();
+      
+      // Si l'utilisateur est un demandeur, l'ajouter par défaut dans le formulaire
+      if (user && user.type_utilisateur === 'demandeur' && !isEdit) {
+        setFormData(prev => ({
+          ...prev,
+          demandeur_id: user.id
+        }));
+      }
+    };
     
-    // Si l'utilisateur est un demandeur, l'ajouter par défaut dans le formulaire
-    if (user && user.type_utilisateur === 'demandeur' && !isEdit) {
-      setFormData(prev => ({
-        ...prev,
-        demandeur_id: user.id
-      }));
-    }
-  }, [user, isEdit]); // eslint-disable-line react-hooks/exhaustive-deps
+    loadData();
+  }, [user, isEdit, portabiliteId]);
 
   // Fonctions pour la navigation des steps
   const nextStep = () => {
