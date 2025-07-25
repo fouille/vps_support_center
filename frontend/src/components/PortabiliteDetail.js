@@ -42,12 +42,7 @@ const PortabiliteDetail = () => {
   // Fonction pour récupérer les détails de la portabilité
   const fetchPortabilite = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/portabilites/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/portabilites/${id}`);
       setPortabilite(response.data);
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
