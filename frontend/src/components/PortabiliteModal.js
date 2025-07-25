@@ -439,7 +439,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
                                   </span>
                                   <span>•</span>
                                   <span>
-                                    {format(new Date(commentaire.created_at), 'HH:mm', { locale: fr })}
+                                    {format(new Date(commentaire.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
                                   </span>
                                 </div>
                               </div>
