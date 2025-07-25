@@ -11,6 +11,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   const [demandeurs, setDemandeurs] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   
   const [formData, setFormData] = useState({
     client_id: '',
