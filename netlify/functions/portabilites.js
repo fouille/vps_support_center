@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
 
       if (isSpecificPortabilite) {
         // Requête pour une portabilité spécifique
-        const specificQuery = `
+        let specificQuery = `
           SELECT 
             p.*,
             c.nom_societe,
