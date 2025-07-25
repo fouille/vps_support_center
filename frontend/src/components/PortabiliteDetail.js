@@ -112,7 +112,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
     try {
       await api.delete(`/api/portabilites/${portabiliteId}`);
 
-      navigate('/portabilites');
+      onNavigate('portabilites');
     } catch (err) {
       setError('Erreur lors de la suppression');
       console.error('Erreur:', err);
