@@ -147,12 +147,13 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
 
   // Fonction pour aller à la page de détail
   const goToDetail = (portabiliteId) => {
-    navigate(`/portabilites/${portabiliteId}`);
+    onSelectPortabilite(portabiliteId);
+    onNavigate('portabilites-detail');
   };
 
   // Fonction pour créer une nouvelle portabilité
   const createPortabilite = () => {
-    navigate('/portabilites/nouvelle');
+    onNavigate('portabilites-nouvelle');
   };
 
   useEffect(() => {
