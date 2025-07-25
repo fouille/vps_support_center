@@ -233,6 +233,202 @@ const createEmailTemplate = {
       `,
       text: `Le statut du ticket #${ticket.numero_ticket} a été mis à jour de "${statusLabels[oldStatus]}" vers "${statusLabels[newStatus]}"\n\nTitre: ${ticket.titre}\nClient: ${client.nom_societe}`
     };
+  },
+
+  // Template pour la création d'une portabilité
+  portabiliteCreated: (portabilite) => ({
+    subject: `Nouvelle demande de portabilité #${portabilite.numero_portabilite}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .portabilite-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8e44ad; }
+          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+          .status-nouveau { background: #e3f2fd; color: #1565c0; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📞 Nouvelle Demande de Portabilité</h1>
+            <p>Une nouvelle demande de portabilité a été créée</p>
+          </div>
+          <div class="content">
+            <div class="portabilite-info">
+              <h2>Portabilité #${portabilite.numero_portabilite}</h2>
+              <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
+              <p><strong>Demandeur:</strong> ${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}</p>
+              <p><strong>Statut:</strong> <span class="status-badge status-nouveau">Nouveau</span></p>
+              <p><strong>Date de création:</strong> ${new Date(portabilite.date_creation).toLocaleDateString('fr-FR', { 
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}</p>
+              ${portabilite.date_portabilite_demandee ? `<p><strong>Date souhaitée:</strong> ${new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR')}</p>` : ''}
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h4>Numéros à porter:</h4>
+              <p style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 3px solid #8e44ad;">
+                ${portabilite.numeros_portes}
+              </p>
+              ${portabilite.adresse ? `<p><strong>Adresse:</strong> ${portabilite.adresse}, ${portabilite.code_postal} ${portabilite.ville}</p>` : ''}
+              ${portabilite.nom_client ? `<p><strong>Contact client:</strong> ${portabilite.nom_client} ${portabilite.prenom_client}</p>` : ''}
+              ${portabilite.email_client ? `<p><strong>Email client:</strong> ${portabilite.email_client}</p>` : ''}
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des portabilités</p>
+            <p>Cet email a été envoyé automatiquement.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouvelle demande de portabilité #${portabilite.numero_portabilite}\n\nClient: ${portabilite.nom_societe}\nDemandeur: ${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}\nNuméros: ${portabilite.numeros_portes}`
+  }),
+
+  // Template pour les commentaires sur portabilité
+  portabiliteCommentAdded: (portabilite, comment, authorType) => ({
+    subject: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #16a085 0%, #27ae60 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .comment-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a085; }
+          .author-info { display: flex; align-items: center; margin-bottom: 15px; }
+          .avatar { width: 40px; height: 40px; border-radius: 50%; background: #8e44ad; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>💬 Nouveau Commentaire</h1>
+            <p>Un commentaire a été ajouté à la portabilité #${portabilite.numero_portabilite}</p>
+          </div>
+          <div class="content">
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3>Portabilité #${portabilite.numero_portabilite}</h3>
+              <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
+            </div>
+            <div class="comment-box">
+              <div class="author-info">
+                <div class="avatar">${comment.auteur_nom ? comment.auteur_nom.split(' ').map(n => n[0]).join('') : 'A'}</div>
+                <div>
+                  <strong>${comment.auteur_nom}</strong>
+                  <div style="font-size: 12px; color: #666;">
+                    ${new Date(comment.created_at).toLocaleDateString('fr-FR', { 
+                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                ${comment.message}
+              </div>
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des portabilités</p>
+            <p>Pour répondre, connectez-vous au système de gestion des portabilités.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}\n\nDe: ${comment.auteur_nom}\nMessage: ${comment.message}`
+  }),
+
+  // Template pour les changements de statut de portabilité
+  portabiliteStatusChanged: (portabilite, oldStatus) => {
+    const statusLabels = {
+      'nouveau': 'Nouveau',
+      'bloque': 'Bloqué',
+      'rejete': 'Rejeté',
+      'en_cours': 'En cours',
+      'demande': 'Demandé',
+      'valide': 'Validé',
+      'termine': 'Terminé'
+    };
+
+    const statusColors = {
+      'nouveau': '#17a2b8',
+      'bloque': '#dc3545',
+      'rejete': '#dc3545',
+      'en_cours': '#ffc107',
+      'demande': '#fd7e14',
+      'valide': '#28a745',
+      'termine': '#20c997'
+    };
+
+    return {
+      subject: `Statut de la portabilité #${portabilite.numero_portabilite} mis à jour: ${statusLabels[portabilite.status]}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+            .status-change { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+            .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; color: white; margin: 0 10px; }
+            .arrow { font-size: 24px; margin: 0 15px; color: #666; }
+            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🔄 Statut Mis à Jour</h1>
+              <p>Le statut de votre portabilité a été modifié</p>
+            </div>
+            <div class="content">
+              <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3>Portabilité #${portabilite.numero_portabilite}</h3>
+                <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
+              </div>
+              <div class="status-change">
+                <h3>Changement de statut</h3>
+                <div style="margin: 30px 0;">
+                  <span class="status-badge" style="background-color: ${statusColors[oldStatus] || '#6c757d'};">
+                    ${statusLabels[oldStatus] || oldStatus}
+                  </span>
+                  <span class="arrow">➡️</span>
+                  <span class="status-badge" style="background-color: ${statusColors[portabilite.status] || '#6c757d'};">
+                    ${statusLabels[portabilite.status] || portabilite.status}
+                  </span>
+                </div>
+                <p style="color: #666; font-style: italic;">
+                  Mis à jour le ${new Date().toLocaleDateString('fr-FR', { 
+                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                  })}
+                </p>
+              </div>
+            </div>
+            <div class="footer">
+              <p>VoIP Services - Système de gestion des portabilités</p>
+              <p>Pour plus de détails, connectez-vous au système de gestion des portabilités.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+      text: `Le statut de la portabilité #${portabilite.numero_portabilite} a été mis à jour de "${statusLabels[oldStatus]}" vers "${statusLabels[portabilite.status]}"\n\nClient: ${portabilite.nom_societe}`
+    };
   }
 };
 
