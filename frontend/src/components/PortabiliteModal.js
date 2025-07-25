@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
   const { user, api } = useContext(AuthContext);
