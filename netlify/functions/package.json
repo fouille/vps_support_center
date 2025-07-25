@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Dependencies for Netlify Functions",
   "dependencies": {
-    "@netlify/neon": "^0.11.0",
+    "@netlify/neon": "^0.1.0",
     "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
     "node-mailjet": "^6.0.6",
