@@ -54,6 +54,18 @@ CREATE TABLE IF NOT EXISTS portabilite_echanges (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table des fichiers liés aux portabilités
+CREATE TABLE IF NOT EXISTS portabilite_fichiers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    portabilite_id UUID NOT NULL REFERENCES portabilites(id) ON DELETE CASCADE,
+    nom_fichier VARCHAR(255) NOT NULL,
+    type_fichier VARCHAR(100),
+    taille_fichier INTEGER,
+    contenu_base64 TEXT NOT NULL,
+    uploaded_by UUID NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes pour optimiser les performances
 CREATE INDEX IF NOT EXISTS idx_portabilites_client_id ON portabilites(client_id);
 CREATE INDEX IF NOT EXISTS idx_portabilites_demandeur_id ON portabilites(demandeur_id);
@@ -63,6 +75,7 @@ CREATE INDEX IF NOT EXISTS idx_portabilites_numero_portabilite ON portabilites(n
 CREATE INDEX IF NOT EXISTS idx_portabilites_date_portabilite_effective ON portabilites(date_portabilite_effective);
 CREATE INDEX IF NOT EXISTS idx_portabilite_echanges_portabilite_id ON portabilite_echanges(portabilite_id);
 CREATE INDEX IF NOT EXISTS idx_portabilite_echanges_created_at ON portabilite_echanges(created_at);
+CREATE INDEX IF NOT EXISTS idx_portabilite_fichiers_portabilite_id ON portabilite_fichiers(portabilite_id);
 
 -- Fonction pour générer un numéro de portabilité aléatoire (8 chiffres)
 CREATE OR REPLACE FUNCTION generate_portabilite_number()
