@@ -18,6 +18,8 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
     search: ''
   });
   const [searchDebounce, setSearchDebounce] = useState(null);
+  const [selectedPortabiliteId, setSelectedPortabiliteId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   
   const { user, api } = useContext(AuthContext);
 
