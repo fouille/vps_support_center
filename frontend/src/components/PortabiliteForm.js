@@ -162,7 +162,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
 
   // Fonction pour soumettre le formulaire
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     setError(null);
     
