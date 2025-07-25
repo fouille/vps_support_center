@@ -1,8 +1,8 @@
-const { Client } = require('@netlify/neon');
+const { neon } = require('@netlify/neon');
 const jwt = require('jsonwebtoken');
 
 // Configuration JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 
 // Fonction pour vérifier le token JWT
 function verifyToken(token) {
