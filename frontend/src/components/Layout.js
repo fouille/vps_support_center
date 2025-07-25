@@ -80,10 +80,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
             {navigation.map((item) => (
               <button
                 key={item.key}
-                onClick={() => {
-                  console.log('Button clicked for:', item.key);
-                  handleNavigate(item.key);
-                }}
+                onClick={() => handleNavigate(item.key)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
                   isCurrentPage(item.key) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
