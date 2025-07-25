@@ -40,7 +40,7 @@ const AppContent = () => {
       case 'agents':
         return <AgentsPage />;
       case 'portabilites':
-        return <PortabilitesPage onNavigate={handleNavigate} onSelectPortabilite={setCurrentPortabiliteId} />;
+        return <PortabilitesPage onNavigate={setCurrentPage} onSelectPortabilite={setCurrentPortabiliteId} />;
       case 'portabilites-nouvelle':
         return <PortabiliteForm onNavigate={handleNavigate} />;
       case 'portabilites-detail':
