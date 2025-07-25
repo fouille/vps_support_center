@@ -2187,9 +2187,9 @@ if __name__ == "__main__":
     print("🧪 Backend API Testing - Support Ticket Management System")
     print("=" * 60)
     
-    # Test 1: Corrected Portabilité APIs (Priority Test from Review Request)
+    # Test: Corrected Portabilité APIs (Priority Test from Review Request)
     print("\n" + "="*60)
-    print("TEST 1: CORRECTED PORTABILITÉ APIs - FIXES VERIFICATION")
+    print("TEST: CORRECTED PORTABILITÉ APIs - FIXES VERIFICATION")
     print("="*60)
     portabilite_success = test_portabilite_apis()
     
