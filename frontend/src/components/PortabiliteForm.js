@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import SearchableSelect from './SearchableSelect';
 
 const PortabiliteForm = () => {
