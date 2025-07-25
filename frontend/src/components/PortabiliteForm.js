@@ -180,9 +180,11 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     }
     
     try {
-      const response = isEdit ? 
-        await api.put(`/api/portabilites/${portabiliteId}`, formData) :
+      if (isEdit) {
+        await api.put(`/api/portabilites/${portabiliteId}`, formData);
+      } else {
         await api.post(`/api/portabilites`, formData);
+      }
       
       setSuccess(true);
       setTimeout(() => {
