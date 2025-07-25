@@ -309,6 +309,56 @@ const emailService = {
     const recipient = { Email: demandeur.email, Name: `${demandeur.prenom} ${demandeur.nom}` };
     
     return await sendEmail([recipient], template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de la création d'une portabilité
+  sendPortabiliteCreationEmail: async (portabilite) => {
+    const template = createEmailTemplate.portabiliteCreated(portabilite);
+    
+    // Envoyer à contact@voipservices.fr et au demandeur
+    const recipients = [
+      { Email: 'contact@voipservices.fr', Name: 'Support VoIP Services' },
+      { Email: portabilite.demandeur_email, Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` }
+    ];
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de l'ajout d'un commentaire sur une portabilité
+  sendPortabiliteCommentEmail: async (portabilite, comment, authorType) => {
+    const template = createEmailTemplate.portabiliteCommentAdded(portabilite, comment, authorType);
+    
+    // Déterminer le destinataire selon l'auteur
+    let recipient;
+    if (authorType === 'agent') {
+      // Si l'agent commente, envoyer au demandeur
+      recipient = { 
+        Email: portabilite.demandeur_email, 
+        Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` 
+      };
+    } else {
+      // Si le demandeur commente, envoyer à l'agent ou au support
+      recipient = { 
+        Email: portabilite.agent_email || 'contact@voipservices.fr', 
+        Name: portabilite.agent_nom && portabilite.agent_prenom ? 
+          `${portabilite.agent_prenom} ${portabilite.agent_nom}` : 'Support VoIP Services'
+      };
+    }
+    
+    return await sendEmail([recipient], template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors du changement de statut d'une portabilité
+  sendPortabiliteStatusChangeEmail: async (portabilite, oldStatus) => {
+    const template = createEmailTemplate.portabiliteStatusChanged(portabilite, oldStatus);
+    
+    // Envoyer seulement au demandeur
+    const recipient = { 
+      Email: portabilite.demandeur_email, 
+      Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` 
+    };
+    
+    return await sendEmail([recipient], template.subject, template.html, template.text);
   }
 };
 
