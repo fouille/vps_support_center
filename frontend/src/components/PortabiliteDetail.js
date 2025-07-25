@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 const PortabiliteDetail = () => {
   const { id } = useParams();
