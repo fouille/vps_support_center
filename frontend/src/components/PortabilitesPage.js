@@ -54,12 +54,6 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
         setSearchLoading(true);
       }
       
-      // Temporairement désactiver l'appel API pour tester la navigation
-      setError('Configuration requise - Tables de portabilités non créées');
-      setPortabilites([]);
-      setTotalPages(1);
-      
-      /*
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '10'
@@ -77,7 +71,6 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
       } else {
         setPortabilites(response.data);
       }
-      */
     } catch (err) {
       console.error('Erreur lors du chargement des portabilités:', err);
       
