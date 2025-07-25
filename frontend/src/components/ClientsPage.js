@@ -32,12 +32,14 @@ const ClientsPage = () => {
 
   useEffect(() => {
     // Premier chargement seulement
-    fetchClients(true);
+    if (clients.length === 0 && !searchTerm && currentPage === 1) {
+      fetchClients(true);
+    }
   }, []); // Seulement au montage du composant
 
   useEffect(() => {
-    // Recherches et pagination (pas initial)
-    if (currentPage !== 1 || searchTerm) {
+    // Recherches et changements de page (pas initial)
+    if (searchTerm || currentPage > 1) {
       fetchClients(false);
     }
   }, [currentPage, searchTerm]);
