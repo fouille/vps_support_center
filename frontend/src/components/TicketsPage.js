@@ -1062,7 +1062,7 @@ const TicketsPage = () => {
                                     </span>
                                     <span>•</span>
                                     <span>
-                                      {format(new Date(echange.created_at), 'HH:mm', { locale: fr })}
+                                      {format(new Date(echange.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
                                     </span>
                                   </div>
                                 </div>
