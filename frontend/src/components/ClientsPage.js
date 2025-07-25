@@ -5,7 +5,8 @@ import { Plus, Edit, Trash2, Building, AlertCircle, Check, Search, ChevronLeft, 
 const ClientsPage = () => {
   const { api } = useAuth();
   const [clients, setClients] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true); // Chargement initial
+  const [searchLoading, setSearchLoading] = useState(false); // Chargement lors des recherches
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
