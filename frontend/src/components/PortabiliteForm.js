@@ -52,7 +52,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
 
   // Fonction pour récupérer les demandeurs (agents seulement)
   const fetchDemandeurs = async () => {
-    if (user.type !== 'agent') return;
+    if (user.type_utilisateur !== 'agent') return;
     
     try {
       const response = await api.get(`/api/demandeurs`);
