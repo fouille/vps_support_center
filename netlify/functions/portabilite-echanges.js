@@ -2,6 +2,8 @@ const { neon } = require('@netlify/neon');
 const jwt = require('jsonwebtoken');
 const emailService = require('./email-service');
 
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
+
 // Configuration JWT
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 
