@@ -431,6 +431,15 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
           </div>
         )}
       </div>
+
+      {/* Modal de détails */}
+      {showModal && selectedPortabiliteId && (
+        <PortabiliteModal 
+          portabiliteId={selectedPortabiliteId}
+          onClose={closeModal}
+          onEdit={editPortabilite}
+        />
+      )}
     </div>
   );
 };
