@@ -97,6 +97,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
       setClients(Array.isArray(clientsData) ? clientsData : []);
     } catch (err) {
       console.error('Erreur lors du chargement des clients:', err);
+      // Ne pas bloquer l'interface pour les clients
     }
   };
 
