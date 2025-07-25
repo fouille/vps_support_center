@@ -200,7 +200,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
               </div>
             </div>
             <div className="flex space-x-2">
-              {user.type === 'agent' && (
+              {user.type_utilisateur === 'agent' && (
                 <>
                   <button
                     onClick={() => onNavigate('portabilites-edit')}
