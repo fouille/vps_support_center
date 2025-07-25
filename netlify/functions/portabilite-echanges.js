@@ -203,7 +203,7 @@ exports.handler = async (event, context) => {
       `;
 
       const commentDetailResult = await client(commentDetailQuery, [newComment.id]);
-      const commentDetail = commentDetailResult.rows[0];
+      const commentDetail = commentDetailResult[0];
 
       // Envoi d'email de notification
       try {
