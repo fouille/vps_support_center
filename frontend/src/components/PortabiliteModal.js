@@ -89,6 +89,31 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     }
   };
 
+  // Fonction pour annulation (demandeurs uniquement)
+  const handleAnnulation = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir demander l\'annulation de cette portabilité ?')) return;
+
+    setCommentLoading(true);
+    try {
+      const response = await api.post(`/api/portabilite-echanges`, {
+        portabiliteId: portabiliteId,
+        message: "Demande d'annulation sans réserves"
+      });
+
+      setCommentaires([...commentaires, response.data]);
+      
+      // Scroll vers le bas
+      setTimeout(() => {
+        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } catch (err) {
+      setError('Erreur lors de l\'envoi de la demande d\'annulation');
+      console.error('Erreur:', err);
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
   // Fonction pour changer le statut
   const handleStatusChange = async () => {
     if (!newStatus) return;
