@@ -57,12 +57,7 @@ const PortabiliteForm = () => {
     if (user.type !== 'agent') return;
     
     try {
-      const response = await axios.get(`${backendUrl}/api/demandeurs`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/demandeurs`);
       
       setDemandeurs(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
