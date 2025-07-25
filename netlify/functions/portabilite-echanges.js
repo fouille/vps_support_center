@@ -185,7 +185,7 @@ exports.handler = async (event, context) => {
         message.trim()
       ]);
 
-      const newComment = result.rows[0];
+      const newComment = result[0];
 
       // Récupération des informations complètes du commentaire
       const commentDetailQuery = `
