@@ -309,7 +309,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form className="space-y-8">
             {/* Step 1: Choix du client */}
             {currentStep === 1 && (
               <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
