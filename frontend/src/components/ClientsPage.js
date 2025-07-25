@@ -31,7 +31,15 @@ const ClientsPage = () => {
   });
 
   useEffect(() => {
-    fetchClients(true); // Chargement initial
+    // Premier chargement seulement
+    fetchClients(true);
+  }, []); // Seulement au montage du composant
+
+  useEffect(() => {
+    // Recherches et pagination (pas initial)
+    if (currentPage !== 1 || searchTerm) {
+      fetchClients(false);
+    }
   }, [currentPage, searchTerm]);
 
   // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
