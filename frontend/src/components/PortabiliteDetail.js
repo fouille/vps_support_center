@@ -39,7 +39,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
   // Fonction pour récupérer les détails de la portabilité
   const fetchPortabilite = async () => {
     try {
-      const response = await api.get(`/api/portabilites/${id}`);
+      const response = await api.get(`/api/portabilites/${portabiliteId}`);
       setPortabilite(response.data);
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
