@@ -6,7 +6,8 @@ const ClientsPage = () => {
   const { api } = useAuth();
   const [clients, setClients] = useState([]);
   const [initialLoading, setInitialLoading] = useState(true); // Chargement initial
-  const [searchLoading, setSearchLoading] = useState(false); // Chargement lors des recherches
+  const [searchLoading, setSearchLoading] = useState(false); // Chargement lors des recherches  
+  const [isFirstLoad, setIsFirstLoad] = useState(true); // Flag pour identifier le premier chargement
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
