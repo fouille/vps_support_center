@@ -45,13 +45,13 @@ const AppContent = () => {
       case 'agents':
         return <AgentsPage />;
       case 'portabilites':
-        return <PortabilitesPage onNavigate={setCurrentPage} onSelectPortabilite={setCurrentPortabiliteId} />;
+        return <PortabilitesPage onNavigate={handleNavigate} onSelectPortabilite={setCurrentPortabiliteId} />;
       case 'portabilites-nouvelle':
-        return <PortabiliteForm onNavigate={setCurrentPage} />;
+        return <PortabiliteForm onNavigate={handleNavigate} />;
       case 'portabilites-detail':
-        return <PortabiliteDetail portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
+        return <PortabiliteDetail portabiliteId={currentPortabiliteId} onNavigate={handleNavigate} />;
       case 'portabilites-edit':
-        return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
+        return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={handleNavigate} />;
       case 'tickets':
       default:
         return <TicketsPage />;
