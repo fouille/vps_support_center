@@ -86,7 +86,7 @@ exports.handler = async (event, context) => {
         decoded.type
       ]);
 
-      if (accessResult.rows.length === 0) {
+      if (accessResult.length === 0) {
         return {
           statusCode: 403,
           headers,
