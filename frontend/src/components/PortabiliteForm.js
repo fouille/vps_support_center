@@ -68,7 +68,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     
     try {
       setLoading(true);
-      const response = await api.get(`/api/portabilites/${id}`);
+      const response = await api.get(`/api/portabilites/${portabiliteId}`);
       
       const portabilite = response.data;
       setFormData({
