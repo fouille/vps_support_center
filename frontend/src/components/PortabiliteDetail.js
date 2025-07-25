@@ -113,12 +113,7 @@ const PortabiliteDetail = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette portabilité ?')) return;
 
     try {
-      await axios.delete(`${backendUrl}/api/portabilites/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      await api.delete(`/api/portabilites/${id}`);
 
       navigate('/portabilites');
     } catch (err) {
