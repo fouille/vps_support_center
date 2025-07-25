@@ -75,7 +75,11 @@ exports.handler = async (event, context) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { sub: userData.email, type: userData.type_utilisateur },
+      { 
+        sub: userData.email, 
+        id: userData.id,
+        type: userData.type_utilisateur 
+      },
       process.env.JWT_SECRET || 'dev-secret-key',
       { expiresIn: '24h' }
     );
