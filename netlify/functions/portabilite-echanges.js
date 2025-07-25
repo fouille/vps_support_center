@@ -54,8 +54,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Initialisation du client Neon
-    const client = neon(process.env.NEON_DB_URL || process.env.DATABASE_URL);
+    // Initialisation du client Neon - using consistent syntax
+    // const sql is already initialized at the top of the file
 
     const method = event.httpMethod;
     const { queryStringParameters } = event;
