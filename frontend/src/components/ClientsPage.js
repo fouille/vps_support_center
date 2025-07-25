@@ -290,7 +290,7 @@ const ClientsPage = () => {
           </tbody>
         </table>
 
-        {clients.length === 0 && !loading && (
+        {clients.length === 0 && !searchLoading && (
           <div className="p-8 text-center text-gray-500 dark:text-dark-muted">
             {searchTerm ? `Aucun client trouvé pour "${searchTerm}"` : 'Aucun client enregistré'}
           </div>
