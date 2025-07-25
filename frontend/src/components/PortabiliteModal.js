@@ -39,6 +39,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
   const fetchPortabilite = async () => {
     try {
       const response = await api.get(`/api/portabilites/${portabiliteId}`);
+      console.log('Portabilité data received:', response.data);
       setPortabilite(response.data);
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
