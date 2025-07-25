@@ -80,7 +80,7 @@ exports.handler = async (event, context) => {
         )
       `;
       
-      const accessResult = await client.query(accessQuery, [
+      const accessResult = await client(accessQuery, [
         portabiliteId, 
         decoded.id, 
         decoded.type
