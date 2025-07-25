@@ -1,4 +1,4 @@
-const { Client } = require('@netlify/neon');
+const { neon } = require('@netlify/neon');
 const jwt = require('jsonwebtoken');
 const emailService = require('./email-service');
 
