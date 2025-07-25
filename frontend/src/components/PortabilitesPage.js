@@ -155,10 +155,22 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
     return date.toDateString() === today.toDateString();
   };
 
-  // Fonction pour aller à la page de détail
+  // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
+    setSelectedPortabiliteId(portabiliteId);
+    setShowModal(true);
+  };
+
+  // Fonction pour fermer le modal
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedPortabiliteId(null);
+  };
+
+  // Fonction pour éditer une portabilité
+  const editPortabilite = (portabiliteId) => {
     onSelectPortabilite(portabiliteId);
-    onNavigate('portabilites-detail');
+    onNavigate('portabilites-edit');
   };
 
   // Fonction pour créer une nouvelle portabilité
