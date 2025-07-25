@@ -32,7 +32,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     fichier_pdf_contenu: ''
   });
 
-  const backendUrl = '';
+
 
   // Fonction pour récupérer les clients
   const fetchClients = async () => {
