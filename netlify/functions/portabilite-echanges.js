@@ -252,7 +252,7 @@ exports.handler = async (event, context) => {
 
       const result = await client(deleteQuery, [commentId]);
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return {
           statusCode: 404,
           headers,
