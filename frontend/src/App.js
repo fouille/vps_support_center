@@ -46,7 +46,7 @@ const AppContent = () => {
       case 'portabilites-detail':
         return <PortabiliteDetail portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
       case 'portabilites-edit':
-        return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={handleNavigate} />;
+        return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
       case 'tickets':
       default:
         return <TicketsPage />;
