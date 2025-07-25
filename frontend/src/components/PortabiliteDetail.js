@@ -50,7 +50,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
   // Fonction pour récupérer les commentaires
   const fetchCommentaires = async () => {
     try {
-      const response = await api.get(`/api/portabilite-echanges?portabiliteId=${id}`);
+      const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabiliteId}`);
       setCommentaires(response.data);
     } catch (err) {
       console.error('Erreur lors du chargement des commentaires:', err);
