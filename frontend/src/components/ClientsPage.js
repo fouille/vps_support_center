@@ -267,43 +267,45 @@ const ClientsPage = () => {
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
-              <thead>
+              <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th>Société</th>
-                  <th>Contact</th>
-                  <th>Téléphone</th>
-                  <th>Adresse</th>
-                  <th>Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Société</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Téléphone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Adresse</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-dark-border">
+              <tbody className="bg-white dark:bg-dark-surface divide-y divide-gray-200 dark:divide-dark-border">
                 {clients.map((client) => (
                   <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-dark-card">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Building className="h-5 w-5 text-gray-400 mr-3" />
+                        <Building className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-3" />
                         <div className="text-sm font-medium text-gray-900 dark:text-dark-text">
                           {client.nom_societe}
                         </div>
                       </div>
                     </td>
-                    <td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
                       {client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '-'}
                     </td>
-                    <td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
                       {client.numero || '-'}
                     </td>
-                    <td>{client.adresse}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
+                      {client.adresse}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleEdit(client)}
-                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3"
+                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(client.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400"
+                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
