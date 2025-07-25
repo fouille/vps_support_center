@@ -174,10 +174,15 @@ const ClientsPage = () => {
     setError('');
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <span className="ml-3 text-lg text-gray-600 dark:text-gray-400">Chargement des clients...</span>
+          </div>
+        </div>
       </div>
     );
   }
