@@ -152,7 +152,7 @@ const PortabiliteDetail = ({ portabiliteId, onNavigate }) => {
     };
     
     loadData();
-  }, [id]);
+  }, [portabiliteId]);
 
   if (loading) {
     return (
