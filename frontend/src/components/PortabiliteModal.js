@@ -516,6 +516,118 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
               </div>
             </div>
 
+            {/* Section des pièces jointes */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Pièces jointes
+                </h3>
+                <div className="flex items-center space-x-3">
+                  {fichiers.length > 0 && (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {fichiers.length} fichier{fichiers.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Upload de fichiers */}
+              <div className="mb-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-purple-500 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="file"
+                    id="fileUpload"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    disabled={uploadingFile}
+                    accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.wav,.txt,.doc,.docx"
+                  />
+                  <label
+                    htmlFor="fileUpload"
+                    className={`text-sm px-3 py-2 rounded border transition-colors cursor-pointer flex items-center space-x-2 ${
+                      uploadingFile
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-300'
+                        : 'bg-purple-600 text-white hover:bg-purple-700 border-purple-600'
+                    }`}
+                  >
+                    {uploadingFile ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        <span>Upload...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>📎</span>
+                        <span>Ajouter un fichier</span>
+                      </>
+                    )}
+                  </label>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Images, PDF, Audio, Documents (max 10MB)
+                  </span>
+                </div>
+              </div>
+              
+              {/* Liste des fichiers */}
+              {loadingFiles ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
+                </div>
+              ) : fichiers.length > 0 ? (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {fichiers.map((file) => (
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                      <div className="flex items-center space-x-3 flex-1">
+                        <span className="text-lg">{getFileIcon(file.type_fichier)}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {file.nom_fichier}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {formatFileSize(file.taille_fichier)} • {file.uploaded_by_name} • {format(new Date(file.uploaded_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => downloadFile(file)}
+                          className="p-2 text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded transition-colors"
+                          title="Télécharger"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </button>
+                        {user.type_utilisateur === 'agent' && (
+                          <button
+                            onClick={() => handleFileDelete(file.id)}
+                            className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                            title="Supprimer"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">📎</span>
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Aucun fichier joint à cette portabilité
+                  </p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+                    Ajoutez des documents pour compléter le dossier
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Système de commentaires - Style moderne des tickets */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
