@@ -7,7 +7,7 @@ const PortabiliteForm = () => {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, api } = useContext(AuthContext);
   
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState([]);
