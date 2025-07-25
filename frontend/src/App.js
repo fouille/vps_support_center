@@ -44,7 +44,7 @@ const AppContent = () => {
       case 'portabilites-nouvelle':
         return <PortabiliteForm onNavigate={setCurrentPage} />;
       case 'portabilites-detail':
-        return <PortabiliteDetail portabiliteId={currentPortabiliteId} onNavigate={handleNavigate} />;
+        return <PortabiliteDetail portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
       case 'portabilites-edit':
         return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={handleNavigate} />;
       case 'tickets':
