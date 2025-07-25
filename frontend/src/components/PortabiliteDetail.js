@@ -53,12 +53,7 @@ const PortabiliteDetail = () => {
   // Fonction pour récupérer les commentaires
   const fetchCommentaires = async () => {
     try {
-      const response = await axios.get(`${backendUrl}/api/portabilite-echanges?portabiliteId=${id}`, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/api/portabilite-echanges?portabiliteId=${id}`);
       setCommentaires(response.data);
     } catch (err) {
       console.error('Erreur lors du chargement des commentaires:', err);
