@@ -188,114 +188,130 @@ const ClientsPage = () => {
   }
 
   return (
-    <div className="fade-in">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
-          Gestion des Clients
-        </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn-primary flex items-center"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          Nouveau Client
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* En-tête - toujours visible */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+            Gestion des Clients
+          </h1>
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-primary flex items-center"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Nouveau Client
+          </button>
+        </div>
 
-      {/* Zone de recherche */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+        {/* Zone de recherche - toujours visible */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Rechercher un client (min. 3 caractères)..."
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="input pl-10 pr-10 w-full"
+            />
+            {isSearching && (
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+              </div>
+            )}
           </div>
-          <input
-            type="text"
-            placeholder="Rechercher un client (min. 3 caractères)..."
-            value={searchInput}
-            onChange={handleSearchChange}
-            className="input pl-10 pr-10 w-full"
-          />
-          {isSearching && (
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+          {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
+            <p className="text-sm text-orange-500 dark:text-orange-400 mt-2">
+              Tapez au moins 3 caractères pour rechercher
+            </p>
+          )}
+          {searchTerm && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              {pagination.total} résultat{pagination.total > 1 ? 's' : ''} pour "{searchTerm}"
+            </p>
+          )}
+        </div>
+
+        {/* Messages d'erreur - toujours visibles */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="flex items-center">
+              <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+              <span className="text-red-700 dark:text-red-400">{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Tableau avec loader spécifique */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow-sm overflow-hidden">
+          {searchLoading ? (
+            // Loader spécifique au tableau
+            <div className="flex justify-center items-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {searchTerm ? `Recherche en cours pour "${searchTerm}"...` : 'Chargement des clients...'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+              <thead>
+                <tr>
+                  <th>Société</th>
+                  <th>Contact</th>
+                  <th>Téléphone</th>
+                  <th>Adresse</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-dark-border">
+                {clients.map((client) => (
+                  <tr key={client.id} className="hover:bg-gray-50 dark:hover:bg-dark-card">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Building className="h-5 w-5 text-gray-400 mr-3" />
+                        <div className="text-sm font-medium text-gray-900 dark:text-dark-text">
+                          {client.nom_societe}
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      {client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '-'}
+                    </td>
+                    <td>
+                      {client.numero || '-'}
+                    </td>
+                    <td>{client.adresse}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(client)}
+                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 mr-3"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(client.id)}
+                        className="text-red-600 hover:text-red-900 dark:text-red-400"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {!searchLoading && clients.length === 0 && (
+            <div className="p-8 text-center text-gray-500 dark:text-dark-muted">
+              {searchTerm ? `Aucun client trouvé pour "${searchTerm}"` : 'Aucun client enregistré'}
             </div>
           )}
         </div>
-        {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
-          <p className="text-sm text-orange-500 dark:text-orange-400 mt-2">
-            Tapez au moins 3 caractères pour rechercher
-          </p>
-        )}
-        {searchTerm && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-            {pagination.total} résultat{pagination.total > 1 ? 's' : ''} pour "{searchTerm}"
-          </p>
-        )}
-      </div>
-
-      {error && (
-        <div className="mb-4 flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
-          <span className="text-red-700 dark:text-red-300">{error}</span>
-        </div>
-      )}
-
-      <div className="card overflow-hidden">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Société</th>
-              <th>Contact</th>
-              <th>Téléphone</th>
-              <th>Adresse</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.map((client) => (
-              <tr key={client.id}>
-                <td>
-                  <div className="flex items-center">
-                    <Building className="h-5 w-5 text-primary-600 mr-2" />
-                    <span className="font-medium">{client.nom_societe}</span>
-                  </div>
-                </td>
-                <td>
-                  {client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : '-'}
-                </td>
-                <td>
-                  {client.numero || '-'}
-                </td>
-                <td className="max-w-xs truncate">
-                  {client.adresse}
-                </td>
-                <td>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEdit(client)}
-                      className="p-2 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(client.id)}
-                      className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {clients.length === 0 && !searchLoading && (
-          <div className="p-8 text-center text-gray-500 dark:text-dark-muted">
-            {searchTerm ? `Aucun client trouvé pour "${searchTerm}"` : 'Aucun client enregistré'}
-          </div>
-        )}
-      </div>
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
