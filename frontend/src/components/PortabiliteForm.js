@@ -166,7 +166,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     
     try {
       const url = isEdit ? 
-        `/api/portabilites/${id}` : 
+        `/api/portabilites/${portabiliteId}` : 
         `/api/portabilites`;
       
       const method = isEdit ? 'PUT' : 'POST';
