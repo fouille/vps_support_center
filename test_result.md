@@ -33,6 +33,22 @@ Implémentation complète d'une nouvelle section "Portabilités" pour la gestion
 - Ask for clarification when requirements are ambiguous
 
 backend:
+  - task: "Portabilités API - structure et endpoints"
+    implemented: true  
+    working: false
+    file: "netlify/functions/portabilites.js, portabilite-echanges.js, email-service.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history: []
+    changes:
+      - "Créé la structure SQL portabilites et portabilite_echanges"
+      - "Implémenté API complète portabilites.js (CRUD avec pagination, filtres, search)"
+      - "Implémenté API portabilite-echanges.js (commentaires avec authentification)"
+      - "Ajouté templates email pour portabilités dans email-service.js"
+      - "Intégré génération automatique numéro 8 chiffres"
+      - "Support complet des statuts et notifications email"
+
   - task: "Mailjet email integration diagnostic"
     implemented: true  
     working: false
