@@ -67,14 +67,9 @@ const PortabiliteDetail = () => {
 
     setCommentLoading(true);
     try {
-      const response = await axios.post(`${backendUrl}/api/portabilite-echanges`, {
+      const response = await api.post(`/api/portabilite-echanges`, {
         portabiliteId: id,
         message: newComment.trim()
-      }, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
       });
 
       setCommentaires([...commentaires, response.data]);
