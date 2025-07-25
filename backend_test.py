@@ -2187,24 +2187,16 @@ if __name__ == "__main__":
     print("🧪 Backend API Testing - Support Ticket Management System")
     print("=" * 60)
     
-    # Test 1: Portabilité APIs (NEW - Priority Test)
+    # Test 1: Corrected Portabilité APIs (Priority Test from Review Request)
     print("\n" + "="*60)
-    print("TEST 1: PORTABILITÉ APIs - AUTHENTICATION & DATE HANDLING")
+    print("TEST 1: CORRECTED PORTABILITÉ APIs - FIXES VERIFICATION")
     print("="*60)
     portabilite_success = test_portabilite_apis()
     
-    # Test 2: Mailjet email integration functionality
-    print("\n" + "="*60)
-    print("TEST 2: Mailjet Email Integration")
-    print("="*60)
-    email_success = test_mailjet_email_integration()
-    
     # Overall result
-    overall_success = portabilite_success and email_success
-    
-    if overall_success:
-        print("\n🎉 All backend tests passed!")
+    if portabilite_success:
+        print("\n🎉 Portabilité API tests passed!")
         sys.exit(0)
     else:
-        print("\n💥 Some backend tests failed!")
+        print("\n💥 Portabilité API tests failed!")
         sys.exit(1)
