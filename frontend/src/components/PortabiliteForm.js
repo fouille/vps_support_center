@@ -180,10 +180,16 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     }
     
     try {
+      // Préparer les données à envoyer (ne pas envoyer la date effective si elle n'est pas saisie en mode création)
+      const dataToSend = { ...formData };
+      if (!isEdit && !dataToSend.date_portabilite_effective) {
+        delete dataToSend.date_portabilite_effective;
+      }
+      
       if (isEdit) {
-        await api.put(`/api/portabilites/${portabiliteId}`, formData);
+        await api.put(`/api/portabilites/${portabiliteId}`, dataToSend);
       } else {
-        await api.post(`/api/portabilites`, formData);
+        await api.post(`/api/portabilites`, dataToSend);
       }
       
       setSuccess(true);
