@@ -6,10 +6,32 @@ const initializeMailjet = () => {
   
   try {
     const mailjet = require('node-mailjet');
-    mj = mailjet.connect(
-      process.env.MJ_APIKEY_PUBLIC,
-      process.env.MJ_APIKEY_PRIVATE
-    );
+    
+    // Pour la version 6.x de node-mailjet, utiliser mailjet.Client.apiConnect
+    if (mailjet.Client && typeof mailjet.Client.apiConnect === 'function') {
+      mj = mailjet.Client.apiConnect(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE
+      );
+    } else if (typeof mailjet.apiConnect === 'function') {
+      mj = mailjet.apiConnect(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE
+      );
+    } else if (typeof mailjet.connect === 'function') {
+      // Fallback pour anciennes versions
+      mj = mailjet.connect(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE
+      );
+    } else {
+      // Si c'est une fonction directe (nouvelle API)
+      mj = mailjet(
+        process.env.MJ_APIKEY_PUBLIC,
+        process.env.MJ_APIKEY_PRIVATE
+      );
+    }
+    
     return mj;
   } catch (error) {
     console.error('Failed to initialize Mailjet:', error);
