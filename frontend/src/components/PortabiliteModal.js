@@ -190,6 +190,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+  // Fonction pour récupérer les commentaires
   const fetchCommentaires = async () => {
     try {
       const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabiliteId}`);
