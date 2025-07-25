@@ -169,8 +169,8 @@ const PortabiliteForm = () => {
     
     try {
       const url = isEdit ? 
-        `${backendUrl}/api/portabilites/${id}` : 
-        `${backendUrl}/api/portabilites`;
+        `/api/portabilites/${id}` : 
+        `/api/portabilites`;
       
       const method = isEdit ? 'PUT' : 'POST';
       
