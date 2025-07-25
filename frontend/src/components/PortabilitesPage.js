@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
+import PortabiliteModal from './PortabiliteModal';
 
 const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
   const [portabilites, setPortabilites] = useState([]);
