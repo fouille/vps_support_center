@@ -313,8 +313,8 @@ const ClientsPage = () => {
           )}
         </div>
 
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
         <div className="mt-6 flex items-center justify-between">
           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
             <span>
