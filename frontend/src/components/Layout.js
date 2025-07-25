@@ -38,6 +38,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   ];
 
   const handleNavigate = (key) => {
+    console.log('handleNavigate called with key:', key);
     onNavigate(key);
     setSidebarOpen(false);
   };
