@@ -93,13 +93,8 @@ const PortabiliteDetail = () => {
 
     setStatusLoading(true);
     try {
-      const response = await axios.put(`${backendUrl}/api/portabilites/${id}`, {
+      const response = await api.put(`/api/portabilites/${id}`, {
         status: newStatus
-      }, {
-        headers: {
-          'Authorization': `Bearer ${user.token}`,
-          'Content-Type': 'application/json'
-        }
       });
 
       setPortabilite(response.data);
