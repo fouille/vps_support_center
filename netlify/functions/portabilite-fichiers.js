@@ -246,7 +246,7 @@ exports.handler = async (event, context) => {
       await sql(commentQuery, [
         deletedFile.portabilite_id,
         decoded.id,
-        decoded.type_utilisateur,
+        decoded.type_utilisateur || decoded.type,
         `🗑️ Fichier supprimé: ${deletedFile.nom_fichier}`
       ]);
 
