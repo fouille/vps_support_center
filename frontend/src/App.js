@@ -63,7 +63,10 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <div className="min-h-screen bg-gray-100 dark:bg-dark-bg flex flex-col">
+          <AppContent />
+          <Footer />
+        </div>
       </AuthProvider>
     </Router>
   );
