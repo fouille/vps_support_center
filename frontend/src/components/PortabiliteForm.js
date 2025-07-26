@@ -134,28 +134,6 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     }));
   };
 
-  // Fonction pour gérer l'upload de fichier
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
-        setError('Seuls les fichiers PDF sont autorisés');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64String = event.target.result;
-        setFormData(prev => ({
-          ...prev,
-          fichier_pdf_nom: file.name,
-          fichier_pdf_contenu: base64String
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Fonction pour soumettre le formulaire
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
