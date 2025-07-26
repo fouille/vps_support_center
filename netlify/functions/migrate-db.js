@@ -38,7 +38,8 @@ exports.handler = async (event, context) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
     
     // Seuls les agents peuvent exécuter les migrations
-    if (decoded.type_utilisateur !== 'agent') {
+    const userType = decoded.type_utilisateur || decoded.type;
+    if (userType !== 'agent') {
       return {
         statusCode: 403,
         headers,
