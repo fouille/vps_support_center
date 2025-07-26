@@ -70,15 +70,15 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     }
   };
 
-  // Fonction pour gérer l'upload de fichier
+  // Fonction pour gérer l'upload de fichier - Style EXACT des tickets
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Vérifications côté client
+    // Vérifications côté client - EXACTES des tickets
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      setError('Le fichier est trop volumineux (limite: 10MB)');
+      setError('Fichier trop volumineux (limite: 10MB)');
       return;
     }
 
@@ -121,9 +121,11 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
           message: `A ajouté une pièce jointe ${file.name}`
         });
         
+        // Ajouter le commentaire à la liste
         setCommentaires([...commentaires, commentResponse.data]);
       } catch (commentError) {
         console.error('Erreur lors de l\'ajout du commentaire automatique:', commentError);
+        // On continue même si le commentaire échoue
       }
       
       fetchFichiers();
@@ -135,7 +137,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
     }
   };
 
-  // Fonction pour supprimer un fichier
+  // Fonction pour supprimer un fichier - Style EXACT des tickets
   const handleFileDelete = async (fileId) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) return;
 
