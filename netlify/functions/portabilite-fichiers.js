@@ -211,7 +211,7 @@ exports.handler = async (event, context) => {
       }
 
       // Vérification des droits (seulement les agents peuvent supprimer)
-      if (decoded.type !== 'agent') {
+      if (decoded.type_utilisateur !== 'agent') {
         return {
           statusCode: 403,
           headers,
@@ -225,9 +225,9 @@ exports.handler = async (event, context) => {
         RETURNING nom_fichier, portabilite_id
       `;
 
-      const result = await client.query(deleteQuery, [fileId]);
+      const result = await sql(deleteQuery, [fileId]);
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return {
           statusCode: 404,
           headers,
@@ -235,7 +235,7 @@ exports.handler = async (event, context) => {
         };
       }
 
-      const deletedFile = result.rows[0];
+      const deletedFile = result[0];
 
       // Ajouter un commentaire automatique pour signaler la suppression
       const commentQuery = `
@@ -243,10 +243,10 @@ exports.handler = async (event, context) => {
         VALUES ($1, $2, $3, $4)
       `;
 
-      await client.query(commentQuery, [
+      await sql(commentQuery, [
         deletedFile.portabilite_id,
         decoded.id,
-        decoded.type,
+        decoded.type_utilisateur,
         `🗑️ Fichier supprimé: ${deletedFile.nom_fichier}`
       ]);
 
