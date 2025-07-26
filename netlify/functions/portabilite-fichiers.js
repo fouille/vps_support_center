@@ -146,13 +146,13 @@ exports.handler = async (event, context) => {
         )
       `;
 
-      const accessResult = await client.query(accessQuery, [
+      const accessResult = await sql(accessQuery, [
         portabiliteId, 
         decoded.id, 
-        decoded.type
+        decoded.type_utilisateur
       ]);
 
-      if (accessResult.rows.length === 0) {
+      if (accessResult.length === 0) {
         return {
           statusCode: 403,
           headers,
@@ -167,7 +167,7 @@ exports.handler = async (event, context) => {
         RETURNING id, nom_fichier, type_fichier, taille_fichier, uploaded_by, uploaded_at
       `;
 
-      const result = await client.query(insertQuery, [
+      const result = await sql(insertQuery, [
         portabiliteId,
         nom_fichier,
         type_fichier,
@@ -176,7 +176,7 @@ exports.handler = async (event, context) => {
         decoded.id
       ]);
 
-      const newFile = result.rows[0];
+      const newFile = result[0];
 
       // Ajouter un commentaire automatique pour signaler l'upload
       const commentQuery = `
@@ -184,10 +184,10 @@ exports.handler = async (event, context) => {
         VALUES ($1, $2, $3, $4)
       `;
 
-      await client.query(commentQuery, [
+      await sql(commentQuery, [
         portabiliteId,
         decoded.id,
-        decoded.type,
+        decoded.type_utilisateur,
         `📎 Fichier ajouté: ${nom_fichier}`
       ]);
 
