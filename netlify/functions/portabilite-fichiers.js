@@ -79,13 +79,13 @@ exports.handler = async (event, context) => {
         )
       `;
       
-      const accessResult = await client.query(accessQuery, [
+      const accessResult = await sql(accessQuery, [
         portabiliteId, 
         decoded.id, 
-        decoded.type
+        decoded.type_utilisateur
       ]);
 
-      if (accessResult.rows.length === 0) {
+      if (accessResult.length === 0) {
         return {
           statusCode: 403,
           headers,
@@ -93,21 +93,29 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Récupération des fichiers (sans le contenu base64 pour la liste)
+      // Récupération des fichiers avec les informations de l'utilisateur
       const filesQuery = `
         SELECT 
-          id,
-          nom_fichier,
-          type_fichier,
-          taille_fichier,
-          uploaded_by,
-          uploaded_at
-        FROM portabilite_fichiers
-        WHERE portabilite_id = $1
-        ORDER BY uploaded_at DESC
+          pf.id,
+          pf.nom_fichier,
+          pf.type_fichier,
+          pf.taille_fichier,
+          pf.uploaded_by,
+          pf.uploaded_at,
+          COALESCE(a.nom || ' ' || a.prenom, d.nom || ' ' || d.prenom, 'Utilisateur') as uploaded_by_name,
+          CASE 
+            WHEN a.id IS NOT NULL THEN 'agent'
+            WHEN d.id IS NOT NULL THEN 'demandeur'
+            ELSE 'unknown'
+          END as uploaded_by_type
+        FROM portabilite_fichiers pf
+        LEFT JOIN agents a ON pf.uploaded_by = a.id
+        LEFT JOIN demandeurs d ON pf.uploaded_by = d.id
+        WHERE pf.portabilite_id = $1
+        ORDER BY pf.uploaded_at DESC
       `;
 
-      const result = await client.query(filesQuery, [portabiliteId]);
+      const result = await sql(filesQuery, [portabiliteId]);
 
       return {
         statusCode: 200,
