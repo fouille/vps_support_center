@@ -199,8 +199,7 @@ exports.handler = async (event, context) => {
 
     } else if (method === 'DELETE') {
       // Suppression d'un fichier
-      const body = JSON.parse(event.body);
-      const { fileId } = body;
+      const fileId = queryStringParameters?.fileId;
 
       if (!fileId) {
         return {
