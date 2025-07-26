@@ -99,6 +99,8 @@ function updateVersionFile(newVersion, type, description = '') {
   // Mettre à jour le changelog automatiquement
   try {
     const { updateChangelog } = require('./update-changelog');
+    const typeStr = type.toUpperCase() === 'MAJOR' ? 'MAJOR' : 
+                    type.toUpperCase() === 'MINOR' ? 'MINOR' : 'PATCH';
     updateChangelog({
       version: `${newVersion.major}.${newVersion.minor}.${newVersion.patch}`,
       date: today,
