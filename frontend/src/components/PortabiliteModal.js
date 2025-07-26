@@ -132,7 +132,9 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
 
     try {
       await api.delete(`/api/portabilite-fichiers?portabiliteId=${portabiliteId}&fileId=${fileId}`);
+      // Recharger les fichiers et commentaires (l'API ajoute automatiquement le commentaire)
       fetchFichiers();
+      fetchCommentaires();
     } catch (error) {
       setError(error.response?.data?.error || 'Erreur lors de la suppression du fichier');
     }
