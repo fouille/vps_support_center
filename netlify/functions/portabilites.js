@@ -241,9 +241,9 @@ exports.handler = async (event, context) => {
 
       // Détermination du demandeur
       let finalDemandeurId = demandeur_id;
-      if (decoded.type === 'demandeur') {
+      if (decoded.type_utilisateur === 'demandeur') {
         finalDemandeurId = decoded.id;
-      } else if (decoded.type === 'agent') {
+      } else if (decoded.type_utilisateur === 'agent') {
         // Pour les agents, si demandeur_id est vide, utiliser null
         finalDemandeurId = demandeur_id && demandeur_id.trim() !== '' ? demandeur_id : null;
       }
@@ -257,21 +257,20 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Insertion de la portabilité
+      // Insertion de la portabilité (SANS les colonnes fichier_pdf)
       const insertQuery = `
         INSERT INTO portabilites (
           client_id, demandeur_id, agent_id, numeros_portes, nom_client, prenom_client,
           email_client, siret_client, adresse, code_postal, ville, date_portabilite_demandee,
-          date_portabilite_effective, fiabilisation_demandee, demande_signee,
-          fichier_pdf_nom, fichier_pdf_contenu
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+          date_portabilite_effective, fiabilisation_demandee, demande_signee
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         RETURNING *
       `;
 
       const result = await sql(insertQuery, [
         client_id,
         finalDemandeurId,
-        decoded.type === 'agent' ? decoded.id : null,
+        decoded.type_utilisateur === 'agent' ? decoded.id : null,
         numeros_portes,
         nom_client,
         prenom_client,
@@ -283,12 +282,45 @@ exports.handler = async (event, context) => {
         date_portabilite_demandee,
         date_portabilite_effective,
         fiabilisation_demandee || false,
-        demande_signee || false,
-        fichier_pdf_nom,
-        fichier_pdf_contenu
+        demande_signee || false
       ]);
 
       const newPortabilite = result[0];
+
+      // Si un fichier PDF est fourni, l'insérer dans la table portabilite_fichiers
+      if (fichier_pdf_nom && fichier_pdf_contenu) {
+        try {
+          const fileInsertQuery = `
+            INSERT INTO portabilite_fichiers (portabilite_id, nom_fichier, type_fichier, taille_fichier, contenu_base64, uploaded_by)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `;
+
+          await sql(fileInsertQuery, [
+            newPortabilite.id,
+            fichier_pdf_nom,
+            'application/pdf',
+            fichier_pdf_contenu.length,
+            fichier_pdf_contenu,
+            decoded.id
+          ]);
+
+          // Ajouter un commentaire automatique
+          const commentQuery = `
+            INSERT INTO portabilite_echanges (portabilite_id, auteur_id, auteur_type, message)
+            VALUES ($1, $2, $3, $4)
+          `;
+
+          await sql(commentQuery, [
+            newPortabilite.id,
+            decoded.id,
+            decoded.type_utilisateur,
+            `📎 Fichier joint lors de la création: ${fichier_pdf_nom}`
+          ]);
+        } catch (fileError) {
+          console.error('Erreur lors de l\'insertion du fichier:', fileError);
+          // Ne pas faire échouer la création pour un problème de fichier
+        }
+      }
 
       // Récupération des informations complètes pour l'email
       const detailQuery = `
