@@ -508,27 +508,6 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify(updatedPortabilite)
       };
-              d.email as demandeur_email
-            FROM portabilites p
-            LEFT JOIN clients c ON p.client_id = c.id
-            LEFT JOIN demandeurs d ON p.demandeur_id = d.id
-            WHERE p.id = $1
-          `;
-
-          const detailResult = await sql(detailQuery, [portabiliteId]);
-          const portabiliteDetail = detailResult[0];
-
-          await emailService.sendPortabiliteStatusChangeEmail(portabiliteDetail, currentStatus);
-        } catch (emailError) {
-          console.error('Erreur envoi email changement statut:', emailError);
-        }
-      }
-
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(updatedPortabilite)
-      };
 
     } else if (method === 'DELETE') {
       // Suppression d'une portabilité (agents uniquement)
