@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.5.0] - 2025-07-26
+### Added
+- ✨ Ajout système de versioning automatique avec scripts rapides
+
 ## [1.4.7] - 2025-07-26
 ### Fixed
 - 🔧 Correction erreurs pièces jointes portabilité - suppression par demandeur et notifications commentaires
