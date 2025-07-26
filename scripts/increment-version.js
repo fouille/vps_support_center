@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Script pour incrémenter automatiquement la version selon semver
-// Usage: node scripts/increment-version.js [patch|minor|major]
+// Usage: node scripts/increment-version.js [patch|minor|major] [description]
 
 const fs = require('fs');
 const path = require('path');
@@ -46,7 +46,7 @@ function incrementVersion(type = 'patch') {
 }
 
 // Fonction pour mettre à jour le fichier version.js
-function updateVersionFile(newVersion, description = '') {
+function updateVersionFile(newVersion, type, description = '') {
   let content = fs.readFileSync(VERSION_FILE_PATH, 'utf8');
   const today = new Date().toISOString().split('T')[0];
   
@@ -57,14 +57,15 @@ function updateVersionFile(newVersion, description = '') {
   
   // Mettre à jour la date de build
   content = content.replace(
-    /buildDate: new Date\(\)\.toISOString\(\)\.split\('T'\)\[0\]/,
+    /buildDate: new Date\(\)\.toISOString\(\)\.split\('T'\)\[0\]|buildDate: "[^"]+"/,
     `buildDate: "${today}"`
   );
   
   // Ajouter l'entrée dans l'historique si une description est fournie
   if (description) {
     const versionStr = `${newVersion.major}.${newVersion.minor}.${newVersion.patch}`;
-    const typeStr = newVersion.patch > 0 ? 'PATCH' : newVersion.minor > 0 ? 'MINOR' : 'MAJOR';
+    const typeStr = type.toUpperCase() === 'MAJOR' ? 'MAJOR' : 
+                    type.toUpperCase() === 'MINOR' ? 'MINOR' : 'PATCH';
     
     const historyEntry = `  {
     version: "${versionStr}",
@@ -81,11 +82,32 @@ function updateVersionFile(newVersion, description = '') {
   
   fs.writeFileSync(VERSION_FILE_PATH, content);
   
+  // Mettre à jour le package.json
+  const packageJsonPath = path.join(__dirname, '../package.json');
+  let packageContent = fs.readFileSync(packageJsonPath, 'utf8');
+  const packageJson = JSON.parse(packageContent);
+  packageJson.version = `${newVersion.major}.${newVersion.minor}.${newVersion.patch}`;
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+  
   console.log(`✅ Version incrémentée: ${newVersion.major}.${newVersion.minor}.${newVersion.patch}`);
   if (description) {
     console.log(`📝 Description: ${description}`);
   }
   console.log(`📅 Date: ${today}`);
+  console.log(`📦 package.json mis à jour`);
+  
+  // Mettre à jour le changelog automatiquement
+  try {
+    const { updateChangelog } = require('./update-changelog');
+    updateChangelog({
+      version: `${newVersion.major}.${newVersion.minor}.${newVersion.patch}`,
+      date: today,
+      type: typeStr,
+      description: description || `Mise à jour ${typeStr.toLowerCase()}`
+    });
+  } catch (error) {
+    console.log('⚠️  Impossible de mettre à jour le changelog automatiquement:', error.message);
+  }
 }
 
 // Exécution du script
@@ -94,8 +116,14 @@ if (require.main === module) {
   const type = args[0] || 'patch';
   const description = args.slice(1).join(' ');
   
+  if (!description) {
+    console.log('⚠️  Veuillez fournir une description pour la version');
+    console.log('Usage: node scripts/increment-version.js [patch|minor|major] "Description du changement"');
+    process.exit(1);
+  }
+  
   const newVersion = incrementVersion(type);
-  updateVersionFile(newVersion, description);
+  updateVersionFile(newVersion, type, description);
 }
 
 module.exports = {
