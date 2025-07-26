@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(result.rows)
+        body: JSON.stringify(result)
       };
 
     } else if (method === 'POST') {
