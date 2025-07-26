@@ -27,9 +27,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     date_portabilite_demandee: '',
     date_portabilite_effective: '',
     fiabilisation_demandee: false,
-    demande_signee: false,
-    fichier_pdf_nom: '',
-    fichier_pdf_contenu: ''
+    demande_signee: false
   });
 
 
