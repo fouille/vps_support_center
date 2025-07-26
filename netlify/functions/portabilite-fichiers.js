@@ -210,7 +210,8 @@ exports.handler = async (event, context) => {
       }
 
       // Vérification des droits (seulement les agents peuvent supprimer)
-      if (decoded.type_utilisateur !== 'agent') {
+      const userType = decoded.type_utilisateur || decoded.type;
+      if (userType !== 'agent') {
         return {
           statusCode: 403,
           headers,
