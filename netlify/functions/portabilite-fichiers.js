@@ -209,13 +209,13 @@ exports.handler = async (event, context) => {
         };
       }
 
-      // Vérification des droits (seulement les agents peuvent supprimer)
+      // Vérification des droits - les agents et demandeurs peuvent supprimer des fichiers
       const userType = decoded.type_utilisateur || decoded.type;
-      if (userType !== 'agent') {
+      if (userType !== 'agent' && userType !== 'demandeur') {
         return {
           statusCode: 403,
           headers,
-          body: JSON.stringify({ error: 'Seuls les agents peuvent supprimer des fichiers' })
+          body: JSON.stringify({ error: 'Accès non autorisé' })
         };
       }
 
