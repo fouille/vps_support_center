@@ -391,7 +391,7 @@ exports.handler = async (event, context) => {
 
       const currentStatus = currentResult[0].status;
 
-      // Mise à jour
+      // Mise à jour (SANS les colonnes fichier_pdf)
       const updateQuery = `
         UPDATE portabilites SET
           client_id = COALESCE($1, client_id),
@@ -408,10 +408,8 @@ exports.handler = async (event, context) => {
           date_portabilite_effective = COALESCE($12, date_portabilite_effective),
           fiabilisation_demandee = COALESCE($13, fiabilisation_demandee),
           demande_signee = COALESCE($14, demande_signee),
-          fichier_pdf_nom = COALESCE($15, fichier_pdf_nom),
-          fichier_pdf_contenu = COALESCE($16, fichier_pdf_contenu),
           updated_at = CURRENT_TIMESTAMP
-        WHERE id = $17
+        WHERE id = $15
         RETURNING *
       `;
 
@@ -430,12 +428,52 @@ exports.handler = async (event, context) => {
         date_portabilite_effective,
         fiabilisation_demandee,
         demande_signee,
-        fichier_pdf_nom,
-        fichier_pdf_contenu,
         portabiliteId
       ]);
 
       const updatedPortabilite = result[0];
+
+      // Si un fichier PDF est fourni, l'insérer/mettre à jour dans la table portabilite_fichiers
+      if (fichier_pdf_nom && fichier_pdf_contenu) {
+        try {
+          // Supprimer l'ancien fichier PDF s'il existe
+          await sql(
+            `DELETE FROM portabilite_fichiers WHERE portabilite_id = $1 AND nom_fichier LIKE '%.pdf'`,
+            [portabiliteId]
+          );
+
+          // Insérer le nouveau fichier
+          const fileInsertQuery = `
+            INSERT INTO portabilite_fichiers (portabilite_id, nom_fichier, type_fichier, taille_fichier, contenu_base64, uploaded_by)
+            VALUES ($1, $2, $3, $4, $5, $6)
+          `;
+
+          await sql(fileInsertQuery, [
+            portabiliteId,
+            fichier_pdf_nom,
+            'application/pdf',
+            fichier_pdf_contenu.length,
+            fichier_pdf_contenu,
+            decoded.id
+          ]);
+
+          // Ajouter un commentaire automatique
+          const commentQuery = `
+            INSERT INTO portabilite_echanges (portabilite_id, auteur_id, auteur_type, message)
+            VALUES ($1, $2, $3, $4)
+          `;
+
+          await sql(commentQuery, [
+            portabiliteId,
+            decoded.id,
+            decoded.type_utilisateur,
+            `📎 Fichier mis à jour: ${fichier_pdf_nom}`
+          ]);
+        } catch (fileError) {
+          console.error('Erreur lors de la mise à jour du fichier:', fileError);
+          // Ne pas faire échouer la mise à jour pour un problème de fichier
+        }
+      }
 
       // Si le statut a changé, envoyer un email
       if (status && status !== currentStatus) {
@@ -448,6 +486,28 @@ exports.handler = async (event, context) => {
               c.prenom as client_prenom,
               d.nom as demandeur_nom,
               d.prenom as demandeur_prenom,
+              d.email as demandeur_email
+            FROM portabilites p
+            LEFT JOIN clients c ON p.client_id = c.id
+            LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+            WHERE p.id = $1
+          `;
+
+          const detailResult = await sql(detailQuery, [portabiliteId]);
+          const portabiliteDetail = detailResult[0];
+
+          await emailService.sendPortabiliteStatusChangeEmail(portabiliteDetail, currentStatus, status);
+        } catch (emailError) {
+          console.error('Erreur envoi email:', emailError);
+          // Ne pas faire échouer la mise à jour pour un problème d'email
+        }
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(updatedPortabilite)
+      };
               d.email as demandeur_email
             FROM portabilites p
             LEFT JOIN clients c ON p.client_id = c.id
