@@ -10,6 +10,8 @@
     "version:minor": "node scripts/increment-version.js minor",
     "version:major": "node scripts/increment-version.js major",
     "version:auto": "node scripts/auto-version.js",
+    "version:commit": "node scripts/auto-commit-version.js",
+    "version:quick": "node version-and-commit.js",
     "version:info": "node -e \"const {getVersionInfo} = require('./frontend/src/config/version'); console.log('📋 VOIPServices Support Center'); console.log('🔢 Version:', getVersionInfo().version); console.log('📅 Build:', getVersionInfo().buildDate); console.log('©️  Copyright:', getVersionInfo().year);\"",
     "version:history": "node -e \"const {VERSION_HISTORY} = require('./frontend/src/config/version'); console.log('📜 Historique des versions:'); VERSION_HISTORY.slice(0,5).forEach(v => console.log('  -', v.version, '(' + v.type + '):', v.description));\""
   },
