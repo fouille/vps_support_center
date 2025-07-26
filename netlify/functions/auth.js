@@ -78,7 +78,7 @@ exports.handler = async (event, context) => {
       { 
         sub: userData.email, 
         id: userData.id,
-        type: userData.type_utilisateur 
+        type_utilisateur: userData.type_utilisateur 
       },
       process.env.JWT_SECRET || 'dev-secret-key',
       { expiresIn: '24h' }
