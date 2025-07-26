@@ -7,8 +7,8 @@
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
   minor: 4,      // Version mineure - nouvelles fonctionnalités
-  patch: 2,      // Version patch - corrections de bugs
-  buildDate: new Date().toISOString().split('T')[0], // Date de build automatique
+  patch: 3,      // Version patch - corrections de bugs
+  buildDate: "2025-07-26", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.4.3",
+    date: "2025-07-26",
+    type: "PATCH",
+    description: "Correction API portabilite-fichiers (erreur 500 GET), amélioration layout modal portabilités"
+  },
+{
     version: "1.4.2",
     date: "2025-01-25",
     type: "PATCH",
