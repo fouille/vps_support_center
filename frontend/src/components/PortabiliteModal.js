@@ -106,13 +106,14 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
       });
 
       const fileData = {
+        portabiliteId: portabiliteId,
         nom_fichier: file.name,
         type_fichier: file.type,
         taille_fichier: file.size,
         contenu_base64: base64
       };
 
-      await api.post(`/api/portabilite-fichiers?portabiliteId=${portabiliteId}`, fileData);
+      await api.post(`/api/portabilite-fichiers`, fileData);
       
       // Ajouter un commentaire automatique
       try {
