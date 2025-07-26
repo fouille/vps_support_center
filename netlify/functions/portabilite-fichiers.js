@@ -187,7 +187,7 @@ exports.handler = async (event, context) => {
       await sql(commentQuery, [
         portabiliteId,
         decoded.id,
-        decoded.type_utilisateur,
+        decoded.type_utilisateur || decoded.type,
         `📎 Fichier ajouté: ${nom_fichier}`
       ]);
 
