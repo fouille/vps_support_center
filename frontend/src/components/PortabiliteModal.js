@@ -733,7 +733,7 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                           </svg>
                         </button>
-                        {(user.type_utilisateur === 'agent' || file.uploaded_by_type === 'demandeur') && (
+                        {(user.type_utilisateur === 'agent' || user.type_utilisateur === 'demandeur') && (
                           <button
                             onClick={() => handleFileDelete(file.id)}
                             className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
