@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
   minor: 4,      // Version mineure - nouvelles fonctionnalités
-  patch: 3,      // Version patch - corrections de bugs
+  patch: 4,      // Version patch - corrections de bugs
   buildDate: "2025-07-26", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.4.4",
+    date: "2025-07-26",
+    type: "PATCH",
+    description: "Implémentation système versioning automatique semver avec footer"
+  },
+{
     version: "1.4.3",
     date: "2025-07-26",
     type: "PATCH",
