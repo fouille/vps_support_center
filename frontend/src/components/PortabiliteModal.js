@@ -115,21 +115,9 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
 
       await api.post(`/api/portabilite-fichiers`, fileData);
       
-      // Ajouter un commentaire automatique
-      try {
-        const commentResponse = await api.post(`/api/portabilite-echanges`, {
-          portabiliteId: portabiliteId,
-          message: `A ajouté une pièce jointe ${file.name}`
-        });
-        
-        // Ajouter le commentaire à la liste
-        setCommentaires([...commentaires, commentResponse.data]);
-      } catch (commentError) {
-        console.error('Erreur lors de l\'ajout du commentaire automatique:', commentError);
-        // On continue même si le commentaire échoue
-      }
-      
+      // Recharger les fichiers et commentaires (l'API ajoute automatiquement le commentaire)
       fetchFichiers();
+      fetchCommentaires();
       event.target.value = ''; // Reset input
     } catch (error) {
       setError(error.response?.data?.error || 'Erreur lors de l\'upload du fichier');
