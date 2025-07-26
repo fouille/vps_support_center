@@ -87,9 +87,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
         date_portabilite_effective: portabilite.date_portabilite_effective ? 
           portabilite.date_portabilite_effective.split('T')[0] : '',
         fiabilisation_demandee: portabilite.fiabilisation_demandee || false,
-        demande_signee: portabilite.demande_signee || false,
-        fichier_pdf_nom: portabilite.fichier_pdf_nom || '',
-        fichier_pdf_contenu: portabilite.fichier_pdf_contenu || ''
+        demande_signee: portabilite.demande_signee || false
       });
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
