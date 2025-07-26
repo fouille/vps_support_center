@@ -543,35 +543,20 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                   </div>
                 </div>
 
-                {/* Fichier PDF */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Fichier PDF
-                  </label>
-                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                      id="pdf-upload"
-                    />
-                    <label
-                      htmlFor="pdf-upload"
-                      className="cursor-pointer flex flex-col items-center space-y-2"
-                    >
-                      <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-                        <span className="text-2xl">📄</span>
-                      </div>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Cliquer pour sélectionner un fichier PDF
-                      </span>
-                    </label>
-                    {formData.fichier_pdf_nom && (
-                      <p className="mt-2 text-sm text-purple-600 dark:text-purple-400">
-                        📎 {formData.fichier_pdf_nom}
+                {/* Note importante sur les fichiers */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0">
+                      <span className="text-blue-500 text-lg">💡</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300">
+                        Ajout de fichiers
+                      </h4>
+                      <p className="text-sm text-blue-700 dark:text-blue-400 mt-1">
+                        Les fichiers peuvent être ajoutés après la création de la portabilité dans la section "Détails".
                       </p>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
