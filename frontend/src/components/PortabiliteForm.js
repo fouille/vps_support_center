@@ -523,7 +523,9 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       value={formData.nom_client}
                       onChange={handleInputChange}
                       required
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                      className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
+                        validationErrors.nom_client ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     />
                   </div>
 
