@@ -85,7 +85,7 @@ exports.handler = async (event, context) => {
       const accessResult = await sql(accessQuery, [
         portabiliteId, 
         decoded.id, 
-        decoded.type
+        decoded.type_utilisateur || decoded.type
       ]);
 
       if (accessResult.length === 0) {
