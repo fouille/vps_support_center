@@ -511,7 +511,7 @@ exports.handler = async (event, context) => {
 
     } else if (method === 'DELETE') {
       // Suppression d'une portabilité (agents uniquement)
-      if (decoded.type !== 'agent') {
+      if ((decoded.type_utilisateur || decoded.type) !== 'agent') {
         return {
           statusCode: 403,
           headers,
