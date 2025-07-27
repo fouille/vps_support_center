@@ -137,7 +137,7 @@ exports.handler = async (event, context) => {
             };
           }
           uploadedBy = agent[0].id;
-        } else if (decoded.type === 'demandeur') {
+        } else if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           const demandeur = await sql`SELECT id FROM demandeurs WHERE email = ${decoded.sub}`;
           if (demandeur.length === 0) {
             return {
