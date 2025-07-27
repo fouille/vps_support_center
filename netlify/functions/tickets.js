@@ -229,7 +229,7 @@ exports.handler = async (event, context) => {
 
         let finalDemandeurId;
 
-        if (decoded.type === 'demandeur') {
+        if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           // For demandeurs, use their own ID
           const demandeur = await sql`
             SELECT id FROM demandeurs WHERE email = ${decoded.sub}
