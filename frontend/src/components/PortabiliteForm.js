@@ -646,7 +646,9 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                     required
                     rows="4"
                     placeholder="Saisir les numéros à porter (un par ligne ou séparés par des virgules)"
-                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                    className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
+                      validationErrors.numeros_portes ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
                 </div>
 
@@ -654,14 +656,17 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Date de portabilité demandée
+                      Date de portabilité demandée *
                     </label>
                     <input
                       type="date"
                       name="date_portabilite_demandee"
                       value={formData.date_portabilite_demandee}
                       onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                      required
+                      className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
+                        validationErrors.date_portabilite_demandee ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     />
                   </div>
 
