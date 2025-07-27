@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.8.0] - 2025-07-27
+### Added
+- ✨ Ajout documentation complète intégration API INSEE
+
 ## [1.7.0] - 2025-07-27
 ### Added
 - ✨ Ajout intégration API INSEE pour validation SIRET et auto-completion adresse
