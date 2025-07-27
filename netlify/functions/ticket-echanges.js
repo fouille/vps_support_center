@@ -121,7 +121,7 @@ exports.handler = async (event, context) => {
         }
 
         // Check if user has access to this ticket
-        if (decoded.type === 'demandeur') {
+        if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           const ticketAccess = await sql`
             SELECT t.id FROM tickets t
             JOIN demandeurs d ON t.demandeur_id = d.id
