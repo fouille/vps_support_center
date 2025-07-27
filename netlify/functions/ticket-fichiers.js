@@ -177,7 +177,7 @@ exports.handler = async (event, context) => {
 
         // Vérifier que l'utilisateur peut supprimer ce fichier
         let canDelete = false;
-        if (decoded.type === 'agent') {
+        if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           // Les agents peuvent supprimer tous les fichiers
           canDelete = true;
         } else if (decoded.type === 'demandeur') {
