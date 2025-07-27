@@ -180,7 +180,7 @@ exports.handler = async (event, context) => {
         if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           // Les agents peuvent supprimer tous les fichiers
           canDelete = true;
-        } else if (decoded.type === 'demandeur') {
+        } else if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           // Les demandeurs ne peuvent supprimer que leurs propres fichiers
           const demandeur = await sql`SELECT id FROM demandeurs WHERE email = ${decoded.sub}`;
           if (demandeur.length > 0) {
