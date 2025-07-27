@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
     const authHeader = event.headers.authorization || event.headers.Authorization;
     const decoded = verifyToken(authHeader);
 
-    if (decoded.type !== 'agent') {
+    if ((decoded.type_utilisateur || decoded.type) !== 'agent') {
       return {
         statusCode: 403,
         headers,
