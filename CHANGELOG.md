@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.10.0] - 2025-07-27
+### Added
+- ✨ Ajout validation étapes formulaire portabilité avec messages erreur et indicateurs visuels
+
 ## [1.9.0] - 2025-07-27
 ### Added
 - ✨ Ajout documentation corrections JWT token

@@ -6,7 +6,7 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 9,      // Version mineure - nouvelles fonctionnalités
+  minor: 10,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-27", // Date de build automatique
 };
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.10.0",
+    date: "2025-07-27",
+    type: "MINOR",
+    description: "Ajout validation étapes formulaire portabilité avec messages erreur et indicateurs visuels"
+  },
+{
     version: "1.9.0",
     date: "2025-07-27",
     type: "MINOR",
