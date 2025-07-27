@@ -36,6 +36,8 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     success: false
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+
 
 
   // Fonction pour récupérer les clients
