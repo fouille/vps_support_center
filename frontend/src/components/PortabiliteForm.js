@@ -450,13 +450,14 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Prénom client
+                      Prénom client *
                     </label>
                     <input
                       type="text"
                       name="prenom_client"
                       value={formData.prenom_client}
                       onChange={handleInputChange}
+                      required
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     />
                   </div>
