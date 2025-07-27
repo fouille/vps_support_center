@@ -131,13 +131,62 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     label: `${demandeur.prenom} ${demandeur.nom} (${demandeur.email})`
   })) : [];
 
-  // Fonction pour gérer les changements de formulaire
+  // Fonction pour nettoyer et valider le SIRET
+  const cleanSiret = (value) => {
+    return value.replace(/[\s\.]/g, '').replace(/[^\d]/g, '');
+  };
+
+  // Fonction pour appeler l'API INSEE
+  const fetchInseeData = async (siret) => {
+    if (!siret || siret.length !== 14) return;
+    
+    setSiretStatus({ loading: true, error: null, success: false });
+    
+    try {
+      const response = await api.get(`/api/insee-api?siret=${siret}`);
+      const data = response.data;
+      
+      // Préremplir les champs avec les données INSEE
+      setFormData(prev => ({
+        ...prev,
+        adresse: data.adresse.adresseComplete || '',
+        code_postal: data.adresse.codePostal || '',
+        ville: data.adresse.commune || ''
+      }));
+      
+      setSiretStatus({ loading: false, error: null, success: true });
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Erreur lors de la récupération des données INSEE';
+      setSiretStatus({ loading: false, error: errorMessage, success: false });
+    }
+  };
+
+  // Gestionnaire de changement pour les inputs
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    if (name === 'siret_client') {
+      const cleanedValue = cleanSiret(value);
+      // Limiter à 14 chiffres
+      const limitedValue = cleanedValue.slice(0, 14);
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: limitedValue
+      }));
+      
+      // Appeler l'API INSEE si le SIRET est complet
+      if (limitedValue.length === 14) {
+        fetchInseeData(limitedValue);
+      } else {
+        setSiretStatus({ loading: false, error: null, success: false });
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
 
   // Fonction pour soumettre le formulaire
