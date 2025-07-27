@@ -439,6 +439,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       onChange={(value) => setFormData(prev => ({ ...prev, client_id: value }))}
                       placeholder="Sélectionner un client..."
                       required
+                      hasError={validationErrors.client_id}
                     />
                   </div>
 
