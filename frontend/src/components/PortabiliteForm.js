@@ -257,45 +257,56 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   // Fonction de validation pour chaque étape
   const validateStep = (step) => {
     const errors = [];
+    const fieldErrors = {};
     
     switch (step) {
       case 1:
         if (!formData.client_id) {
           errors.push('Veuillez sélectionner un client');
+          fieldErrors.client_id = true;
         }
         if (!formData.numeros_portes.trim()) {
           errors.push('Veuillez saisir les numéros à porter');
+          fieldErrors.numeros_portes = true;
         }
         break;
         
       case 2:
         if (!formData.siret_client.trim()) {
           errors.push('Le SIRET client est obligatoire');
+          fieldErrors.siret_client = true;
         }
         if (!formData.nom_client.trim()) {
           errors.push('Le nom client est obligatoire');
+          fieldErrors.nom_client = true;
         }
         if (!formData.prenom_client.trim()) {
           errors.push('Le prénom client est obligatoire');
+          fieldErrors.prenom_client = true;
         }
         if (!formData.adresse.trim()) {
           errors.push('L\'adresse est obligatoire');
+          fieldErrors.adresse = true;
         }
         if (!formData.code_postal.trim()) {
           errors.push('Le code postal est obligatoire');
+          fieldErrors.code_postal = true;
         }
         if (!formData.ville.trim()) {
           errors.push('La ville est obligatoire');
+          fieldErrors.ville = true;
         }
         break;
         
       case 3:
         if (!formData.date_portabilite_demandee) {
           errors.push('La date de portabilité demandée est obligatoire');
+          fieldErrors.date_portabilite_demandee = true;
         }
         break;
     }
     
+    setValidationErrors(fieldErrors);
     return errors;
   };
 
