@@ -436,7 +436,17 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                     <SearchableSelect
                       options={clientOptions}
                       value={formData.client_id}
-                      onChange={(value) => setFormData(prev => ({ ...prev, client_id: value }))}
+                      onChange={(value) => {
+                        setFormData(prev => ({ ...prev, client_id: value }));
+                        // Nettoyer les erreurs de validation
+                        if (validationErrors.client_id) {
+                          setValidationErrors(prev => {
+                            const newErrors = { ...prev };
+                            delete newErrors.client_id;
+                            return newErrors;
+                          });
+                        }
+                      }}
                       placeholder="Sélectionner un client..."
                       required
                       hasError={validationErrors.client_id}
