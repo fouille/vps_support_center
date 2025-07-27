@@ -30,6 +30,12 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     demande_signee: false
   });
 
+  const [siretStatus, setSiretStatus] = useState({
+    loading: false,
+    error: null,
+    success: false
+  });
+
 
 
   // Fonction pour récupérer les clients
