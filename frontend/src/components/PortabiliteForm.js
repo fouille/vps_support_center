@@ -461,7 +461,17 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       <SearchableSelect
                         options={demandeurOptions}
                         value={formData.demandeur_id}
-                        onChange={(value) => setFormData(prev => ({ ...prev, demandeur_id: value }))}
+                        onChange={(value) => {
+                          setFormData(prev => ({ ...prev, demandeur_id: value }));
+                          // Nettoyer les erreurs de validation
+                          if (validationErrors.demandeur_id) {
+                            setValidationErrors(prev => {
+                              const newErrors = { ...prev };
+                              delete newErrors.demandeur_id;
+                              return newErrors;
+                            });
+                          }
+                        }}
                         placeholder="Sélectionner un demandeur..."
                         required
                         hasError={validationErrors.demandeur_id}
