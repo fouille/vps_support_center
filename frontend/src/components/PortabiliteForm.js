@@ -274,9 +274,10 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
           errors.push('Veuillez sélectionner un client');
           fieldErrors.client_id = true;
         }
-        if (!formData.numeros_portes.trim()) {
-          errors.push('Veuillez saisir les numéros à porter');
-          fieldErrors.numeros_portes = true;
+        // Validation du demandeur seulement pour les agents
+        if (user.type_utilisateur === 'agent' && !formData.demandeur_id) {
+          errors.push('Veuillez sélectionner un demandeur');
+          fieldErrors.demandeur_id = true;
         }
         break;
         
