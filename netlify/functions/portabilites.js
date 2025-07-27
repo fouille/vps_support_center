@@ -81,7 +81,7 @@ exports.handler = async (event, context) => {
         let queryParams = [portabiliteId];
 
         // Vérification des permissions pour les demandeurs
-        if (decoded.type === 'demandeur') {
+        if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           specificQuery += ` AND p.demandeur_id = $2`;
           queryParams.push(decoded.id);
         }
