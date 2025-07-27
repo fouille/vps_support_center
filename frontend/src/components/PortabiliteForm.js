@@ -399,6 +399,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       onChange={handleInputChange}
                       placeholder="14 chiffres (espaces et points supprimés automatiquement)"
                       maxLength="14"
+                      required
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     />
                     <div className="ml-3 flex items-center">
