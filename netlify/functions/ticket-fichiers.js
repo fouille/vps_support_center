@@ -127,7 +127,7 @@ exports.handler = async (event, context) => {
         // Get user ID based on token
         let uploadedBy;
         
-        if (decoded.type === 'agent') {
+        if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           const agent = await sql`SELECT id FROM agents WHERE email = ${decoded.sub}`;
           if (agent.length === 0) {
             return {
