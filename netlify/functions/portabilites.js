@@ -143,7 +143,7 @@ exports.handler = async (event, context) => {
         let paramCount = 0;
 
         // Filtrage par utilisateur selon le type
-        if (decoded.type === 'demandeur') {
+        if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
           paramCount++;
           baseQuery += ` AND p.demandeur_id = $${paramCount}`;
           queryParams.push(decoded.id);
