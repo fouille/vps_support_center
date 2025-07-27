@@ -167,6 +167,15 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     
+    // Nettoyer les erreurs de validation pour ce champ
+    if (validationErrors[name]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+    
     if (name === 'siret_client') {
       const cleanedValue = cleanSiret(value);
       // Limiter à 14 chiffres
