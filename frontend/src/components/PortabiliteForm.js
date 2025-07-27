@@ -386,6 +386,51 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                   Données du client
                 </h2>
                 
+                {/* SIRET client - EN PREMIER */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    SIRET client *
+                  </label>
+                  <div className="relative flex items-center">
+                    <input
+                      type="text"
+                      name="siret_client"
+                      value={formData.siret_client}
+                      onChange={handleInputChange}
+                      placeholder="14 chiffres (espaces et points supprimés automatiquement)"
+                      maxLength="14"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                    />
+                    <div className="ml-3 flex items-center">
+                      {siretStatus.loading && (
+                        <div className="flex items-center text-blue-600">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                          <span className="text-sm">Vérification...</span>
+                        </div>
+                      )}
+                      {siretStatus.success && (
+                        <div className="flex items-center text-green-600">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-sm">Données récupérées</span>
+                        </div>
+                      )}
+                      {siretStatus.error && (
+                        <div className="flex items-center text-red-600">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span className="text-sm">{siretStatus.error}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Les données d'adresse seront automatiquement remplies si le SIRET est trouvé
+                  </p>
+                </div>
+                
                 {/* Informations client */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <div>
@@ -426,32 +471,23 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      SIRET client
-                    </label>
-                    <input
-                      type="text"
-                      name="siret_client"
-                      value={formData.siret_client}
-                      onChange={handleInputChange}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
-                    />
-                  </div>
                 </div>
 
-                {/* Adresse */}
+                {/* Adresse - avec indication de pré-remplissage */}
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Adresse
+                      {siretStatus.success && (
+                        <span className="text-green-600 text-xs ml-2">(remplie automatiquement)</span>
+                      )}
                     </label>
                     <input
                       type="text"
                       name="adresse"
                       value={formData.adresse}
                       onChange={handleInputChange}
+                      placeholder="Adresse sera remplie automatiquement avec le SIRET"
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     />
                   </div>
@@ -460,12 +496,16 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Code postal
+                        {siretStatus.success && (
+                          <span className="text-green-600 text-xs ml-2">(rempli automatiquement)</span>
+                        )}
                       </label>
                       <input
                         type="text"
                         name="code_postal"
                         value={formData.code_postal}
                         onChange={handleInputChange}
+                        placeholder="Code postal sera rempli automatiquement"
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                       />
                     </div>
@@ -473,12 +513,16 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Ville
+                        {siretStatus.success && (
+                          <span className="text-green-600 text-xs ml-2">(remplie automatiquement)</span>
+                        )}
                       </label>
                       <input
                         type="text"
                         name="ville"
                         value={formData.ville}
                         onChange={handleInputChange}
+                        placeholder="Ville sera remplie automatiquement"
                         className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                       />
                     </div>
