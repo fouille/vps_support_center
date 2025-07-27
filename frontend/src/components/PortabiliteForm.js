@@ -252,8 +252,63 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     loadData();
   }, [user, isEdit, portabiliteId]);
 
+  // Fonction de validation pour chaque étape
+  const validateStep = (step) => {
+    const errors = [];
+    
+    switch (step) {
+      case 1:
+        if (!formData.client_id) {
+          errors.push('Veuillez sélectionner un client');
+        }
+        if (!formData.numeros_portes.trim()) {
+          errors.push('Veuillez saisir les numéros à porter');
+        }
+        break;
+        
+      case 2:
+        if (!formData.siret_client.trim()) {
+          errors.push('Le SIRET client est obligatoire');
+        }
+        if (!formData.nom_client.trim()) {
+          errors.push('Le nom client est obligatoire');
+        }
+        if (!formData.prenom_client.trim()) {
+          errors.push('Le prénom client est obligatoire');
+        }
+        if (!formData.adresse.trim()) {
+          errors.push('L\'adresse est obligatoire');
+        }
+        if (!formData.code_postal.trim()) {
+          errors.push('Le code postal est obligatoire');
+        }
+        if (!formData.ville.trim()) {
+          errors.push('La ville est obligatoire');
+        }
+        break;
+        
+      case 3:
+        if (!formData.date_portabilite_demandee) {
+          errors.push('La date de portabilité demandée est obligatoire');
+        }
+        break;
+    }
+    
+    return errors;
+  };
+
   // Fonctions pour la navigation des steps
   const nextStep = () => {
+    // Valider l'étape actuelle avant de passer à la suivante
+    const validationErrors = validateStep(currentStep);
+    
+    if (validationErrors.length > 0) {
+      setError(validationErrors.join(', '));
+      return;
+    }
+    
+    // Réinitialiser les erreurs et passer à l'étape suivante
+    setError(null);
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
