@@ -6,9 +6,9 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 6,      // Version mineure - nouvelles fonctionnalités
+  minor: 7,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
-  buildDate: "2025-07-26", // Date de build automatique
+  buildDate: "2025-07-27", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.7.0",
+    date: "2025-07-27",
+    type: "MINOR",
+    description: "Ajout intégration API INSEE pour validation SIRET et auto-completion adresse"
+  },
+{
     version: "1.6.0",
     date: "2025-07-26",
     type: "MINOR",
