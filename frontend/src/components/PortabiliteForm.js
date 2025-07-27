@@ -596,7 +596,9 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                         onChange={handleInputChange}
                         placeholder="Code postal sera rempli automatiquement"
                         required
-                        className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                        className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
+                          validationErrors.code_postal ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
                     </div>
 
