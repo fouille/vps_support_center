@@ -183,7 +183,7 @@ exports.handler = async (event, context) => {
       const result = await sql(insertQuery, [
         portabiliteId,
         decoded.id,
-        decoded.type,
+        decoded.type_utilisateur || decoded.type,
         message.trim()
       ]);
 
