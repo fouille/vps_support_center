@@ -243,7 +243,7 @@ exports.handler = async (event, context) => {
             };
           }
           finalDemandeurId = demandeur[0].id;
-        } else if (decoded.type === 'agent') {
+        } else if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           // For agents, they must specify a demandeur_id
           if (!demandeur_id) {
             return {
