@@ -308,6 +308,10 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
         break;
         
       case 3:
+        if (!formData.numeros_portes.trim()) {
+          errors.push('Les numéros à porter sont obligatoires');
+          fieldErrors.numeros_portes = true;
+        }
         if (!formData.date_portabilite_demandee) {
           errors.push('La date de portabilité demandée est obligatoire');
           fieldErrors.date_portabilite_demandee = true;
