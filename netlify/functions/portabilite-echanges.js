@@ -227,7 +227,7 @@ exports.handler = async (event, context) => {
 
     } else if (method === 'DELETE') {
       // Suppression d'un commentaire (agents uniquement)
-      if (decoded.type !== 'agent') {
+      if ((decoded.type_utilisateur || decoded.type) !== 'agent') {
         return {
           statusCode: 403,
           headers,
