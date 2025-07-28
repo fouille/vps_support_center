@@ -28,25 +28,11 @@ const Dashboard = () => {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
-      
-      const response = await fetch(`${backendUrl}/api/dashboard`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des statistiques');
-      }
-
-      const data = await response.json();
-      setStats(data);
+      const response = await api.get('/api/dashboard');
+      setStats(response.data);
     } catch (error) {
       console.error('Erreur:', error);
-      setError(error.message);
+      setError(error.response?.data?.detail || error.message);
     } finally {
       setLoading(false);
     }
