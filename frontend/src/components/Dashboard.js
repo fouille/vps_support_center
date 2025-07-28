@@ -91,9 +91,15 @@ const Dashboard = () => {
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const data = payload[0];
+      const displayLabel = label || data.name || '';
+      const displayValue = data.value || 0;
+      
       return (
         <div className="bg-white dark:bg-dark-surface p-3 border border-gray-200 dark:border-dark-border rounded-lg shadow-lg">
-          <p className="text-gray-900 dark:text-dark-text font-medium">{`${label}: ${payload[0].value}`}</p>
+          <p className="text-gray-900 dark:text-dark-text font-medium">
+            {displayLabel ? `${displayLabel}: ${displayValue}` : displayValue}
+          </p>
         </div>
       );
     }
