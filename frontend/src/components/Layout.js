@@ -11,7 +11,8 @@ import {
   X,
   Sun,
   Moon,
-  Phone
+  Phone,
+  BarChart3
 } from 'lucide-react';
 
 const Layout = ({ children, currentPage, onNavigate }) => {
