@@ -71,6 +71,25 @@ backend:
       - "Added société_id field support throughout demandeur operations"
       - "Integrated société name resolution from demandeurs_societe table"
 
+  - task: "Demandeur permissions for accessing demandeurs menu"
+    implemented: true  
+    working: true
+    file: "dev-server.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DEMANDEUR PERMISSIONS FULLY TESTED: All 22 comprehensive test cases passed successfully. Tested the new functionality where demandeurs can access the 'Mes Collaborateurs' menu (renamed from 'Demandeurs'). VERIFIED FUNCTIONALITY: 1) Demandeur access to /api/demandeurs ✅ - Demandeurs can now access the endpoint that was previously agent-only 2) Société restriction working ✅ - Demandeurs only see demandeurs from their own société, not from other sociétés 3) Create new demandeur ✅ - Demandeurs can create new demandeurs in their société, with société_id automatically forced to their own 4) Modify demandeur ✅ - Demandeurs can modify other demandeurs from their société with proper validation 5) Self-deletion protection ✅ - Demandeurs cannot delete their own account (400 error) 6) Delete other demandeur ✅ - Demandeurs can delete other demandeurs from their société 7) Cross-société restrictions ✅ - Demandeurs cannot modify or delete demandeurs from other sociétés (403 Forbidden) 8) Authentication validation ✅ - Proper token validation and error handling. The dual management system is working perfectly with proper permissions and restrictions as requested in the review."
+    changes:
+      - "Enabled demandeur access to GET /api/demandeurs with société-based filtering"
+      - "Implemented société-based visibility restrictions for demandeurs"
+      - "Added permission checks for demandeur CRUD operations on other demandeurs"
+      - "Enforced cross-société access restrictions (403 Forbidden)"
+      - "Maintained self-deletion protection for demandeurs"
+      - "Verified all authentication and authorization flows work correctly"
+
   - task: "Portabilités API - structure et endpoints"
     implemented: true  
     working: false
