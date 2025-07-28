@@ -48,7 +48,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   };
 
   return (
-    <div className="flex h-full bg-gray-50 dark:bg-dark-bg">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
       {/* Sidebar mobile backdrop */}
       {sidebarOpen && (
         <div 
@@ -58,7 +58,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-dark-surface shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:z-0 lg:shadow-none ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-dark-surface shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:shadow-none ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
@@ -76,7 +76,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 mt-6 px-3">
+        <nav className="flex-1 mt-6 px-3 pb-6">
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
