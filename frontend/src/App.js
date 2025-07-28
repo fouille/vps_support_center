@@ -54,7 +54,9 @@ const AppContent = () => {
 
   return (
     <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
-      {renderPage()}
+      <div className="flex-1">
+        {renderPage()}
+      </div>
     </Layout>
   );
 };
