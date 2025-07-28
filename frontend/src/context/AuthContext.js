@@ -42,11 +42,22 @@ export const AuthProvider = ({ children }) => {
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401) {
+      const isTokenExpired = 
+        error.response?.status === 401 || 
+        (error.response?.status === 500 && 
+         (error.response?.data?.detail?.includes('jwt expired') || 
+          error.response?.data?.detail?.includes('Token expiré') ||
+          error.response?.data?.detail?.includes('Invalid token')));
+      
+      if (isTokenExpired) {
+        console.log('Token expired, logging out user');
         // Token expired or invalid
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
+        
+        // Redirection vers la page de connexion
+        window.location.href = '/';
       }
       return Promise.reject(error);
     }
