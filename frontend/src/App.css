@@ -51,6 +51,23 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Footer always at bottom */
+html, body, #root {
+  height: 100%;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* Animations et styles existants */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
