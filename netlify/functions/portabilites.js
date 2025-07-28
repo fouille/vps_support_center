@@ -82,8 +82,28 @@ exports.handler = async (event, context) => {
 
         // Vérification des permissions pour les demandeurs
         if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
-          specificQuery += ` AND p.demandeur_id = $2`;
-          queryParams.push(decoded.id);
+          // Pour les demandeurs, vérifier qu'ils peuvent accéder à cette portabilité via leur société
+          const demandeur = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}
+          `;
+          
+          if (demandeur.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ error: 'Utilisateur non trouvé' })
+            };
+          }
+
+          if (demandeur[0].societe_id) {
+            // Vérifier via la société
+            specificQuery += ` AND d.societe_id = $2`;
+            queryParams.push(demandeur[0].societe_id);
+          } else {
+            // Si pas de société, voir seulement ses propres portabilités
+            specificQuery += ` AND p.demandeur_id = $2`;
+            queryParams.push(decoded.id);
+          }
         }
 
         const result = await sql(specificQuery, queryParams);
