@@ -473,7 +473,7 @@ const DemandeursPage = () => {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal Demandeur */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
           <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-md modal-content">
@@ -510,17 +510,37 @@ const DemandeursPage = () => {
                 </div>
               </div>
 
+              {/* Société - Selection ou saisie manuelle */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
                   Société *
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.societe}
-                  onChange={(e) => setFormData({ ...formData, societe: e.target.value })}
-                  className="input"
-                />
+                {isAgent && societes.length > 0 ? (
+                  <SearchableSelect
+                    options={societeOptions}
+                    value={formData.societe_id}
+                    onChange={(value) => {
+                      const selectedSociete = societes.find(s => s.id === value);
+                      setFormData({ 
+                        ...formData, 
+                        societe_id: value,
+                        societe: selectedSociete ? selectedSociete.nom_societe : ''
+                      });
+                    }}
+                    placeholder="Sélectionner une société..."
+                    className="w-full"
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    required
+                    value={formData.societe}
+                    onChange={(e) => setFormData({ ...formData, societe: e.target.value })}
+                    className="input"
+                    placeholder="Nom de la société"
+                    readOnly={!isAgent}
+                  />
+                )}
               </div>
 
               <div>
@@ -576,6 +596,201 @@ const DemandeursPage = () => {
                 >
                   <Check className="h-4 w-4 mr-2" />
                   {editingDemandeur ? 'Modifier' : 'Créer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Société */}
+      {showSocieteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
+          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-2xl modal-content max-h-90vh overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-dark-text">
+              {editingSociete ? 'Modifier la Société' : 'Nouvelle Société'}
+            </h2>
+
+            <form onSubmit={handleSocieteSubmit} className="space-y-4">
+              {/* SIRET avec autocomplete */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  SIRET
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={societeFormData.siret}
+                    onChange={(e) => {
+                      const siret = e.target.value.replace(/\D/g, '');
+                      setSocieteFormData({ ...societeFormData, siret });
+                      if (siret.length === 14) {
+                        handleSiretLookup(siret);
+                      }
+                    }}
+                    className="input pr-10"
+                    placeholder="Ex: 12345678901234"
+                    maxLength="14"
+                  />
+                  {siretLoading && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                    </div>
+                  )}
+                </div>
+                {siretError && (
+                  <p className="text-red-500 text-sm mt-1">{siretError}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Nom de la société *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={societeFormData.nom_societe}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, nom_societe: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Adresse *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={societeFormData.adresse}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, adresse: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Complément d'adresse
+                </label>
+                <input
+                  type="text"
+                  value={societeFormData.adresse_complement}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, adresse_complement: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                    Code postal *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={societeFormData.code_postal}
+                    onChange={(e) => setSocieteFormData({ ...societeFormData, code_postal: e.target.value })}
+                    className="input"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                    Ville *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={societeFormData.ville}
+                    onChange={(e) => setSocieteFormData({ ...societeFormData, ville: e.target.value })}
+                    className="input"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Numéro de téléphone
+                </label>
+                <input
+                  type="tel"
+                  value={societeFormData.numero_tel}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, numero_tel: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={societeFormData.email}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, email: e.target.value })}
+                  className="input"
+                />
+              </div>
+
+              {/* Upload de logo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Logo de la société
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                    id="logo-upload"
+                  />
+                  <label
+                    htmlFor="logo-upload"
+                    className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Choisir un logo
+                  </label>
+                  {societeFormData.logo_base64 && (
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={`data:image/jpeg;base64,${societeFormData.logo_base64}`}
+                        alt="Logo"
+                        className="h-8 w-8 rounded object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSocieteFormData({ ...societeFormData, logo_base64: '' })}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Formats acceptés: JPG, PNG, GIF, WebP • Taille max: 2MB
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleCloseSocieteModal}
+                  className="btn-secondary"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary flex items-center"
+                  disabled={siretLoading}
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  {editingSociete ? 'Modifier' : 'Créer'}
                 </button>
               </div>
             </form>
