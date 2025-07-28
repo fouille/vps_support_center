@@ -296,7 +296,24 @@ const DemandeursPage = () => {
             </button>
           )}
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              // Pré-remplir la société pour les demandeurs
+              if (!isAgent && demandeurs.length > 0) {
+                const userDemandeur = demandeurs.find(d => d.email === user.email);
+                if (userDemandeur) {
+                  setFormData({
+                    nom: '',
+                    prenom: '',
+                    societe: userDemandeur.societe_nom || userDemandeur.societe,
+                    societe_id: userDemandeur.societe_id || '',
+                    telephone: '',
+                    email: '',
+                    password: ''
+                  });
+                }
+              }
+              setShowModal(true);
+            }}
             className="btn-primary flex items-center"
           >
             <Plus className="h-5 w-5 mr-2" />
