@@ -118,6 +118,24 @@ backend:
       - "Intégré génération automatique numéro 8 chiffres"
       - "Support complet des statuts et notifications email"
 
+  - task: "Email notifications for portabilité file attachments"
+    implemented: true  
+    working: false
+    file: "netlify/functions/portabilite-fichiers.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ EMAIL NOTIFICATIONS FOR FILE ATTACHMENTS TESTING BLOCKED: Cannot test email notification functionality for file uploads/deletions because database tables don't exist. TESTING RESULTS: 1) Authentication working ✅ - Both agent and demandeur login successful 2) Database structure check ❌ - GET /api/portabilites returns 404, indicating portabilites, portabilite_echanges, and portabilite_fichiers tables are missing 3) Code analysis verified ✅ - portabilite-fichiers.js properly implements email notifications: Lines 235-244 call emailService.sendPortabiliteCommentEmail() for file uploads, Lines 352-361 call emailService.sendPortabiliteCommentEmail() for file deletions, Both operations create automatic comments (📎 Fichier ajouté / 🗑️ Fichier supprimé) before sending emails 4) Error handling ✅ - Email failures don't block file operations (graceful degradation). CRITICAL BLOCKER: Database tables (portabilites, portabilite_echanges, portabilite_fichiers) must be created before email notification functionality can be tested. The implementation is ready and will work correctly once database structure exists."
+    changes:
+      - "Added email notification for file upload (POST method) in portabilite-fichiers.js"
+      - "Added email notification for file deletion (DELETE method) in portabilite-fichiers.js"
+      - "Both operations use emailService.sendPortabiliteCommentEmail for consistency"
+      - "Automatic comments created for file operations (📎 upload, 🗑️ deletion)"
+      - "Graceful error handling - file operations continue even if email fails"
+
   - task: "Mailjet email integration diagnostic"
     implemented: true  
     working: false
