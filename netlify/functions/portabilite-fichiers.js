@@ -177,6 +177,8 @@ exports.handler = async (event, context) => {
         };
       }
 
+      const portabiliteInfo = accessResult[0];
+
       // Insertion du fichier
       const insertQuery = `
         INSERT INTO portabilite_fichiers (portabilite_id, nom_fichier, type_fichier, taille_fichier, contenu_base64, uploaded_by)
