@@ -37,13 +37,16 @@ backend:
     implemented: true  
     working: false
     file: "netlify/functions/demandeurs.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
         comment: "❌ DEMANDEUR TRANSFER FUNCTIONALITY CRITICAL ISSUE IDENTIFIED: The new transfer functionality implemented in demandeurs.js DELETE method is not working correctly. SPECIFIC PROBLEMS: 1) DELETE requests with linked tickets return 200 (success) instead of 409 (conflict) - the COUNT queries for linked tickets/portabilities are not detecting existing data 2) Demandeurs are being deleted despite having linked tickets, causing data integrity issues 3) The SQL queries `(SELECT COUNT(*) FROM tickets WHERE demandeur_id = d.id) as tickets_count` and `(SELECT COUNT(*) FROM portabilites WHERE demandeur_id = d.id) as portabilites_count` are not working as expected 4) Response structure missing required fields like 'transferred' and 'transferredData' for normal deletions. ROOT CAUSE: The database queries in the transfer logic are failing to detect linked data, causing the system to bypass the transfer requirement and delete demandeurs directly. This is a critical data integrity issue that needs immediate attention. TESTING EVIDENCE: Created test ticket successfully linked to demandeur (verified via GET /api/tickets), but DELETE /api/demandeurs/{id} returned 200 success instead of 409 conflict, and demandeur was deleted despite having linked data."
+      - working: false
+        agent: "testing"
+        comment: "❌ DEMANDEUR TRANSFER FUNCTIONALITY STILL BROKEN AFTER SUPPOSED FIX: Comprehensive testing of the corrected implementation reveals the SQL query fixes are NOT working. CRITICAL FINDINGS: 1) **DATA INTEGRITY VIOLATION**: Demandeurs with linked tickets are still being deleted (200 response) instead of triggering transfer workflow (409 response) 2) **COUNT QUERIES FAILING**: The separate COUNT queries `SELECT COUNT(*) as count FROM tickets WHERE demandeur_id = ${demandeurId}` and `SELECT COUNT(*) as count FROM portabilites WHERE demandeur_id = ${demandeurId}` are not detecting existing linked data 3) **MISSING RESPONSE FIELDS**: Normal deletions missing 'transferred: false' field in response structure 4) **TRANSFER PROCESS BROKEN**: Cannot test transfer functionality because demandeurs are deleted before transfer can occur. TESTING EVIDENCE: Created test demandeur with linked ticket (ticket ID: 0b7d4025-7ca7-4166-83b4-7db97debedc3), DELETE /api/demandeurs/afb2c667-d19b-4a50-ab1c-cca6bf75ec75 returned 200 success and deleted demandeur despite having linked ticket. The supposed SQL query fixes in lines 299-308 of demandeurs.js are not functioning correctly. This is a critical data integrity issue requiring immediate investigation of the database query logic."
 
   - task: "Demandeurs-Société API - dual management system"
     implemented: true  
