@@ -144,9 +144,30 @@ exports.handler = async (event, context) => {
 
         // Filtrage par utilisateur selon le type
         if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
-          paramCount++;
-          baseQuery += ` AND p.demandeur_id = $${paramCount}`;
-          queryParams.push(decoded.id);
+          // Pour les demandeurs, utiliser societe_id pour voir toutes les portabilités de la société
+          const demandeur = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}
+          `;
+          
+          if (demandeur.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ error: 'Utilisateur non trouvé' })
+            };
+          }
+
+          if (demandeur[0].societe_id) {
+            // Filtrer par société (tous les demandeurs de la même société)
+            paramCount++;
+            baseQuery += ` AND d.societe_id = $${paramCount}`;
+            queryParams.push(demandeur[0].societe_id);
+          } else {
+            // Si pas de société, voir seulement ses propres portabilités
+            paramCount++;
+            baseQuery += ` AND p.demandeur_id = $${paramCount}`;
+            queryParams.push(decoded.id);
+          }
         }
 
         // Filtrage par statut
