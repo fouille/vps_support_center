@@ -1407,6 +1407,213 @@ def test_portabilite_apis():
     
     return results.summary()
 
+def test_database_query_debug():
+    """Debug test to check database queries directly"""
+    results = TestResults()
+    
+    print("🚀 Starting Database Query Debug Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate
+    print("\n📋 STEP 1: Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    agent_headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Get existing demandeur and create a ticket
+    print("\n📋 STEP 2: Get Existing Demandeur and Create Test Ticket")
+    
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            if len(demandeurs) > 0:
+                test_demandeur = demandeurs[0]
+                test_demandeur_id = test_demandeur['id']
+                results.add_result("Get Test Demandeur", True)
+                print(f"   Using demandeur: {test_demandeur['nom']} {test_demandeur['prenom']} (ID: {test_demandeur_id})")
+            else:
+                results.add_result("Get Test Demandeur", False, "No demandeurs found")
+                return results.summary()
+        else:
+            results.add_result("Get Test Demandeur", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Demandeur", False, str(e))
+        return results.summary()
+    
+    # Get a client
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+            elif isinstance(clients_data, list) and len(clients_data) > 0:
+                test_client_id = clients_data[0]['id']
+            else:
+                results.add_result("Get Test Client", False, "No clients found")
+                return results.summary()
+            results.add_result("Get Test Client", True)
+        else:
+            results.add_result("Get Test Client", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Client", False, str(e))
+        return results.summary()
+    
+    # Create a test ticket linked to the demandeur
+    ticket_data = {
+        "titre": "DATABASE DEBUG Test Ticket",
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "requete_initiale": "Database debug test ticket to verify query functionality",
+        "status": "nouveau"
+    }
+    
+    created_ticket = None
+    try:
+        response = requests.post(f"{API_BASE}/tickets", headers=agent_headers, 
+                               json=ticket_data, timeout=10)
+        if response.status_code == 201:
+            created_ticket = response.json()
+            results.add_result("Create Test Ticket", True)
+            print(f"   Created ticket: {created_ticket['titre']} (ID: {created_ticket['id']})")
+            print(f"   Ticket demandeur_id: {created_ticket.get('demandeur_id')}")
+        else:
+            results.add_result("Create Test Ticket", False, f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Create Test Ticket", False, str(e))
+        return results.summary()
+    
+    # Step 3: Verify ticket exists and is linked
+    print("\n📋 STEP 3: Verify Ticket Exists and is Linked")
+    
+    try:
+        response = requests.get(f"{API_BASE}/tickets", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            tickets = response.json()
+            linked_tickets = [t for t in tickets if t.get('demandeur_id') == test_demandeur_id]
+            results.add_result("Verify Ticket Linkage", True)
+            print(f"   Found {len(linked_tickets)} tickets linked to demandeur {test_demandeur_id}")
+            
+            if len(linked_tickets) > 0:
+                print(f"   Linked ticket IDs: {[t['id'] for t in linked_tickets]}")
+                print(f"   Sample ticket demandeur_id: {linked_tickets[0].get('demandeur_id')}")
+            else:
+                print("   ⚠️  No tickets found linked to this demandeur!")
+        else:
+            results.add_result("Verify Ticket Linkage", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("Verify Ticket Linkage", False, str(e))
+    
+    # Step 4: Now let's examine what happens in the DELETE logic
+    print("\n📋 STEP 4: Examine DELETE Logic - Check Response Details")
+    
+    try:
+        # First, let's see what the demandeur looks like before deletion
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            current_demandeur = next((d for d in demandeurs if d['id'] == test_demandeur_id), None)
+            if current_demandeur:
+                print(f"   Demandeur before deletion: {current_demandeur}")
+                results.add_result("Get Demandeur Before Delete", True)
+            else:
+                results.add_result("Get Demandeur Before Delete", False, "Demandeur not found")
+        
+        # Now try to delete and capture the full response
+        response = requests.delete(f"{API_BASE}/demandeurs/{test_demandeur_id}", 
+                                 headers=agent_headers, timeout=10)
+        
+        print(f"   DELETE response status: {response.status_code}")
+        print(f"   DELETE response headers: {dict(response.headers)}")
+        print(f"   DELETE response body: {response.text}")
+        
+        if response.status_code == 200:
+            result = response.json()
+            results.add_result("DELETE - Unexpected Success", False, 
+                             "DELETE succeeded when it should have returned 409 due to linked tickets")
+            
+            # Check if the response has the expected structure
+            if 'message' in result:
+                print(f"   Response message: {result['message']}")
+            if 'transferred' in result:
+                print(f"   Response transferred: {result['transferred']}")
+            else:
+                print("   ⚠️  Response missing 'transferred' field")
+                
+        elif response.status_code == 409:
+            result = response.json()
+            results.add_result("DELETE - Correct 409 Response", True)
+            
+            # Examine the 409 response structure
+            print(f"   409 Response structure: {list(result.keys())}")
+            if 'linkedData' in result:
+                linked_data = result['linkedData']
+                print(f"   Linked data: {linked_data}")
+                if 'tickets' in linked_data:
+                    print(f"   Tickets count in response: {linked_data['tickets']}")
+                if 'portabilites' in linked_data:
+                    print(f"   Portabilites count in response: {linked_data['portabilites']}")
+            else:
+                print("   ⚠️  409 response missing 'linkedData' field")
+                
+        else:
+            results.add_result("DELETE - Unexpected Status", False, 
+                             f"Unexpected status code: {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("DELETE - Exception", False, str(e))
+    
+    # Step 5: Check if demandeur still exists after delete attempt
+    print("\n📋 STEP 5: Check Demandeur Existence After Delete Attempt")
+    
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            demandeur_still_exists = any(d['id'] == test_demandeur_id for d in demandeurs)
+            
+            if demandeur_still_exists:
+                results.add_result("Demandeur Still Exists", True, "Demandeur correctly preserved due to linked data")
+                print("   ✅ Demandeur still exists (correct if 409 was returned)")
+            else:
+                results.add_result("Demandeur Still Exists", False, "Demandeur was deleted despite linked data")
+                print("   ❌ Demandeur was deleted despite having linked tickets")
+        else:
+            results.add_result("Demandeur Still Exists", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("Demandeur Still Exists", False, str(e))
+    
+    # Cleanup: Delete test ticket if it still exists
+    print("\n📋 STEP 6: Cleanup")
+    
+    if created_ticket:
+        try:
+            response = requests.delete(f"{API_BASE}/tickets/{created_ticket['id']}", 
+                                     headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("CLEANUP - Delete test ticket", True)
+            else:
+                results.add_result("CLEANUP - Delete test ticket", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("CLEANUP - Delete test ticket", False, str(e))
+    
+    return results.summary()
+
 def test_demandeur_transfer_debug():
     """Debug test to understand why transfer functionality isn't working"""
     results = TestResults()
