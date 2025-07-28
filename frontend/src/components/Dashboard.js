@@ -109,7 +109,7 @@ const Dashboard = () => {
             Dashboard
           </h1>
           <p className="text-gray-600 dark:text-dark-text-secondary">
-            Vue d'ensemble de votre activité {isAgent ? '(Vue Agent)' : '(Vue Demandeur)'}
+            Vue d'ensemble de votre activité
           </p>
         </div>
         <button 
