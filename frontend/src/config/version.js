@@ -6,7 +6,7 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 12,      // Version mineure - nouvelles fonctionnalités
+  minor: 13,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-28", // Date de build automatique
 };
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.13.0",
+    date: "2025-07-28",
+    type: "MINOR",
+    description: "Ajout documentation complète gestion expiration token"
+  },
+{
     version: "1.12.0",
     date: "2025-07-28",
     type: "MINOR",
