@@ -23,21 +23,9 @@ const mockDB = {
       societe: 'VoIP Services'
     }
   ],
-  demandeurs: [
-    {
-      id: uuidv4(),
-      nom: 'Martin',
-      prenom: 'Sophie',
-      societe: 'TechCorp SARL',
-      societe_id: null, // Will be set when societes are created
-      telephone: '0123456789',
-      email: 'sophie.martin@techcorp.fr',
-      password: '$2a$10$GdyKzfgy3bdkrOsi6weev.8V3msbHhiuRrKM4m3PUwMCf7ShDYv6G' // password123
-    }
-  ],
   demandeurs_societe: [
     {
-      id: uuidv4(),
+      id: 'societe-techcorp-id',
       nom_societe: 'TechCorp SARL',
       siret: '12345678901234',
       adresse: '123 Avenue des Champs-Élysées',
@@ -49,6 +37,18 @@ const mockDB = {
       logo_base64: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
+    }
+  ],
+  demandeurs: [
+    {
+      id: uuidv4(),
+      nom: 'Martin',
+      prenom: 'Sophie',
+      societe: 'TechCorp SARL',
+      societe_id: 'societe-techcorp-id', // Link to the société
+      telephone: '0123456789',
+      email: 'sophie.martin@techcorp.fr',
+      password: '$2a$10$GdyKzfgy3bdkrOsi6weev.8V3msbHhiuRrKM4m3PUwMCf7ShDYv6G' // password123
     }
   ],
   clients: [],
