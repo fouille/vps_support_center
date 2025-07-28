@@ -5019,17 +5019,17 @@ def test_portabilite_file_email_notifications():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Portabilité File Email Notifications")
+    print("🚀 Starting Backend API Tests - Demandeur Transfer Functionality")
     print("="*60)
     
-    # Run specific test for the email notification functionality for file attachments
+    # Run specific test for the demandeur transfer functionality before deletion
     success = True
     
-    # Test: Portabilité File Email Notifications (NEW)
+    # Test: Demandeur Transfer Functionality (NEW - PRIORITY TEST)
     print("\n" + "="*60)
-    print("TEST: PORTABILITÉ FILE EMAIL NOTIFICATIONS")
+    print("TEST: DEMANDEUR TRANSFER FUNCTIONALITY")
     print("="*60)
-    success &= test_portabilite_file_email_notifications()
+    success &= test_demandeur_transfer_functionality()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
