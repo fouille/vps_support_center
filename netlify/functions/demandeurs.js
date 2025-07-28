@@ -95,8 +95,8 @@ exports.handler = async (event, context) => {
           };
         }
         
-        let finalSocieteId = societe_id;
-        let finalSociete = societe;
+        let createSocieteId = societe_id;
+        let createSociete = societe;
         
         if (userType === 'demandeur') {
           // If user is demandeur, force the society to be their own
@@ -105,19 +105,19 @@ exports.handler = async (event, context) => {
           `;
           
           if (userInfo.length > 0) {
-            finalSocieteId = userInfo[0].societe_id;
-            finalSociete = userInfo[0].societe;
+            createSocieteId = userInfo[0].societe_id;
+            createSociete = userInfo[0].societe;
           }
         }
 
         // If societe_id is provided, get the society name
-        if (finalSocieteId) {
+        if (createSocieteId) {
           const societeInfo = await sql`
-            SELECT nom_societe FROM demandeurs_societe WHERE id = ${finalSocieteId}
+            SELECT nom_societe FROM demandeurs_societe WHERE id = ${createSocieteId}
           `;
           
           if (societeInfo.length > 0) {
-            finalSociete = societeInfo[0].nom_societe;
+            createSociete = societeInfo[0].nom_societe;
           }
         }
 
@@ -140,7 +140,7 @@ exports.handler = async (event, context) => {
         
         const createdDemandeur = await sql`
           INSERT INTO demandeurs (id, nom, prenom, societe, societe_id, telephone, email, password)
-          VALUES (${uuidv4()}, ${nom}, ${prenom}, ${finalSociete}, ${finalSocieteId}, ${telephone}, ${email}, ${hashedPassword})
+          VALUES (${uuidv4()}, ${nom}, ${prenom}, ${createSociete}, ${createSocieteId}, ${telephone}, ${email}, ${hashedPassword})
           RETURNING id, email, nom, prenom, societe, societe_id, telephone
         `;
         
@@ -174,8 +174,8 @@ exports.handler = async (event, context) => {
           }
         }
 
-        let finalSocieteId = upd_societe_id;
-        let finalSociete = upd_societe;
+        let updateSocieteId = upd_societe_id;
+        let updateSociete = upd_societe;
         
         if (userType === 'demandeur') {
           // If user is demandeur, force the society to be their own
@@ -184,19 +184,19 @@ exports.handler = async (event, context) => {
           `;
           
           if (userInfo.length > 0) {
-            finalSocieteId = userInfo[0].societe_id;
-            finalSociete = userInfo[0].societe;
+            updateSocieteId = userInfo[0].societe_id;
+            updateSociete = userInfo[0].societe;
           }
         }
 
         // If societe_id is provided, get the society name
-        if (finalSocieteId) {
+        if (updateSocieteId) {
           const societeInfo = await sql`
-            SELECT nom_societe FROM demandeurs_societe WHERE id = ${finalSocieteId}
+            SELECT nom_societe FROM demandeurs_societe WHERE id = ${updateSocieteId}
           `;
           
           if (societeInfo.length > 0) {
-            finalSociete = societeInfo[0].nom_societe;
+            updateSociete = societeInfo[0].nom_societe;
           }
         }
         
@@ -204,8 +204,8 @@ exports.handler = async (event, context) => {
         
         const updatedDemandeur = await sql`
           UPDATE demandeurs 
-          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${finalSociete}, 
-              societe_id = ${finalSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}, 
+          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${updateSociete}, 
+              societe_id = ${updateSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}, 
               password = ${hashedNewPassword}
           WHERE id = ${demandeurId}
           RETURNING id, email, nom, prenom, societe, societe_id, telephone
