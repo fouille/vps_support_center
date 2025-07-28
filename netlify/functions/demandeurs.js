@@ -31,7 +31,8 @@ exports.handler = async (event, context) => {
   try {
     // Verify authentication
     const authHeader = event.headers.authorization || event.headers.Authorization;
-    verifyToken(authHeader);
+    const decoded = verifyToken(authHeader);
+    const userType = decoded.type_utilisateur || decoded.type;
 
     const pathParts = event.path.split('/');
     const demandeurId = pathParts[pathParts.length - 1];
@@ -39,10 +40,6 @@ exports.handler = async (event, context) => {
     switch (event.httpMethod) {
       case 'GET':
         console.log('Getting demandeurs...');
-        
-        // Check if user is demandeur and get their society
-        const decoded = verifyToken(authHeader);
-        const userType = decoded.type_utilisateur || decoded.type;
         
         let demandeurs;
         if (userType === 'demandeur') {
@@ -97,10 +94,6 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ detail: 'Les champs obligatoires doivent être remplis: nom, prenom, email, password' })
           };
         }
-
-        // Check user permissions
-        const decoded = verifyToken(authHeader);
-        const userType = decoded.type_utilisateur || decoded.type;
         
         let finalSocieteId = societe_id;
         let finalSociete = societe;
