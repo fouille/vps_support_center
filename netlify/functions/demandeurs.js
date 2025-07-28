@@ -39,11 +39,49 @@ exports.handler = async (event, context) => {
     switch (event.httpMethod) {
       case 'GET':
         console.log('Getting demandeurs...');
-        const demandeurs = await sql`
-          SELECT id, email, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur 
-          FROM demandeurs 
-          ORDER BY nom, prenom
-        `;
+        
+        // Check if user is demandeur and get their society
+        const decoded = verifyToken(authHeader);
+        const userType = decoded.type_utilisateur || decoded.type;
+        
+        let demandeurs;
+        if (userType === 'demandeur') {
+          // If user is demandeur, only show demandeurs from their society
+          const userInfo = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}
+          `;
+          
+          if (userInfo.length > 0 && userInfo[0].societe_id) {
+            demandeurs = await sql`
+              SELECT d.id, d.email, d.nom, d.prenom, d.societe, d.telephone, d.societe_id,
+                     ds.nom_societe as societe_nom, 'demandeur' as type_utilisateur 
+              FROM demandeurs d
+              LEFT JOIN demandeurs_societe ds ON d.societe_id = ds.id
+              WHERE d.societe_id = ${userInfo[0].societe_id}
+              ORDER BY d.nom, d.prenom
+            `;
+          } else {
+            // If demandeur has no society, show only themselves
+            demandeurs = await sql`
+              SELECT d.id, d.email, d.nom, d.prenom, d.societe, d.telephone, d.societe_id,
+                     ds.nom_societe as societe_nom, 'demandeur' as type_utilisateur 
+              FROM demandeurs d
+              LEFT JOIN demandeurs_societe ds ON d.societe_id = ds.id
+              WHERE d.id = ${decoded.id}
+              ORDER BY d.nom, d.prenom
+            `;
+          }
+        } else {
+          // If user is agent, show all demandeurs
+          demandeurs = await sql`
+            SELECT d.id, d.email, d.nom, d.prenom, d.societe, d.telephone, d.societe_id,
+                   ds.nom_societe as societe_nom, 'demandeur' as type_utilisateur 
+            FROM demandeurs d
+            LEFT JOIN demandeurs_societe ds ON d.societe_id = ds.id
+            ORDER BY d.nom, d.prenom
+          `;
+        }
+        
         console.log('Demandeurs found:', demandeurs.length);
         return { statusCode: 200, headers, body: JSON.stringify(demandeurs) };
 
