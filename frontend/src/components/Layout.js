@@ -34,6 +34,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
     ] : [
       { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
       { name: 'Mes Portabilités', icon: Phone, key: 'portabilites' },
+      { name: 'Mes Collaborateurs', icon: UserCheck, key: 'demandeurs' },
     ])
   ];
 
