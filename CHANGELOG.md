@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.14.2] - 2025-07-28
+### Fixed
+- 🔧 Fix build Netlify - ajout dépendance uri-js et downgrade netlify-cli
+
 ## [1.14.1] - 2025-07-28
 ### Fixed
 - 🔧 Correction hauteur sidebar avec footer sticky
