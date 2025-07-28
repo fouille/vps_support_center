@@ -94,6 +94,8 @@ exports.handler = async (event, context) => {
         };
       }
 
+      const portabiliteInfo = accessResult[0];
+
       // Récupération des fichiers avec les informations de l'utilisateur
       const filesQuery = `
         SELECT 
