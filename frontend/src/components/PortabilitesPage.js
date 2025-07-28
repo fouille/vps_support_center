@@ -173,6 +173,33 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
     onNavigate('portabilites-edit');
   };
 
+  // Fonction pour supprimer une portabilité depuis le tableau
+  const handleDeleteFromTable = async (portabiliteId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette portabilité ?')) return;
+
+    try {
+      await api.delete(`/api/portabilites/${portabiliteId}`);
+      // Actualiser le tableau
+      fetchPortabilites(currentPage);
+    } catch (err) {
+      setError('Erreur lors de la suppression');
+      console.error('Erreur:', err);
+    }
+  };
+
+  // Fonction pour actualiser le tableau (appelée depuis le modal)
+  const refreshPortabilites = () => {
+    fetchPortabilites(currentPage);
+  };
+
+  // Exposer la fonction de rafraîchissement pour le modal
+  React.useEffect(() => {
+    window.refreshPortabilites = refreshPortabilites;
+    return () => {
+      delete window.refreshPortabilites;
+    };
+  }, [currentPage]);
+
   // Fonction pour créer une nouvelle portabilité
   const createPortabilite = () => {
     onNavigate('portabilites-nouvelle');
