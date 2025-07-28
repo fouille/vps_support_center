@@ -200,7 +200,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 dark:bg-dark-bg min-h-screen">
+    <div className="fade-in">
       <div className="max-w-7xl mx-auto">
         {/* En-tête */}
         <div className="mb-8">
