@@ -33,6 +33,44 @@ Implémentation complète d'une nouvelle section "Portabilités" pour la gestion
 - Ask for clarification when requirements are ambiguous
 
 backend:
+  - task: "Demandeurs-Société API - dual management system"
+    implemented: true  
+    working: true
+    file: "dev-server.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DEMANDEURS-SOCIÉTÉ API FULLY TESTED: All 21 comprehensive test cases passed successfully. Tested: 1) Agent-only access restriction ✅ - Demandeurs correctly receive 403 Forbidden when accessing société endpoints 2) GET /api/demandeurs-societe with pagination ✅ - Response structure with 'data' and 'pagination' fields working correctly 3) POST create société ✅ - Required fields validation, SIRET uniqueness, email uniqueness, response structure verified 4) PUT update société ✅ - Update functionality with duplicate validation working correctly 5) DELETE société ✅ - Protection against deletion when demandeurs are associated, successful deletion after cleanup 6) Search functionality ✅ - Search by société name, SIRET, email, ville working accurately 7) Authentication validation ✅ - No token (401), invalid token (401) protection working. All CRUD operations functioning perfectly with proper permissions, validation, and error handling as required for the dual management system."
+    changes:
+      - "Implemented GET /api/demandeurs-societe with pagination and search"
+      - "Added POST /api/demandeurs-societe with validation (SIRET, email uniqueness)"
+      - "Created PUT /api/demandeurs-societe/{id} with duplicate checking"
+      - "Implemented DELETE /api/demandeurs-societe/{id} with protection logic"
+      - "Added agent-only access restriction (403 for demandeurs)"
+      - "Integrated search functionality across all société fields"
+
+  - task: "Demandeurs API - dual management modifications"
+    implemented: true  
+    working: true
+    file: "dev-server.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DEMANDEURS DUAL MANAGEMENT API FULLY TESTED: All 18 comprehensive test cases passed successfully. Tested: 1) GET visibility restrictions ✅ - Agents see all demandeurs, demandeurs only see their société's demandeurs 2) POST with société_id (agent) ✅ - Agents can create demandeurs with specific société_id assignment 3) POST forced société (demandeur user) ✅ - Demandeurs' creations are forced to their own société 4) PUT permissions ✅ - Agents can update any demandeur, demandeurs can only update within their société 5) DELETE permissions ✅ - Demandeurs cannot delete their own account (400), agents can delete any demandeur 6) Validation and error handling ✅ - Required fields validation, duplicate email validation working 7) Authentication validation ✅ - No token (401), invalid token (401) protection working. All dual management functionality working perfectly with proper société-based restrictions and permissions."
+    changes:
+      - "Modified GET /api/demandeurs with société-based visibility restrictions"
+      - "Updated POST /api/demandeurs with société_id support and forcing logic"
+      - "Enhanced PUT /api/demandeurs with société-based permission checks"
+      - "Modified DELETE /api/demandeurs with self-deletion protection"
+      - "Added société_id field support throughout demandeur operations"
+      - "Integrated société name resolution from demandeurs_societe table"
+
   - task: "Portabilités API - structure et endpoints"
     implemented: true  
     working: false
