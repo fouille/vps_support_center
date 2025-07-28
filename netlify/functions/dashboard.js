@@ -7,7 +7,16 @@ const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Content-Type': 'application/json'
+  'Content-Type': 'application/json',
+};
+
+const verifyToken = (authHeader) => {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new Error('Token manquant');
+  }
+  
+  const token = authHeader.substring(7);
+  return jwt.verify(token, process.env.JWT_SECRET || 'dev-secret-key');
 };
 
 // Mock data for development when database is not accessible
