@@ -336,7 +336,25 @@ exports.handler = async (event, context) => {
     }
 
   } catch (error) {
-    console.error('Erreur dashboard:', error);
+    console.error('Dashboard error:', error);
+    
+    // Handle JWT errors
+    if (error.message === 'Token manquant') {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ detail: 'Token d\'authentification manquant' })
+      };
+    }
+    
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return {
+        statusCode: 401,
+        headers,
+        body: JSON.stringify({ detail: 'Token invalide ou expiré' })
+      };
+    }
+    
     return {
       statusCode: 500,
       headers,
