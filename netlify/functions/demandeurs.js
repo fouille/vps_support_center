@@ -242,6 +242,16 @@ exports.handler = async (event, context) => {
         return { statusCode: 200, headers, body: JSON.stringify(responseUpdatedDemandeur) };
 
       case 'DELETE':
+        // Parse request body to check if it's a transfer request
+        let requestData = {};
+        try {
+          if (event.body) {
+            requestData = JSON.parse(event.body);
+          }
+        } catch (e) {
+          // No body or invalid JSON, proceed with normal deletion
+        }
+
         // Check if user can delete this demandeur
         if (userType === 'demandeur') {
           if (decoded.id === demandeurId) {
@@ -268,20 +278,131 @@ exports.handler = async (event, context) => {
           }
         }
 
-        const deletedDemandeur = await sql`DELETE FROM demandeurs WHERE id = ${demandeurId} RETURNING id`;
+        // Get demandeur info and check for linked data
+        const demandeurInfo = await sql`
+          SELECT d.*, 
+                 (SELECT COUNT(*) FROM tickets WHERE demandeur_id = d.id) as tickets_count,
+                 (SELECT COUNT(*) FROM portabilites WHERE demandeur_id = d.id) as portabilites_count
+          FROM demandeurs d 
+          WHERE d.id = ${demandeurId}
+        `;
         
-        if (deletedDemandeur.length === 0) {
+        if (demandeurInfo.length === 0) {
           return {
             statusCode: 404,
             headers,
             body: JSON.stringify({ detail: 'Demandeur non trouvé' })
           };
         }
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ message: 'Demandeur supprimé avec succès' })
-        };
+
+        const demandeur = demandeurInfo[0];
+        const hasLinkedData = demandeur.tickets_count > 0 || demandeur.portabilites_count > 0;
+
+        // If no linked data, proceed with simple deletion
+        if (!hasLinkedData) {
+          const deletedDemandeur = await sql`DELETE FROM demandeurs WHERE id = ${demandeurId} RETURNING id`;
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ 
+              message: 'Demandeur supprimé avec succès',
+              transferred: false
+            })
+          };
+        }
+
+        // If linked data exists but no transfer target specified, return info for frontend
+        if (!requestData.transferTo) {
+          // Get other demandeurs from the same society
+          const otherDemandeurs = await sql`
+            SELECT id, nom, prenom, email 
+            FROM demandeurs 
+            WHERE societe_id = ${demandeur.societe_id} 
+            AND id != ${demandeurId}
+            ORDER BY nom, prenom
+          `;
+
+          return {
+            statusCode: 409, // Conflict - requires transfer
+            headers,
+            body: JSON.stringify({
+              detail: 'Ce demandeur a des tickets ou portabilités liés',
+              demandeur: {
+                nom: demandeur.nom,
+                prenom: demandeur.prenom,
+                email: demandeur.email
+              },
+              linkedData: {
+                tickets: demandeur.tickets_count,
+                portabilites: demandeur.portabilites_count
+              },
+              otherDemandeurs: otherDemandeurs,
+              canDelete: otherDemandeurs.length > 0
+            })
+          };
+        }
+
+        // Transfer requested - validate target demandeur
+        const transferTarget = requestData.transferTo;
+        const targetDemandeur = await sql`
+          SELECT id, societe_id 
+          FROM demandeurs 
+          WHERE id = ${transferTarget} 
+          AND societe_id = ${demandeur.societe_id}
+        `;
+
+        if (targetDemandeur.length === 0) {
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ detail: 'Demandeur de destination invalide ou pas dans la même société' })
+          };
+        }
+
+        // Perform transfer in a transaction
+        try {
+          // Transfer tickets
+          if (demandeur.tickets_count > 0) {
+            await sql`
+              UPDATE tickets 
+              SET demandeur_id = ${transferTarget}
+              WHERE demandeur_id = ${demandeurId}
+            `;
+          }
+
+          // Transfer portabilites
+          if (demandeur.portabilites_count > 0) {
+            await sql`
+              UPDATE portabilites 
+              SET demandeur_id = ${transferTarget}
+              WHERE demandeur_id = ${demandeurId}
+            `;
+          }
+
+          // Delete the original demandeur
+          await sql`DELETE FROM demandeurs WHERE id = ${demandeurId}`;
+
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ 
+              message: 'Demandeur supprimé avec succès après transfert',
+              transferred: true,
+              transferredData: {
+                tickets: demandeur.tickets_count,
+                portabilites: demandeur.portabilites_count
+              }
+            })
+          };
+
+        } catch (transferError) {
+          console.error('Transfer error:', transferError);
+          return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ detail: 'Erreur lors du transfert des données' })
+          };
+        }
 
       default:
         return {
