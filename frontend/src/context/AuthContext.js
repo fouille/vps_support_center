@@ -125,14 +125,7 @@ export const AuthProvider = ({ children }) => {
           error.response?.data?.detail?.includes('Invalid token')));
       
       if (isTokenExpired) {
-        console.log('Token expired, logging out user');
-        // Token expired or invalid
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        
-        // Redirection vers la page de connexion
-        window.location.href = '/';
+        handleTokenExpiration();
       }
       return Promise.reject(error);
     }
