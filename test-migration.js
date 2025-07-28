@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'https://c928bd4f-e1db-4532-b21b-49a90431e71c.preview.emergentagent.com';
+const BASE_URL = 'https://c78afae3-1935-4fc6-a6e9-16fd765e8475.preview.emergentagent.com';
 
 // Test user credentials (assuming we have a test agent)
 const testAgent = {
