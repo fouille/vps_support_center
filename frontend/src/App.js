@@ -33,6 +33,8 @@ const AppContent = () => {
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'dashboard':
+        return <Dashboard />;
       case 'clients':
         return <ClientsPage />;
       case 'demandeurs':
@@ -48,8 +50,9 @@ const AppContent = () => {
       case 'portabilites-edit':
         return <PortabiliteForm portabiliteId={currentPortabiliteId} onNavigate={setCurrentPage} />;
       case 'tickets':
-      default:
         return <TicketsPage />;
+      default:
+        return <Dashboard />;
     }
   };
 
