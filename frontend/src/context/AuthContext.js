@@ -45,6 +45,48 @@ export const AuthProvider = ({ children }) => {
 
   const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || '';
 
+  // Fonction pour gérer la déconnexion pour expiration de token
+  const handleTokenExpiration = (showNotification = true) => {
+    console.log('Token expired, logging out user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    
+    if (showNotification) {
+      // Afficher la notification temporairement avec du CSS inline
+      const notification = document.createElement('div');
+      notification.innerHTML = `
+        <div style="
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #f44336;
+          color: white;
+          padding: 16px;
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+          z-index: 10000;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          max-width: 300px;
+        ">
+          <strong>Session expirée</strong><br>
+          Votre session a expiré. Redirection vers la connexion...
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 3000);
+    }
+    
+    // Redirection vers la page de connexion après un court délai
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1000);
+  };
+
   // Create axios instance
   const api = axios.create({
     baseURL: API_BASE_URL
