@@ -280,9 +280,7 @@ exports.handler = async (event, context) => {
 
         // Get demandeur info and check for linked data
         const demandeurInfo = await sql`
-          SELECT d.*, 
-                 (SELECT COUNT(*) FROM tickets WHERE demandeur_id = d.id) as tickets_count,
-                 (SELECT COUNT(*) FROM portabilites WHERE demandeur_id = d.id) as portabilites_count
+          SELECT d.* 
           FROM demandeurs d 
           WHERE d.id = ${demandeurId}
         `;
@@ -296,6 +294,19 @@ exports.handler = async (event, context) => {
         }
 
         const demandeur = demandeurInfo[0];
+
+        // Check for linked tickets and portabilites separately  
+        const ticketsCount = await sql`
+          SELECT COUNT(*) as count FROM tickets WHERE demandeur_id = ${demandeurId}
+        `;
+        
+        const portabilitesCount = await sql`
+          SELECT COUNT(*) as count FROM portabilites WHERE demandeur_id = ${demandeurId}
+        `;
+
+        demandeur.tickets_count = parseInt(ticketsCount[0].count) || 0;
+        demandeur.portabilites_count = parseInt(portabilitesCount[0].count) || 0;
+
         const hasLinkedData = demandeur.tickets_count > 0 || demandeur.portabilites_count > 0;
 
         // If no linked data, proceed with simple deletion
