@@ -570,19 +570,22 @@ const DemandeursPage = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-                  Mot de passe *
-                </label>
-                <input
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="input"
-                  placeholder={editingDemandeur ? "Nouveau mot de passe" : "Mot de passe"}
-                />
-              </div>
+              {/* Mot de passe seulement lors de la création */}
+              {!editingDemandeur && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                    Mot de passe *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="input"
+                    placeholder="Mot de passe"
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button
