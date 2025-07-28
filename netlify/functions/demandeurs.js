@@ -88,14 +88,44 @@ exports.handler = async (event, context) => {
       case 'POST':
         console.log('Creating demandeur...');
         const newDemandeur = JSON.parse(event.body);
-        const { nom, prenom, societe, telephone, email, password } = newDemandeur;
+        const { nom, prenom, societe, societe_id, telephone, email, password } = newDemandeur;
         
-        if (!nom || !prenom || !societe || !email || !password) {
+        if (!nom || !prenom || !email || !password) {
           return {
             statusCode: 400,
             headers,
-            body: JSON.stringify({ detail: 'Tous les champs obligatoires doivent être remplis' })
+            body: JSON.stringify({ detail: 'Les champs obligatoires doivent être remplis: nom, prenom, email, password' })
           };
+        }
+
+        // Check user permissions
+        const decoded = verifyToken(authHeader);
+        const userType = decoded.type_utilisateur || decoded.type;
+        
+        let finalSocieteId = societe_id;
+        let finalSociete = societe;
+        
+        if (userType === 'demandeur') {
+          // If user is demandeur, force the society to be their own
+          const userInfo = await sql`
+            SELECT societe_id, societe FROM demandeurs WHERE id = ${decoded.id}
+          `;
+          
+          if (userInfo.length > 0) {
+            finalSocieteId = userInfo[0].societe_id;
+            finalSociete = userInfo[0].societe;
+          }
+        }
+
+        // If societe_id is provided, get the society name
+        if (finalSocieteId) {
+          const societeInfo = await sql`
+            SELECT nom_societe FROM demandeurs_societe WHERE id = ${finalSocieteId}
+          `;
+          
+          if (societeInfo.length > 0) {
+            finalSociete = societeInfo[0].nom_societe;
+          }
         }
 
         // Check if email already exists
@@ -116,9 +146,9 @@ exports.handler = async (event, context) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const createdDemandeur = await sql`
-          INSERT INTO demandeurs (id, nom, prenom, societe, telephone, email, password)
-          VALUES (${uuidv4()}, ${nom}, ${prenom}, ${societe}, ${telephone}, ${email}, ${hashedPassword})
-          RETURNING id, email, nom, prenom, societe, telephone
+          INSERT INTO demandeurs (id, nom, prenom, societe, societe_id, telephone, email, password)
+          VALUES (${uuidv4()}, ${nom}, ${prenom}, ${finalSociete}, ${finalSocieteId}, ${telephone}, ${email}, ${hashedPassword})
+          RETURNING id, email, nom, prenom, societe, societe_id, telephone
         `;
         
         const responseDemandeur = {
