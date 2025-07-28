@@ -5879,17 +5879,17 @@ def test_demandeur_transfer_functionality():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Database Query Debug")
+    print("🚀 Starting Backend API Tests - Demandeur Transfer Functionality")
     print("="*60)
     
-    # Run database query debug test to understand the root cause
+    # Run demandeur transfer functionality test as requested in review
     success = True
     
-    # Test: Database Query Debug (PRIORITY DEBUG TEST)
+    # Test: Demandeur Transfer Functionality (PRIORITY TEST)
     print("\n" + "="*60)
-    print("TEST: DATABASE QUERY DEBUG")
+    print("TEST: DEMANDEUR TRANSFER FUNCTIONALITY")
     print("="*60)
-    success &= test_database_query_debug()
+    success &= test_demandeur_transfer_functionality()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
