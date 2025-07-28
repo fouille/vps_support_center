@@ -220,16 +220,6 @@ app.delete('/api/clients/:id', verifyToken, (req, res) => {
   res.json({ message: 'Client supprimé avec succès' });
 });
 
-// Demandeurs endpoints
-app.get('/api/demandeurs', verifyToken, (req, res) => {
-  const demandeurs = mockDB.demandeurs.map(d => ({
-    ...d,
-    type_utilisateur: 'demandeur',
-    password: undefined
-  }));
-  res.json(demandeurs);
-});
-
 // Agents endpoints
 app.get('/api/agents', verifyToken, (req, res) => {
   const agents = mockDB.agents.map(a => ({
