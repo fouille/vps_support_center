@@ -5412,6 +5412,472 @@ def test_portabilite_file_email_notifications():
     
     return results.summary()
 
+def test_demandeur_transfer_functionality():
+    """Test the CORRECTED demandeur transfer functionality after SQL query fix"""
+    results = TestResults()
+    
+    print("🚀 Starting Demandeur Transfer Functionality Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate
+    print("\n📋 STEP 1: Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Get existing demandeurs and create test data
+    print("\n📋 STEP 2: Setup Test Data")
+    
+    # Get existing demandeurs
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=headers, timeout=10)
+        if response.status_code == 200:
+            existing_demandeurs = response.json()
+            results.add_result("GET - Existing demandeurs", True)
+            print(f"   Found {len(existing_demandeurs)} existing demandeurs")
+        else:
+            results.add_result("GET - Existing demandeurs", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("GET - Existing demandeurs", False, str(e))
+        return results.summary()
+    
+    # Create a test demandeur for deletion testing
+    test_demandeur_data = {
+        "nom": "TestDemandeur",
+        "prenom": "Transfer",
+        "email": f"test.transfer.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com",
+        "password": "testpass123",
+        "societe": "Test Société Transfer",
+        "telephone": "0123456789"
+    }
+    
+    test_demandeur_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs", headers=headers, 
+                               json=test_demandeur_data, timeout=10)
+        if response.status_code == 201:
+            test_demandeur = response.json()
+            test_demandeur_id = test_demandeur['id']
+            results.add_result("POST - Create test demandeur", True)
+            print(f"   Created test demandeur: {test_demandeur_id}")
+        else:
+            results.add_result("POST - Create test demandeur", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("POST - Create test demandeur", False, str(e))
+        return results.summary()
+    
+    # Step 3: Test deletion of demandeur with NO linked data (should work normally)
+    print("\n📋 STEP 3: Test Deletion with NO Linked Data")
+    
+    try:
+        response = requests.delete(f"{API_BASE}/demandeurs/{test_demandeur_id}", 
+                                 headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            delete_response = response.json()
+            results.add_result("DELETE - No linked data (200 response)", True)
+            
+            # Verify response structure
+            if 'transferred' in delete_response and delete_response['transferred'] == False:
+                results.add_result("DELETE - Response contains 'transferred: false'", True)
+            else:
+                results.add_result("DELETE - Response contains 'transferred: false'", False, 
+                                 f"Expected transferred: false, got: {delete_response}")
+                
+            # Verify message
+            if 'message' in delete_response:
+                results.add_result("DELETE - Response contains success message", True)
+            else:
+                results.add_result("DELETE - Response contains success message", False, 
+                                 "Missing success message in response")
+        else:
+            results.add_result("DELETE - No linked data (200 response)", False, 
+                             f"Expected 200, got {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("DELETE - No linked data (200 response)", False, str(e))
+    
+    # Step 4: Create another test demandeur and link it to tickets
+    print("\n📋 STEP 4: Setup Demandeur with Linked Data")
+    
+    # Create another test demandeur
+    test_demandeur_with_data = {
+        "nom": "TestDemandeurLinked",
+        "prenom": "WithTickets",
+        "email": f"test.linked.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com",
+        "password": "testpass123",
+        "societe": "Test Société Linked",
+        "telephone": "0123456789"
+    }
+    
+    linked_demandeur_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs", headers=headers, 
+                               json=test_demandeur_with_data, timeout=10)
+        if response.status_code == 201:
+            linked_demandeur = response.json()
+            linked_demandeur_id = linked_demandeur['id']
+            results.add_result("POST - Create demandeur for linking", True)
+            print(f"   Created linked demandeur: {linked_demandeur_id}")
+        else:
+            results.add_result("POST - Create demandeur for linking", False, 
+                             f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("POST - Create demandeur for linking", False, str(e))
+        return results.summary()
+    
+    # Get a client for ticket creation
+    test_client_id = None
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+            elif isinstance(clients_data, list) and len(clients_data) > 0:
+                test_client_id = clients_data[0]['id']
+            
+            if test_client_id:
+                results.add_result("GET - Test client for ticket", True)
+            else:
+                results.add_result("GET - Test client for ticket", False, "No clients found")
+                return results.summary()
+        else:
+            results.add_result("GET - Test client for ticket", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("GET - Test client for ticket", False, str(e))
+        return results.summary()
+    
+    # Create a test ticket linked to the demandeur
+    test_ticket_data = {
+        "titre": "Test Ticket for Transfer Testing",
+        "client_id": test_client_id,
+        "demandeur_id": linked_demandeur_id,
+        "requete_initiale": "This ticket is linked to test demandeur for transfer functionality testing",
+        "status": "nouveau"
+    }
+    
+    test_ticket_id = None
+    try:
+        response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                               json=test_ticket_data, timeout=10)
+        if response.status_code == 201:
+            test_ticket = response.json()
+            test_ticket_id = test_ticket['id']
+            results.add_result("POST - Create linked ticket", True)
+            print(f"   Created linked ticket: {test_ticket_id}")
+        else:
+            results.add_result("POST - Create linked ticket", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("POST - Create linked ticket", False, str(e))
+        return results.summary()
+    
+    # Step 5: Test deletion of demandeur WITH linked tickets (should return 409)
+    print("\n📋 STEP 5: Test Deletion with Linked Data (409 Expected)")
+    
+    try:
+        response = requests.delete(f"{API_BASE}/demandeurs/{linked_demandeur_id}", 
+                                 headers=headers, timeout=10)
+        
+        if response.status_code == 409:
+            conflict_response = response.json()
+            results.add_result("DELETE - With linked data (409 response)", True)
+            
+            # Verify response structure
+            required_fields = ['detail', 'demandeur', 'linkedData', 'otherDemandeurs', 'canDelete']
+            missing_fields = [field for field in required_fields if field not in conflict_response]
+            
+            if not missing_fields:
+                results.add_result("DELETE - 409 response structure", True)
+                
+                # Verify linkedData counts
+                linked_data = conflict_response.get('linkedData', {})
+                if 'tickets' in linked_data and linked_data['tickets'] > 0:
+                    results.add_result("DELETE - Correct tickets count in linkedData", True)
+                    print(f"   Detected {linked_data['tickets']} linked tickets")
+                else:
+                    results.add_result("DELETE - Correct tickets count in linkedData", False, 
+                                     f"Expected tickets > 0, got: {linked_data}")
+                
+                # Verify portabilites count (should be 0)
+                if 'portabilites' in linked_data:
+                    results.add_result("DELETE - Portabilites count included", True)
+                    print(f"   Detected {linked_data['portabilites']} linked portabilites")
+                else:
+                    results.add_result("DELETE - Portabilites count included", False, 
+                                     "Missing portabilites count in linkedData")
+                
+                # Verify demandeur info
+                demandeur_info = conflict_response.get('demandeur', {})
+                if 'nom' in demandeur_info and 'prenom' in demandeur_info:
+                    results.add_result("DELETE - Demandeur info in response", True)
+                else:
+                    results.add_result("DELETE - Demandeur info in response", False, 
+                                     "Missing demandeur info in response")
+                
+                # Verify otherDemandeurs list
+                other_demandeurs = conflict_response.get('otherDemandeurs', [])
+                if isinstance(other_demandeurs, list):
+                    results.add_result("DELETE - Other demandeurs list", True)
+                    print(f"   Found {len(other_demandeurs)} other demandeurs for transfer")
+                else:
+                    results.add_result("DELETE - Other demandeurs list", False, 
+                                     "otherDemandeurs is not a list")
+                
+                # Verify canDelete flag
+                can_delete = conflict_response.get('canDelete')
+                if isinstance(can_delete, bool):
+                    results.add_result("DELETE - canDelete flag present", True)
+                    print(f"   canDelete: {can_delete}")
+                else:
+                    results.add_result("DELETE - canDelete flag present", False, 
+                                     "canDelete flag missing or not boolean")
+            else:
+                results.add_result("DELETE - 409 response structure", False, 
+                                 f"Missing fields: {missing_fields}")
+        else:
+            results.add_result("DELETE - With linked data (409 response)", False, 
+                             f"Expected 409, got {response.status_code}, Body: {response.text}")
+            # This is the critical issue mentioned in the review request
+            if response.status_code == 200:
+                print("   ❌ CRITICAL ISSUE: Demandeur deleted despite having linked data!")
+    except Exception as e:
+        results.add_result("DELETE - With linked data (409 response)", False, str(e))
+    
+    # Step 6: Test the actual transfer process
+    print("\n📋 STEP 6: Test Transfer Process")
+    
+    # Get another demandeur from the same société for transfer target
+    transfer_target_id = None
+    if existing_demandeurs and len(existing_demandeurs) > 0:
+        # Find a demandeur that's not the one we're trying to delete
+        for demandeur in existing_demandeurs:
+            if demandeur['id'] != linked_demandeur_id:
+                transfer_target_id = demandeur['id']
+                break
+    
+    if not transfer_target_id:
+        # Create a transfer target demandeur
+        transfer_target_data = {
+            "nom": "TransferTarget",
+            "prenom": "Demandeur",
+            "email": f"transfer.target.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com",
+            "password": "testpass123",
+            "societe": "Test Société Linked",  # Same société
+            "telephone": "0123456789"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/demandeurs", headers=headers, 
+                                   json=transfer_target_data, timeout=10)
+            if response.status_code == 201:
+                transfer_target = response.json()
+                transfer_target_id = transfer_target['id']
+                results.add_result("POST - Create transfer target", True)
+                print(f"   Created transfer target: {transfer_target_id}")
+            else:
+                results.add_result("POST - Create transfer target", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("POST - Create transfer target", False, str(e))
+    else:
+        results.add_result("GET - Transfer target available", True)
+        print(f"   Using existing demandeur as transfer target: {transfer_target_id}")
+    
+    # Perform the transfer
+    if transfer_target_id:
+        transfer_request = {
+            "transferTo": transfer_target_id
+        }
+        
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{linked_demandeur_id}", 
+                                     headers=headers, json=transfer_request, timeout=10)
+            
+            if response.status_code == 200:
+                transfer_response = response.json()
+                results.add_result("DELETE - Transfer process (200 response)", True)
+                
+                # Verify transfer response structure
+                if 'transferred' in transfer_response and transfer_response['transferred'] == True:
+                    results.add_result("DELETE - Transfer response 'transferred: true'", True)
+                else:
+                    results.add_result("DELETE - Transfer response 'transferred: true'", False, 
+                                     f"Expected transferred: true, got: {transfer_response}")
+                
+                # Verify transferredData
+                if 'transferredData' in transfer_response:
+                    transferred_data = transfer_response['transferredData']
+                    if 'tickets' in transferred_data and transferred_data['tickets'] > 0:
+                        results.add_result("DELETE - Transfer data counts", True)
+                        print(f"   Transferred {transferred_data['tickets']} tickets")
+                    else:
+                        results.add_result("DELETE - Transfer data counts", False, 
+                                         f"Expected tickets > 0 in transferredData, got: {transferred_data}")
+                else:
+                    results.add_result("DELETE - Transfer data included", False, 
+                                     "Missing transferredData in response")
+                
+                # Verify the ticket was actually transferred
+                try:
+                    ticket_response = requests.get(f"{API_BASE}/tickets", headers=headers, timeout=10)
+                    if ticket_response.status_code == 200:
+                        tickets = ticket_response.json()
+                        transferred_ticket = None
+                        for ticket in tickets:
+                            if ticket['id'] == test_ticket_id:
+                                transferred_ticket = ticket
+                                break
+                        
+                        if transferred_ticket and transferred_ticket['demandeur_id'] == transfer_target_id:
+                            results.add_result("VERIFY - Ticket actually transferred", True)
+                            print(f"   Verified ticket {test_ticket_id} now belongs to {transfer_target_id}")
+                        else:
+                            results.add_result("VERIFY - Ticket actually transferred", False, 
+                                             f"Ticket not transferred correctly. Current demandeur_id: {transferred_ticket['demandeur_id'] if transferred_ticket else 'ticket not found'}")
+                    else:
+                        results.add_result("VERIFY - Ticket transfer check", False, 
+                                         f"Could not verify transfer: {ticket_response.status_code}")
+                except Exception as e:
+                    results.add_result("VERIFY - Ticket transfer check", False, str(e))
+                
+            else:
+                results.add_result("DELETE - Transfer process (200 response)", False, 
+                                 f"Expected 200, got {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("DELETE - Transfer process (200 response)", False, str(e))
+    else:
+        results.add_result("DELETE - Transfer process", False, "No transfer target available")
+    
+    # Step 7: Test edge case - only one demandeur in société
+    print("\n📋 STEP 7: Test Edge Case - Single Demandeur in Société")
+    
+    # Create a demandeur in a unique société
+    unique_demandeur_data = {
+        "nom": "OnlyDemandeur",
+        "prenom": "InSociete",
+        "email": f"only.demandeur.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com",
+        "password": "testpass123",
+        "societe": f"Unique Société {datetime.now().strftime('%Y%m%d%H%M%S')}",
+        "telephone": "0123456789"
+    }
+    
+    unique_demandeur_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs", headers=headers, 
+                               json=unique_demandeur_data, timeout=10)
+        if response.status_code == 201:
+            unique_demandeur = response.json()
+            unique_demandeur_id = unique_demandeur['id']
+            results.add_result("POST - Create unique société demandeur", True)
+            print(f"   Created unique demandeur: {unique_demandeur_id}")
+        else:
+            results.add_result("POST - Create unique société demandeur", False, 
+                             f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("POST - Create unique société demandeur", False, str(e))
+    
+    # Create a ticket for this demandeur
+    if unique_demandeur_id:
+        unique_ticket_data = {
+            "titre": "Ticket for Unique Demandeur",
+            "client_id": test_client_id,
+            "demandeur_id": unique_demandeur_id,
+            "requete_initiale": "This ticket belongs to the only demandeur in the société",
+            "status": "nouveau"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/tickets", headers=headers, 
+                                   json=unique_ticket_data, timeout=10)
+            if response.status_code == 201:
+                results.add_result("POST - Create ticket for unique demandeur", True)
+            else:
+                results.add_result("POST - Create ticket for unique demandeur", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("POST - Create ticket for unique demandeur", False, str(e))
+        
+        # Try to delete this demandeur (should show canDelete: false)
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{unique_demandeur_id}", 
+                                     headers=headers, timeout=10)
+            
+            if response.status_code == 409:
+                conflict_response = response.json()
+                results.add_result("DELETE - Unique demandeur (409 response)", True)
+                
+                # Verify canDelete is false
+                can_delete = conflict_response.get('canDelete')
+                if can_delete == False:
+                    results.add_result("DELETE - canDelete: false for unique demandeur", True)
+                    print("   Correctly identified that demandeur cannot be deleted (no transfer targets)")
+                else:
+                    results.add_result("DELETE - canDelete: false for unique demandeur", False, 
+                                     f"Expected canDelete: false, got: {can_delete}")
+                
+                # Verify otherDemandeurs is empty
+                other_demandeurs = conflict_response.get('otherDemandeurs', [])
+                if len(other_demandeurs) == 0:
+                    results.add_result("DELETE - Empty otherDemandeurs for unique", True)
+                else:
+                    results.add_result("DELETE - Empty otherDemandeurs for unique", False, 
+                                     f"Expected empty list, got {len(other_demandeurs)} demandeurs")
+            else:
+                results.add_result("DELETE - Unique demandeur (409 response)", False, 
+                                 f"Expected 409, got {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Unique demandeur (409 response)", False, str(e))
+    
+    # Step 8: Cleanup
+    print("\n📋 STEP 8: Cleanup")
+    
+    # Clean up created test tickets
+    if test_ticket_id:
+        try:
+            response = requests.delete(f"{API_BASE}/tickets/{test_ticket_id}", 
+                                     headers=headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("CLEANUP - Delete test ticket", True)
+            else:
+                results.add_result("CLEANUP - Delete test ticket", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("CLEANUP - Delete test ticket", False, str(e))
+    
+    # Clean up remaining demandeurs (those without linked data should delete normally)
+    cleanup_demandeurs = [unique_demandeur_id, transfer_target_id]
+    for i, demandeur_id in enumerate(cleanup_demandeurs):
+        if demandeur_id:
+            try:
+                response = requests.delete(f"{API_BASE}/demandeurs/{demandeur_id}", 
+                                         headers=headers, timeout=10)
+                if response.status_code in [200, 404]:  # 404 is OK if already deleted
+                    results.add_result(f"CLEANUP - Delete demandeur {i+1}", True)
+                else:
+                    results.add_result(f"CLEANUP - Delete demandeur {i+1}", False, 
+                                     f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result(f"CLEANUP - Delete demandeur {i+1}", False, str(e))
+    
+    return results.summary()
+
 if __name__ == "__main__":
     print("🚀 Starting Backend API Tests - Database Query Debug")
     print("="*60)
