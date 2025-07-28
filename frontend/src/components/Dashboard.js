@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, 
 import { Ticket, CheckCircle, Clock, AlertTriangle, Users, Building, TrendingUp } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, api } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
