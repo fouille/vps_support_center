@@ -5413,17 +5413,17 @@ def test_portabilite_file_email_notifications():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Demandeur Transfer Debug")
+    print("🚀 Starting Backend API Tests - Database Query Debug")
     print("="*60)
     
-    # Run debug test first to understand the issue
+    # Run database query debug test to understand the root cause
     success = True
     
-    # Test: Demandeur Transfer Debug (PRIORITY DEBUG TEST)
+    # Test: Database Query Debug (PRIORITY DEBUG TEST)
     print("\n" + "="*60)
-    print("TEST: DEMANDEUR TRANSFER DEBUG")
+    print("TEST: DATABASE QUERY DEBUG")
     print("="*60)
-    success &= test_demandeur_transfer_debug()
+    success &= test_database_query_debug()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
