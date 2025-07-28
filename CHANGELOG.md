@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.18.2] - 2025-07-28
+### Fixed
+- 🔧 Corrections visuelles Dashboard: suppression mention Vue Agent/Demandeur et correction tooltips undefined
+
 ## [1.18.1] - 2025-07-28
 ### Fixed
 - 🔧 Bug fix: Correction authentification API Dashboard - harmonisation avec les autres APIs

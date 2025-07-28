@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
   minor: 18,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  patch: 2,      // Version patch - corrections de bugs
   buildDate: "2025-07-28", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.18.2",
+    date: "2025-07-28",
+    type: "PATCH",
+    description: "Corrections visuelles Dashboard: suppression mention Vue Agent/Demandeur et correction tooltips undefined"
+  },
+{
     version: "1.18.1",
     date: "2025-07-28",
     type: "PATCH",
