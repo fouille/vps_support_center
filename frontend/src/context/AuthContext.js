@@ -122,6 +122,20 @@ export const AuthProvider = ({ children }) => {
       }
     }
     setLoading(false);
+    
+    // Vérification périodique du token (toutes les 5 minutes)
+    const tokenCheckInterval = setInterval(() => {
+      const currentToken = localStorage.getItem('token');
+      if (currentToken && isTokenExpired(currentToken)) {
+        console.log('Token expired during session, logging out');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        window.location.href = '/';
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+    
+    return () => clearInterval(tokenCheckInterval);
   }, []);
 
   const login = async (email, password) => {
