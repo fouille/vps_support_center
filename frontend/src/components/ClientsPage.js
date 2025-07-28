@@ -191,7 +191,7 @@ const ClientsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg p-6">
+    <div className="fade-in">
       <div className="max-w-7xl mx-auto">
         {/* En-tête - toujours visible */}
         <div className="flex justify-between items-center mb-6">
