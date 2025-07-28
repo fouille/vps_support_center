@@ -26,7 +26,8 @@
     "uri-js": "^4.4.1"
   },
   "devDependencies": {
-    "netlify-cli": "^15.0.0"
+    "netlify-cli": "^15.0.0",
+    "read-package-up": "^7.0.1"
   },
   "keywords": [
     "voip",
