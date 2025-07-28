@@ -272,8 +272,11 @@ const PortabiliteModal = ({ portabiliteId, onClose, onEdit }) => {
 
     try {
       await api.delete(`/api/portabilites/${portabiliteId}`);
-      onClose();
-      window.location.reload(); // Rafraîchir la liste
+      onClose(); // Fermer le modal
+      // Déclencher une actualisation du tableau parent via une callback
+      if (window.refreshPortabilites) {
+        window.refreshPortabilites();
+      }
     } catch (err) {
       setError('Erreur lors de la suppression');
       console.error('Erreur:', err);
