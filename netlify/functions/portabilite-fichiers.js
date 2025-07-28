@@ -272,20 +272,45 @@ exports.handler = async (event, context) => {
       }
 
       const deleteQuery = `
-        DELETE FROM portabilite_fichiers 
-        WHERE id = $1 
-        RETURNING nom_fichier, portabilite_id
+        SELECT pf.nom_fichier, pf.portabilite_id,
+          p.*,
+          c.nom_societe,
+          c.nom as client_nom,
+          c.prenom as client_prenom,
+          d.nom as demandeur_nom,
+          d.prenom as demandeur_prenom,
+          d.email as demandeur_email,
+          a.nom as agent_nom,
+          a.prenom as agent_prenom,
+          a.email as agent_email
+        FROM portabilite_fichiers pf
+        LEFT JOIN portabilites p ON pf.portabilite_id = p.id
+        LEFT JOIN clients c ON p.client_id = c.id
+        LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+        LEFT JOIN agents a ON p.agent_id = a.id
+        WHERE pf.id = $1
       `;
 
-      const result = await sql(deleteQuery, [fileId]);
+      const fileInfoResult = await sql(deleteQuery, [fileId]);
 
-      if (result.length === 0) {
+      if (fileInfoResult.length === 0) {
         return {
           statusCode: 404,
           headers,
           body: JSON.stringify({ error: 'Fichier non trouvé' })
         };
       }
+
+      const fileInfo = fileInfoResult[0];
+
+      // Supprimer le fichier
+      const actualDeleteQuery = `
+        DELETE FROM portabilite_fichiers 
+        WHERE id = $1 
+        RETURNING nom_fichier, portabilite_id
+      `;
+
+      const result = await sql(actualDeleteQuery, [fileId]);
 
       const deletedFile = result[0];
 
