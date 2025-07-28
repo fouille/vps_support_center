@@ -3414,7 +3414,7 @@ def test_demandeurs_dual_management_api():
     
     test_societe_data = {
         "nom_societe": "Test Société for Demandeurs",
-        "siret": "98765432109876",
+        "siret": "11111111111111",  # Different SIRET
         "adresse": "789 Rue de Test",
         "code_postal": "75003",
         "ville": "Paris",
