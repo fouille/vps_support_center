@@ -25,11 +25,7 @@
     "cors": "^2.8.5",
     "uri-js": "^4.4.1"
   },
-  "devDependencies": {
-    "netlify-cli": "^19.0.2",
-    "read-package-up": "^11.0.0",
-    "get-package-name": "^2.2.0"
-  },
+  "devDependencies": {},
   "keywords": [
     "voip",
     "support",
