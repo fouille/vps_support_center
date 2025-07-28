@@ -154,16 +154,61 @@ exports.handler = async (event, context) => {
 
       case 'PUT':
         const updateData = JSON.parse(event.body);
-        const { nom: upd_nom, prenom: upd_prenom, societe: upd_societe, telephone: upd_telephone, email: upd_email, password: upd_password } = updateData;
+        const { nom: upd_nom, prenom: upd_prenom, societe: upd_societe, societe_id: upd_societe_id, telephone: upd_telephone, email: upd_email, password: upd_password } = updateData;
+        
+        // Check if user can modify this demandeur
+        if (userType === 'demandeur' && decoded.id !== demandeurId) {
+          // Demandeur can only modify someone from their society
+          const [userInfo, targetInfo] = await Promise.all([
+            sql`SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}`,
+            sql`SELECT societe_id FROM demandeurs WHERE id = ${demandeurId}`
+          ]);
+          
+          if (userInfo.length === 0 || targetInfo.length === 0 || 
+              !userInfo[0].societe_id || userInfo[0].societe_id !== targetInfo[0].societe_id) {
+            return {
+              statusCode: 403,
+              headers,
+              body: JSON.stringify({ detail: 'Accès non autorisé' })
+            };
+          }
+        }
+
+        let finalSocieteId = upd_societe_id;
+        let finalSociete = upd_societe;
+        
+        if (userType === 'demandeur') {
+          // If user is demandeur, force the society to be their own
+          const userInfo = await sql`
+            SELECT societe_id, societe FROM demandeurs WHERE id = ${decoded.id}
+          `;
+          
+          if (userInfo.length > 0) {
+            finalSocieteId = userInfo[0].societe_id;
+            finalSociete = userInfo[0].societe;
+          }
+        }
+
+        // If societe_id is provided, get the society name
+        if (finalSocieteId) {
+          const societeInfo = await sql`
+            SELECT nom_societe FROM demandeurs_societe WHERE id = ${finalSocieteId}
+          `;
+          
+          if (societeInfo.length > 0) {
+            finalSociete = societeInfo[0].nom_societe;
+          }
+        }
         
         const hashedNewPassword = await bcrypt.hash(upd_password, 10);
         
         const updatedDemandeur = await sql`
           UPDATE demandeurs 
-          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
-              telephone = ${upd_telephone}, email = ${upd_email}, password = ${hashedNewPassword}
+          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${finalSociete}, 
+              societe_id = ${finalSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}, 
+              password = ${hashedNewPassword}
           WHERE id = ${demandeurId}
-          RETURNING id, email, nom, prenom, societe, telephone
+          RETURNING id, email, nom, prenom, societe, societe_id, telephone
         `;
         
         if (updatedDemandeur.length === 0) {
@@ -182,6 +227,32 @@ exports.handler = async (event, context) => {
         return { statusCode: 200, headers, body: JSON.stringify(responseUpdatedDemandeur) };
 
       case 'DELETE':
+        // Check if user can delete this demandeur
+        if (userType === 'demandeur') {
+          if (decoded.id === demandeurId) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ detail: 'Vous ne pouvez pas supprimer votre propre compte' })
+            };
+          }
+          
+          // Demandeur can only delete someone from their society
+          const [userInfo, targetInfo] = await Promise.all([
+            sql`SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}`,
+            sql`SELECT societe_id FROM demandeurs WHERE id = ${demandeurId}`
+          ]);
+          
+          if (userInfo.length === 0 || targetInfo.length === 0 || 
+              !userInfo[0].societe_id || userInfo[0].societe_id !== targetInfo[0].societe_id) {
+            return {
+              statusCode: 403,
+              headers,
+              body: JSON.stringify({ detail: 'Accès non autorisé' })
+            };
+          }
+        }
+
         const deletedDemandeur = await sql`DELETE FROM demandeurs WHERE id = ${demandeurId} RETURNING id`;
         
         if (deletedDemandeur.length === 0) {
