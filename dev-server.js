@@ -85,7 +85,12 @@ app.post('/api/auth', async (req, res) => {
 
     // Create JWT token
     const token = jwt.sign(
-      { sub: user.email, type: userType },
+      { 
+        sub: user.email, 
+        id: user.id,
+        type: userType,
+        type_utilisateur: userType
+      },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
