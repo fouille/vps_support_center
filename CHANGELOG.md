@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.18.0] - 2025-07-28
+### Added
+- ✨ Bug fix: Correction appels API Dashboard et ajout données mockées pour développement
+
 ## [1.17.0] - 2025-07-28
 ### Added
 - ✨ Ajout page Dashboard avec graphiques et statistiques pour agents et demandeurs
