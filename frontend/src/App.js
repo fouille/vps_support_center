@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import Footer from './components/Footer';
+import Dashboard from './components/Dashboard';
 import ClientsPage from './components/ClientsPage';
 import DemandeursPage from './components/DemandeursPage';
 import AgentsPage from './components/AgentsPage';
