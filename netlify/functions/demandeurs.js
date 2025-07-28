@@ -200,16 +200,31 @@ exports.handler = async (event, context) => {
           }
         }
         
-        const hashedNewPassword = await bcrypt.hash(upd_password, 10);
+        let updatedDemandeur;
         
-        const updatedDemandeur = await sql`
-          UPDATE demandeurs 
-          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${updateSociete}, 
-              societe_id = ${updateSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}, 
-              password = ${hashedNewPassword}
-          WHERE id = ${demandeurId}
-          RETURNING id, email, nom, prenom, societe, societe_id, telephone
-        `;
+        // Update with or without password
+        if (upd_password) {
+          // Password provided - update it
+          const hashedNewPassword = await bcrypt.hash(upd_password, 10);
+          
+          updatedDemandeur = await sql`
+            UPDATE demandeurs 
+            SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${updateSociete}, 
+                societe_id = ${updateSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}, 
+                password = ${hashedNewPassword}
+            WHERE id = ${demandeurId}
+            RETURNING id, email, nom, prenom, societe, societe_id, telephone
+          `;
+        } else {
+          // No password provided - don't update password
+          updatedDemandeur = await sql`
+            UPDATE demandeurs 
+            SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${updateSociete}, 
+                societe_id = ${updateSocieteId}, telephone = ${upd_telephone}, email = ${upd_email}
+            WHERE id = ${demandeurId}
+            RETURNING id, email, nom, prenom, societe, societe_id, telephone
+          `;
+        }
         
         if (updatedDemandeur.length === 0) {
           return {
