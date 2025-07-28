@@ -749,6 +749,382 @@ app.post('/api/email-test', verifyToken, (req, res) => {
   }
 });
 
+// Demandeurs-Société endpoints (agents only)
+app.get('/api/demandeurs-societe', verifyToken, (req, res) => {
+  // Check if user is agent
+  if (req.user.type !== 'agent') {
+    return res.status(403).json({ detail: 'Accès non autorisé. Seuls les agents peuvent gérer les sociétés.' });
+  }
+
+  // Support for pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || '';
+  const offset = (page - 1) * limit;
+
+  let filteredSocietes = mockDB.demandeurs_societe;
+
+  // Add search if present
+  if (search) {
+    const searchLower = search.toLowerCase();
+    filteredSocietes = mockDB.demandeurs_societe.filter(societe => {
+      return (
+        (societe.nom_societe && societe.nom_societe.toLowerCase().includes(searchLower)) ||
+        (societe.siret && societe.siret.toLowerCase().includes(searchLower)) ||
+        (societe.email && societe.email.toLowerCase().includes(searchLower)) ||
+        (societe.ville && societe.ville.toLowerCase().includes(searchLower))
+      );
+    });
+  }
+
+  // Sort results
+  filteredSocietes.sort((a, b) => a.nom_societe.localeCompare(b.nom_societe));
+
+  // Apply pagination
+  const total = filteredSocietes.length;
+  const totalPages = Math.ceil(total / limit);
+  const paginatedSocietes = filteredSocietes.slice(offset, offset + limit);
+
+  res.json({
+    data: paginatedSocietes,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
+    }
+  });
+});
+
+app.post('/api/demandeurs-societe', verifyToken, (req, res) => {
+  // Check if user is agent
+  if (req.user.type !== 'agent') {
+    return res.status(403).json({ detail: 'Accès non autorisé. Seuls les agents peuvent gérer les sociétés.' });
+  }
+
+  const { 
+    nom_societe, 
+    siret, 
+    adresse, 
+    adresse_complement, 
+    code_postal, 
+    ville, 
+    numero_tel, 
+    email,
+    logo_base64
+  } = req.body;
+  
+  if (!nom_societe || !adresse || !code_postal || !ville || !email) {
+    return res.status(400).json({ 
+      detail: 'Les champs obligatoires doivent être remplis: nom_societe, adresse, code_postal, ville, email' 
+    });
+  }
+
+  // Check if SIRET already exists (if provided)
+  if (siret) {
+    const existingSiret = mockDB.demandeurs_societe.find(s => s.siret === siret);
+    if (existingSiret) {
+      return res.status(400).json({ detail: 'Ce SIRET est déjà utilisé' });
+    }
+  }
+
+  // Check if email already exists
+  const existingEmail = mockDB.demandeurs_societe.find(s => s.email === email);
+  if (existingEmail) {
+    return res.status(400).json({ detail: 'Cet email est déjà utilisé' });
+  }
+  
+  const newSociete = {
+    id: uuidv4(),
+    nom_societe,
+    siret,
+    adresse,
+    adresse_complement,
+    code_postal,
+    ville,
+    numero_tel,
+    email,
+    logo_base64,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  mockDB.demandeurs_societe.push(newSociete);
+  res.status(201).json(newSociete);
+});
+
+app.put('/api/demandeurs-societe/:id', verifyToken, (req, res) => {
+  // Check if user is agent
+  if (req.user.type !== 'agent') {
+    return res.status(403).json({ detail: 'Accès non autorisé. Seuls les agents peuvent gérer les sociétés.' });
+  }
+
+  const societeId = req.params.id;
+  const { 
+    nom_societe, 
+    siret, 
+    adresse, 
+    adresse_complement,
+    code_postal, 
+    ville, 
+    numero_tel, 
+    email,
+    logo_base64
+  } = req.body;
+  
+  const societeIndex = mockDB.demandeurs_societe.findIndex(s => s.id === societeId);
+  if (societeIndex === -1) {
+    return res.status(404).json({ detail: 'Société non trouvée' });
+  }
+
+  // Check if SIRET already exists for another company (if provided)
+  if (siret) {
+    const existingSiret = mockDB.demandeurs_societe.find(s => s.siret === siret && s.id !== societeId);
+    if (existingSiret) {
+      return res.status(400).json({ detail: 'Ce SIRET est déjà utilisé par une autre société' });
+    }
+  }
+
+  // Check if email already exists for another company
+  const existingEmail = mockDB.demandeurs_societe.find(s => s.email === email && s.id !== societeId);
+  if (existingEmail) {
+    return res.status(400).json({ detail: 'Cet email est déjà utilisé par une autre société' });
+  }
+  
+  mockDB.demandeurs_societe[societeIndex] = {
+    ...mockDB.demandeurs_societe[societeIndex],
+    nom_societe,
+    siret,
+    adresse,
+    adresse_complement,
+    code_postal,
+    ville,
+    numero_tel,
+    email,
+    logo_base64,
+    updated_at: new Date().toISOString()
+  };
+  
+  res.json(mockDB.demandeurs_societe[societeIndex]);
+});
+
+app.delete('/api/demandeurs-societe/:id', verifyToken, (req, res) => {
+  // Check if user is agent
+  if (req.user.type !== 'agent') {
+    return res.status(403).json({ detail: 'Accès non autorisé. Seuls les agents peuvent gérer les sociétés.' });
+  }
+
+  const societeId = req.params.id;
+  
+  // Check if society has associated demandeurs
+  const associatedDemandeurs = mockDB.demandeurs.filter(d => d.societe_id === societeId);
+  if (associatedDemandeurs.length > 0) {
+    return res.status(400).json({ 
+      detail: `Impossible de supprimer cette société. ${associatedDemandeurs.length} demandeur(s) y sont encore associés.` 
+    });
+  }
+
+  const societeIndex = mockDB.demandeurs_societe.findIndex(s => s.id === societeId);
+  if (societeIndex === -1) {
+    return res.status(404).json({ detail: 'Société non trouvée' });
+  }
+  
+  mockDB.demandeurs_societe.splice(societeIndex, 1);
+  res.json({ message: 'Société supprimée avec succès' });
+});
+
+// Modified Demandeurs endpoints with dual management
+app.get('/api/demandeurs', verifyToken, (req, res) => {
+  let demandeurs;
+  
+  if (req.user.type === 'demandeur') {
+    // If user is demandeur, only show demandeurs from their society
+    const currentDemandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    
+    if (currentDemandeur && currentDemandeur.societe_id) {
+      demandeurs = mockDB.demandeurs
+        .filter(d => d.societe_id === currentDemandeur.societe_id)
+        .map(d => {
+          const societe = mockDB.demandeurs_societe.find(s => s.id === d.societe_id);
+          return {
+            ...d,
+            societe_nom: societe ? societe.nom_societe : d.societe,
+            type_utilisateur: 'demandeur'
+          };
+        });
+    } else {
+      // If demandeur has no society, show only themselves
+      demandeurs = mockDB.demandeurs
+        .filter(d => d.id === currentDemandeur.id)
+        .map(d => ({
+          ...d,
+          societe_nom: d.societe,
+          type_utilisateur: 'demandeur'
+        }));
+    }
+  } else {
+    // If user is agent, show all demandeurs
+    demandeurs = mockDB.demandeurs.map(d => {
+      const societe = mockDB.demandeurs_societe.find(s => s.id === d.societe_id);
+      return {
+        ...d,
+        societe_nom: societe ? societe.nom_societe : d.societe,
+        type_utilisateur: 'demandeur'
+      };
+    });
+  }
+  
+  res.json(demandeurs);
+});
+
+app.post('/api/demandeurs', verifyToken, (req, res) => {
+  const { nom, prenom, societe, societe_id, telephone, email, password } = req.body;
+  
+  if (!nom || !prenom || !email || !password) {
+    return res.status(400).json({ detail: 'Les champs obligatoires doivent être remplis: nom, prenom, email, password' });
+  }
+  
+  let createSocieteId = societe_id;
+  let createSociete = societe;
+  
+  if (req.user.type === 'demandeur') {
+    // If user is demandeur, force the society to be their own
+    const currentDemandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    if (currentDemandeur) {
+      createSocieteId = currentDemandeur.societe_id;
+      createSociete = currentDemandeur.societe;
+    }
+  }
+
+  // If societe_id is provided, get the society name
+  if (createSocieteId) {
+    const societeInfo = mockDB.demandeurs_societe.find(s => s.id === createSocieteId);
+    if (societeInfo) {
+      createSociete = societeInfo.nom_societe;
+    }
+  }
+
+  // Check if email already exists
+  const existingUser = mockDB.demandeurs.find(d => d.email === email) || 
+                      mockDB.agents.find(a => a.email === email);
+  if (existingUser) {
+    return res.status(400).json({ detail: 'Cet email est déjà utilisé' });
+  }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  
+  const newDemandeur = {
+    id: uuidv4(),
+    nom,
+    prenom,
+    societe: createSociete,
+    societe_id: createSocieteId,
+    telephone,
+    email,
+    password: hashedPassword,
+    type_utilisateur: 'demandeur'
+  };
+  
+  mockDB.demandeurs.push(newDemandeur);
+  
+  // Remove password from response
+  const { password: _, ...responseDemandeur } = newDemandeur;
+  res.status(201).json(responseDemandeur);
+});
+
+app.put('/api/demandeurs/:id', verifyToken, (req, res) => {
+  const demandeurId = req.params.id;
+  const { nom, prenom, societe, societe_id, telephone, email, password } = req.body;
+  
+  // Check if user can modify this demandeur
+  if (req.user.type === 'demandeur') {
+    const currentDemandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    const targetDemandeur = mockDB.demandeurs.find(d => d.id === demandeurId);
+    
+    if (currentDemandeur.id !== demandeurId) {
+      // Demandeur can only modify someone from their society
+      if (!currentDemandeur.societe_id || !targetDemandeur.societe_id || 
+          currentDemandeur.societe_id !== targetDemandeur.societe_id) {
+        return res.status(403).json({ detail: 'Accès non autorisé' });
+      }
+    }
+  }
+
+  const demandeurIndex = mockDB.demandeurs.findIndex(d => d.id === demandeurId);
+  if (demandeurIndex === -1) {
+    return res.status(404).json({ detail: 'Demandeur non trouvé' });
+  }
+
+  let updateSocieteId = societe_id;
+  let updateSociete = societe;
+  
+  if (req.user.type === 'demandeur') {
+    // If user is demandeur, force the society to be their own
+    const currentDemandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    if (currentDemandeur) {
+      updateSocieteId = currentDemandeur.societe_id;
+      updateSociete = currentDemandeur.societe;
+    }
+  }
+
+  // If societe_id is provided, get the society name
+  if (updateSocieteId) {
+    const societeInfo = mockDB.demandeurs_societe.find(s => s.id === updateSocieteId);
+    if (societeInfo) {
+      updateSociete = societeInfo.nom_societe;
+    }
+  }
+  
+  const hashedPassword = password ? bcrypt.hashSync(password, 10) : mockDB.demandeurs[demandeurIndex].password;
+  
+  mockDB.demandeurs[demandeurIndex] = {
+    ...mockDB.demandeurs[demandeurIndex],
+    nom,
+    prenom,
+    societe: updateSociete,
+    societe_id: updateSocieteId,
+    telephone,
+    email,
+    password: hashedPassword
+  };
+  
+  // Remove password from response
+  const { password: _, ...responseUpdatedDemandeur } = mockDB.demandeurs[demandeurIndex];
+  responseUpdatedDemandeur.type_utilisateur = 'demandeur';
+  
+  res.json(responseUpdatedDemandeur);
+});
+
+app.delete('/api/demandeurs/:id', verifyToken, (req, res) => {
+  const demandeurId = req.params.id;
+  
+  // Check if user can delete this demandeur
+  if (req.user.type === 'demandeur') {
+    const currentDemandeur = mockDB.demandeurs.find(d => d.email === req.user.sub);
+    
+    if (currentDemandeur.id === demandeurId) {
+      return res.status(400).json({ detail: 'Vous ne pouvez pas supprimer votre propre compte' });
+    }
+    
+    // Demandeur can only delete someone from their society
+    const targetDemandeur = mockDB.demandeurs.find(d => d.id === demandeurId);
+    if (!currentDemandeur.societe_id || !targetDemandeur.societe_id || 
+        currentDemandeur.societe_id !== targetDemandeur.societe_id) {
+      return res.status(403).json({ detail: 'Accès non autorisé' });
+    }
+  }
+
+  const demandeurIndex = mockDB.demandeurs.findIndex(d => d.id === demandeurId);
+  if (demandeurIndex === -1) {
+    return res.status(404).json({ detail: 'Demandeur non trouvé' });
+  }
+  
+  mockDB.demandeurs.splice(demandeurIndex, 1);
+  res.json({ message: 'Demandeur supprimé avec succès' });
+});
+
 app.listen(PORT, () => {
   console.log(`Dev server running on http://localhost:${PORT}`);
 });
