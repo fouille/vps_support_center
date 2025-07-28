@@ -1407,6 +1407,592 @@ def test_portabilite_apis():
     
     return results.summary()
 
+def test_demandeur_transfer_functionality():
+    """Test the new demandeur transfer functionality before deletion"""
+    results = TestResults()
+    
+    print("🚀 Starting Demandeur Transfer Functionality Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication Tests")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    agent_headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    demandeur_headers = {
+        "Authorization": f"Bearer {demandeur_token}",
+        "Content-Type": "application/json"
+    } if demandeur_token else None
+    
+    # Step 2: Setup test data - Create test demandeurs and société
+    print("\n📋 STEP 2: Setup Test Data")
+    
+    # Get existing société or create one for testing
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs-societe", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            societes_data = response.json()
+            if 'data' in societes_data and len(societes_data['data']) > 0:
+                test_societe_id = societes_data['data'][0]['id']
+                results.add_result("Get Test Société", True)
+            else:
+                # Create a test société
+                societe_data = {
+                    "nom_societe": "Test Transfer Corp",
+                    "siret": "12345678901234",
+                    "adresse": "123 Test Street",
+                    "ville": "Test City",
+                    "email": "test@transfercorp.fr"
+                }
+                response = requests.post(f"{API_BASE}/demandeurs-societe", headers=agent_headers, 
+                                       json=societe_data, timeout=10)
+                if response.status_code == 201:
+                    test_societe_id = response.json()['id']
+                    results.add_result("Create Test Société", True)
+                else:
+                    results.add_result("Create Test Société", False, f"Status: {response.status_code}")
+                    return results.summary()
+        else:
+            results.add_result("Get Test Société", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Société", False, str(e))
+        return results.summary()
+    
+    # Create test demandeurs in the same société
+    test_demandeurs = []
+    for i in range(3):  # Create 3 demandeurs for testing
+        demandeur_data = {
+            "nom": f"TestDemandeur{i+1}",
+            "prenom": f"Transfer{i+1}",
+            "email": f"testdemandeur{i+1}@transfercorp.fr",
+            "password": "testpass123",
+            "societe_id": test_societe_id,
+            "telephone": f"0123456{i+1}00"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/demandeurs", headers=agent_headers, 
+                                   json=demandeur_data, timeout=10)
+            if response.status_code == 201:
+                test_demandeurs.append(response.json())
+                results.add_result(f"Create Test Demandeur {i+1}", True)
+            else:
+                results.add_result(f"Create Test Demandeur {i+1}", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result(f"Create Test Demandeur {i+1}", False, str(e))
+    
+    if len(test_demandeurs) < 2:
+        results.add_result("Setup Test Demandeurs", False, "Need at least 2 demandeurs for transfer testing")
+        return results.summary()
+    else:
+        results.add_result("Setup Test Demandeurs", True, f"Created {len(test_demandeurs)} test demandeurs")
+    
+    # Step 3: Test deletion of demandeur with NO linked data (should work normally)
+    print("\n📋 STEP 3: Test Deletion with NO Linked Data")
+    
+    demandeur_to_delete = test_demandeurs[0]
+    try:
+        response = requests.delete(f"{API_BASE}/demandeurs/{demandeur_to_delete['id']}", 
+                                 headers=agent_headers, timeout=10)
+        
+        if response.status_code == 200:
+            result = response.json()
+            results.add_result("DELETE - No linked data", True)
+            
+            # Verify response structure
+            if 'message' in result and 'transferred' in result:
+                if result['transferred'] == False:
+                    results.add_result("DELETE - No transfer response structure", True)
+                else:
+                    results.add_result("DELETE - No transfer response structure", False, 
+                                     "transferred should be False for no linked data")
+            else:
+                results.add_result("DELETE - No transfer response structure", False, 
+                                 "Missing message or transferred fields")
+            
+            # Verify demandeur is actually deleted
+            verify_response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+            if verify_response.status_code == 200:
+                remaining_demandeurs = verify_response.json()
+                deleted_found = any(d['id'] == demandeur_to_delete['id'] for d in remaining_demandeurs)
+                if not deleted_found:
+                    results.add_result("DELETE - Verification demandeur deleted", True)
+                else:
+                    results.add_result("DELETE - Verification demandeur deleted", False, 
+                                     "Demandeur still exists after deletion")
+        else:
+            results.add_result("DELETE - No linked data", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("DELETE - No linked data", False, str(e))
+    
+    # Update test_demandeurs list (remove deleted one)
+    test_demandeurs = test_demandeurs[1:]
+    
+    # Step 4: Create linked data for testing transfer functionality
+    print("\n📋 STEP 4: Create Linked Data for Transfer Testing")
+    
+    if len(test_demandeurs) >= 2:
+        demandeur_with_data = test_demandeurs[0]
+        transfer_target = test_demandeurs[1]
+        
+        # Get a client for ticket creation
+        try:
+            response = requests.get(f"{API_BASE}/clients", headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                clients_data = response.json()
+                if 'data' in clients_data and len(clients_data['data']) > 0:
+                    test_client_id = clients_data['data'][0]['id']
+                elif isinstance(clients_data, list) and len(clients_data) > 0:
+                    test_client_id = clients_data[0]['id']
+                else:
+                    # Create a test client
+                    client_data = {
+                        "nom_societe": "Test Client Corp",
+                        "adresse": "456 Client Street"
+                    }
+                    response = requests.post(f"{API_BASE}/clients", headers=agent_headers, 
+                                           json=client_data, timeout=10)
+                    if response.status_code == 201:
+                        test_client_id = response.json()['id']
+                    else:
+                        results.add_result("Create Test Client", False, f"Status: {response.status_code}")
+                        return results.summary()
+        except Exception as e:
+            results.add_result("Get Test Client", False, str(e))
+            return results.summary()
+        
+        # Create test tickets linked to demandeur
+        created_tickets = []
+        for i in range(2):
+            ticket_data = {
+                "titre": f"Test Ticket {i+1} for Transfer",
+                "client_id": test_client_id,
+                "demandeur_id": demandeur_with_data['id'],
+                "requete_initiale": f"Test ticket {i+1} to test transfer functionality",
+                "status": "nouveau"
+            }
+            
+            try:
+                response = requests.post(f"{API_BASE}/tickets", headers=agent_headers, 
+                                       json=ticket_data, timeout=10)
+                if response.status_code == 201:
+                    created_tickets.append(response.json())
+                    results.add_result(f"Create Test Ticket {i+1}", True)
+                else:
+                    results.add_result(f"Create Test Ticket {i+1}", False, f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result(f"Create Test Ticket {i+1}", False, str(e))
+        
+        if len(created_tickets) > 0:
+            results.add_result("Create Linked Tickets", True, f"Created {len(created_tickets)} test tickets")
+        else:
+            results.add_result("Create Linked Tickets", False, "No tickets created")
+    
+    # Step 5: Test deletion of demandeur WITH linked data (should return 409 with transfer info)
+    print("\n📋 STEP 5: Test Deletion with Linked Data - Should Return 409")
+    
+    if len(test_demandeurs) >= 2:
+        demandeur_with_data = test_demandeurs[0]
+        
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{demandeur_with_data['id']}", 
+                                     headers=agent_headers, timeout=10)
+            
+            if response.status_code == 409:
+                result = response.json()
+                results.add_result("DELETE - With linked data returns 409", True)
+                
+                # Verify response structure
+                required_fields = ['detail', 'demandeur', 'linkedData', 'otherDemandeurs', 'canDelete']
+                missing_fields = [field for field in required_fields if field not in result]
+                
+                if not missing_fields:
+                    results.add_result("DELETE - 409 response structure", True)
+                    
+                    # Verify linkedData shows ticket count
+                    if 'tickets' in result['linkedData'] and result['linkedData']['tickets'] > 0:
+                        results.add_result("DELETE - Linked tickets detected", True)
+                    else:
+                        results.add_result("DELETE - Linked tickets detected", False, 
+                                         "No tickets found in linkedData")
+                    
+                    # Verify otherDemandeurs list is provided
+                    if isinstance(result['otherDemandeurs'], list) and len(result['otherDemandeurs']) > 0:
+                        results.add_result("DELETE - Other demandeurs listed", True)
+                    else:
+                        results.add_result("DELETE - Other demandeurs listed", False, 
+                                         "No other demandeurs in same société")
+                    
+                    # Verify canDelete flag
+                    if result['canDelete'] == True:
+                        results.add_result("DELETE - Can delete flag correct", True)
+                    else:
+                        results.add_result("DELETE - Can delete flag correct", False, 
+                                         "canDelete should be True when other demandeurs exist")
+                else:
+                    results.add_result("DELETE - 409 response structure", False, 
+                                     f"Missing fields: {missing_fields}")
+            else:
+                results.add_result("DELETE - With linked data returns 409", False, 
+                                 f"Expected 409, got {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("DELETE - With linked data returns 409", False, str(e))
+    
+    # Step 6: Test transfer process - DELETE with transferTo parameter
+    print("\n📋 STEP 6: Test Transfer Process")
+    
+    if len(test_demandeurs) >= 2:
+        demandeur_with_data = test_demandeurs[0]
+        transfer_target = test_demandeurs[1]
+        
+        transfer_request = {
+            "transferTo": transfer_target['id']
+        }
+        
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{demandeur_with_data['id']}", 
+                                     headers=agent_headers, json=transfer_request, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                results.add_result("DELETE - Transfer successful", True)
+                
+                # Verify response structure
+                if 'message' in result and 'transferred' in result and 'transferredData' in result:
+                    if result['transferred'] == True:
+                        results.add_result("DELETE - Transfer response structure", True)
+                        
+                        # Verify transferred data counts
+                        if 'tickets' in result['transferredData'] and result['transferredData']['tickets'] > 0:
+                            results.add_result("DELETE - Transfer data counts", True)
+                        else:
+                            results.add_result("DELETE - Transfer data counts", False, 
+                                             "No tickets shown in transferredData")
+                    else:
+                        results.add_result("DELETE - Transfer response structure", False, 
+                                         "transferred should be True for transfer operation")
+                else:
+                    results.add_result("DELETE - Transfer response structure", False, 
+                                     "Missing required fields in transfer response")
+                
+                # Verify tickets are transferred to target demandeur
+                try:
+                    tickets_response = requests.get(f"{API_BASE}/tickets", headers=agent_headers, timeout=10)
+                    if tickets_response.status_code == 200:
+                        tickets = tickets_response.json()
+                        transferred_tickets = [t for t in tickets if t.get('demandeur_id') == transfer_target['id']]
+                        
+                        if len(transferred_tickets) >= len(created_tickets):
+                            results.add_result("DELETE - Tickets transferred correctly", True)
+                        else:
+                            results.add_result("DELETE - Tickets transferred correctly", False, 
+                                             f"Expected {len(created_tickets)} tickets, found {len(transferred_tickets)}")
+                except Exception as e:
+                    results.add_result("DELETE - Tickets transferred correctly", False, str(e))
+                
+                # Verify original demandeur is deleted
+                try:
+                    verify_response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+                    if verify_response.status_code == 200:
+                        remaining_demandeurs = verify_response.json()
+                        deleted_found = any(d['id'] == demandeur_with_data['id'] for d in remaining_demandeurs)
+                        if not deleted_found:
+                            results.add_result("DELETE - Original demandeur deleted after transfer", True)
+                        else:
+                            results.add_result("DELETE - Original demandeur deleted after transfer", False, 
+                                             "Original demandeur still exists after transfer")
+                except Exception as e:
+                    results.add_result("DELETE - Original demandeur deleted after transfer", False, str(e))
+                
+            else:
+                results.add_result("DELETE - Transfer successful", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("DELETE - Transfer successful", False, str(e))
+        
+        # Update test_demandeurs list (remove transferred one)
+        test_demandeurs = [d for d in test_demandeurs if d['id'] != demandeur_with_data['id']]
+    
+    # Step 7: Test validation - transfer target must be in same société
+    print("\n📋 STEP 7: Test Transfer Validation - Same Société Required")
+    
+    if len(test_demandeurs) >= 1:
+        # Create a demandeur in a different société
+        different_societe_data = {
+            "nom_societe": "Different Corp",
+            "siret": "98765432109876",
+            "adresse": "789 Different Street",
+            "ville": "Different City",
+            "email": "different@corp.fr"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/demandeurs-societe", headers=agent_headers, 
+                                   json=different_societe_data, timeout=10)
+            if response.status_code == 201:
+                different_societe_id = response.json()['id']
+                
+                # Create demandeur in different société
+                different_demandeur_data = {
+                    "nom": "DifferentDemandeur",
+                    "prenom": "Different",
+                    "email": "different@differentcorp.fr",
+                    "password": "testpass123",
+                    "societe_id": different_societe_id,
+                    "telephone": "0987654321"
+                }
+                
+                response = requests.post(f"{API_BASE}/demandeurs", headers=agent_headers, 
+                                       json=different_demandeur_data, timeout=10)
+                if response.status_code == 201:
+                    different_demandeur = response.json()
+                    
+                    # Create a ticket for the remaining test demandeur
+                    remaining_demandeur = test_demandeurs[0]
+                    ticket_data = {
+                        "titre": "Test Ticket for Cross-Société Transfer",
+                        "client_id": test_client_id,
+                        "demandeur_id": remaining_demandeur['id'],
+                        "requete_initiale": "Test ticket for cross-société transfer validation",
+                        "status": "nouveau"
+                    }
+                    
+                    response = requests.post(f"{API_BASE}/tickets", headers=agent_headers, 
+                                           json=ticket_data, timeout=10)
+                    if response.status_code == 201:
+                        # Now try to transfer to different société demandeur (should fail)
+                        invalid_transfer_request = {
+                            "transferTo": different_demandeur['id']
+                        }
+                        
+                        response = requests.delete(f"{API_BASE}/demandeurs/{remaining_demandeur['id']}", 
+                                                 headers=agent_headers, json=invalid_transfer_request, timeout=10)
+                        
+                        if response.status_code == 400:
+                            result = response.json()
+                            if 'detail' in result and 'même société' in result['detail']:
+                                results.add_result("DELETE - Cross-société transfer validation", True)
+                            else:
+                                results.add_result("DELETE - Cross-société transfer validation", False, 
+                                                 "Error message doesn't mention société requirement")
+                        else:
+                            results.add_result("DELETE - Cross-société transfer validation", False, 
+                                             f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cross-société transfer validation", False, str(e))
+    
+    # Step 8: Test edge case - only one demandeur in société (should prevent deletion)
+    print("\n📋 STEP 8: Test Edge Case - Only One Demandeur in Société")
+    
+    # Create a new société with only one demandeur
+    try:
+        single_societe_data = {
+            "nom_societe": "Single Demandeur Corp",
+            "siret": "11111111111111",
+            "adresse": "111 Single Street",
+            "ville": "Single City",
+            "email": "single@corp.fr"
+        }
+        
+        response = requests.post(f"{API_BASE}/demandeurs-societe", headers=agent_headers, 
+                               json=single_societe_data, timeout=10)
+        if response.status_code == 201:
+            single_societe_id = response.json()['id']
+            
+            # Create single demandeur
+            single_demandeur_data = {
+                "nom": "SingleDemandeur",
+                "prenom": "Only",
+                "email": "single@singlecorp.fr",
+                "password": "testpass123",
+                "societe_id": single_societe_id,
+                "telephone": "0111111111"
+            }
+            
+            response = requests.post(f"{API_BASE}/demandeurs", headers=agent_headers, 
+                                   json=single_demandeur_data, timeout=10)
+            if response.status_code == 201:
+                single_demandeur = response.json()
+                
+                # Create a ticket for this demandeur
+                ticket_data = {
+                    "titre": "Test Ticket for Single Demandeur",
+                    "client_id": test_client_id,
+                    "demandeur_id": single_demandeur['id'],
+                    "requete_initiale": "Test ticket for single demandeur deletion test",
+                    "status": "nouveau"
+                }
+                
+                response = requests.post(f"{API_BASE}/tickets", headers=agent_headers, 
+                                       json=ticket_data, timeout=10)
+                if response.status_code == 201:
+                    # Try to delete (should return 409 with canDelete=false)
+                    response = requests.delete(f"{API_BASE}/demandeurs/{single_demandeur['id']}", 
+                                             headers=agent_headers, timeout=10)
+                    
+                    if response.status_code == 409:
+                        result = response.json()
+                        if 'canDelete' in result and result['canDelete'] == False:
+                            results.add_result("DELETE - Single demandeur prevention", True)
+                        else:
+                            results.add_result("DELETE - Single demandeur prevention", False, 
+                                             "canDelete should be False when no other demandeurs exist")
+                    else:
+                        results.add_result("DELETE - Single demandeur prevention", False, 
+                                         f"Expected 409, got {response.status_code}")
+    except Exception as e:
+        results.add_result("DELETE - Single demandeur prevention", False, str(e))
+    
+    # Step 9: Test permissions - demandeurs vs agents transfer capabilities
+    print("\n📋 STEP 9: Test Permissions - Demandeur vs Agent Transfer")
+    
+    if demandeur_token and len(test_demandeurs) >= 1:
+        # Test demandeur trying to delete another demandeur with transfer
+        remaining_demandeur = test_demandeurs[0]
+        
+        # First, verify demandeur can see other demandeurs in their société
+        try:
+            response = requests.get(f"{API_BASE}/demandeurs", headers=demandeur_headers, timeout=10)
+            if response.status_code == 200:
+                visible_demandeurs = response.json()
+                if len(visible_demandeurs) > 1:
+                    # Find a different demandeur to try to delete
+                    target_demandeur = None
+                    for d in visible_demandeurs:
+                        if d['id'] != demandeur_info.get('id'):
+                            target_demandeur = d
+                            break
+                    
+                    if target_demandeur:
+                        # Create a ticket for the target demandeur
+                        ticket_data = {
+                            "titre": "Test Ticket for Demandeur Permission Test",
+                            "client_id": test_client_id,
+                            "demandeur_id": target_demandeur['id'],
+                            "requete_initiale": "Test ticket for demandeur permission test",
+                            "status": "nouveau"
+                        }
+                        
+                        response = requests.post(f"{API_BASE}/tickets", headers=agent_headers, 
+                                               json=ticket_data, timeout=10)
+                        if response.status_code == 201:
+                            # Try to delete as demandeur (should work if in same société)
+                            response = requests.delete(f"{API_BASE}/demandeurs/{target_demandeur['id']}", 
+                                                     headers=demandeur_headers, timeout=10)
+                            
+                            if response.status_code == 409:
+                                # Should get transfer info
+                                result = response.json()
+                                if 'otherDemandeurs' in result:
+                                    results.add_result("DELETE - Demandeur can initiate transfer", True)
+                                    
+                                    # Try actual transfer
+                                    if len(result['otherDemandeurs']) > 0:
+                                        transfer_target_id = result['otherDemandeurs'][0]['id']
+                                        transfer_request = {"transferTo": transfer_target_id}
+                                        
+                                        response = requests.delete(f"{API_BASE}/demandeurs/{target_demandeur['id']}", 
+                                                                 headers=demandeur_headers, json=transfer_request, timeout=10)
+                                        
+                                        if response.status_code == 200:
+                                            results.add_result("DELETE - Demandeur can complete transfer", True)
+                                        else:
+                                            results.add_result("DELETE - Demandeur can complete transfer", False, 
+                                                             f"Status: {response.status_code}")
+                                else:
+                                    results.add_result("DELETE - Demandeur can initiate transfer", False, 
+                                                     "No otherDemandeurs in response")
+                            else:
+                                results.add_result("DELETE - Demandeur can initiate transfer", False, 
+                                                 f"Expected 409, got {response.status_code}")
+                else:
+                    results.add_result("DELETE - Demandeur permission test setup", False, 
+                                     "Not enough demandeurs visible to test")
+        except Exception as e:
+            results.add_result("DELETE - Demandeur permission test", False, str(e))
+    
+    # Step 10: Cleanup - Delete test data
+    print("\n📋 STEP 10: Cleanup Test Data")
+    
+    # Delete remaining test tickets
+    try:
+        response = requests.get(f"{API_BASE}/tickets", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            tickets = response.json()
+            test_tickets = [t for t in tickets if 'Test Ticket' in t.get('titre', '')]
+            
+            for ticket in test_tickets:
+                try:
+                    response = requests.delete(f"{API_BASE}/tickets/{ticket['id']}", 
+                                             headers=agent_headers, timeout=10)
+                    if response.status_code == 200:
+                        results.add_result(f"CLEANUP - Delete test ticket", True)
+                except:
+                    pass
+    except:
+        pass
+    
+    # Delete remaining test demandeurs
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            test_demandeurs_remaining = [d for d in demandeurs if 'Test' in d.get('nom', '') or 'Different' in d.get('nom', '') or 'Single' in d.get('nom', '')]
+            
+            for demandeur in test_demandeurs_remaining:
+                try:
+                    response = requests.delete(f"{API_BASE}/demandeurs/{demandeur['id']}", 
+                                             headers=agent_headers, timeout=10)
+                    if response.status_code in [200, 409]:  # 409 is ok if still has linked data
+                        results.add_result(f"CLEANUP - Delete test demandeur", True)
+                except:
+                    pass
+    except:
+        pass
+    
+    # Delete test sociétés
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs-societe", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            societes_data = response.json()
+            if 'data' in societes_data:
+                societes = societes_data['data']
+                test_societes = [s for s in societes if 'Test' in s.get('nom_societe', '') or 'Different' in s.get('nom_societe', '') or 'Single' in s.get('nom_societe', '')]
+                
+                for societe in test_societes:
+                    try:
+                        response = requests.delete(f"{API_BASE}/demandeurs-societe/{societe['id']}", 
+                                                 headers=agent_headers, timeout=10)
+                        if response.status_code == 200:
+                            results.add_result(f"CLEANUP - Delete test société", True)
+                    except:
+                        pass
+    except:
+        pass
+    
+    return results.summary()
+
 def test_mailjet_email_integration():
     """Test Mailjet email integration functionality"""
     results = TestResults()
