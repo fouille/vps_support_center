@@ -104,13 +104,21 @@ export const AuthProvider = ({ children }) => {
     const userData = localStorage.getItem('user');
     
     if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+      // Vérifier immédiatement si le token est expiré
+      if (isTokenExpired(token)) {
+        console.log('Token expired on app load, clearing storage');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setUser(null);
+      } else {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
       }
     }
     setLoading(false);
