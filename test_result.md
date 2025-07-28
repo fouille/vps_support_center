@@ -435,13 +435,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Interface complète section Portabilités"
-    - "Email notifications for portabilité file attachments"
+    - "Demandeur Transfer Functionality Before Deletion"
   stuck_tasks:
-    - "Interface complète section Portabilités"
-    - "Email notifications for portabilité file attachments"
+    - "Demandeur Transfer Functionality Before Deletion"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "testing"
