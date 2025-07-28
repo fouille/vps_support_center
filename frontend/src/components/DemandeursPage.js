@@ -132,10 +132,17 @@ const DemandeursPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let submitData = { ...formData };
+      
+      // Pour l'édition, ne pas inclure le mot de passe vide
       if (editingDemandeur) {
-        await api.put(`/api/demandeurs/${editingDemandeur.id}`, formData);
+        delete submitData.password;
+      }
+      
+      if (editingDemandeur) {
+        await api.put(`/api/demandeurs/${editingDemandeur.id}`, submitData);
       } else {
-        await api.post('/api/demandeurs', formData);
+        await api.post('/api/demandeurs', submitData);
       }
       fetchDemandeurs();
       handleCloseModal();
