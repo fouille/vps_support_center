@@ -3218,7 +3218,7 @@ def test_demandeurs_societe_api():
     if created_societe_id:
         update_data = {
             "nom_societe": "Test Société SARL - Updated",
-            "siret": "12345678901234",
+            "siret": "98765432109876",  # Keep the same SIRET for the update
             "adresse": "456 Rue de Test Updated",
             "adresse_complement": "Bâtiment B",
             "code_postal": "75002",
