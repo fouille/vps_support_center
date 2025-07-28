@@ -71,23 +71,27 @@ const Dashboard = () => {
   const ticketsChartData = [
     { name: 'Ouverts', value: stats.tickets.ouverts, color: COLORS.warning },
     { name: 'Cloturés', value: stats.tickets.clotures, color: COLORS.success }
-  ];
+  ].filter(item => item.value > 0); // Filtrer les valeurs à 0
 
   const portabilitesChartData = [
     { name: 'Ouvertes', value: stats.portabilites.ouvertes, color: COLORS.info },
     { name: 'Terminées', value: stats.portabilites.terminees, color: COLORS.success },
     { name: 'En erreur', value: stats.portabilites.erreur, color: COLORS.danger }
-  ];
+  ].filter(item => item.value > 0); // Filtrer les valeurs à 0
 
-  const ticketsDetailData = Object.entries(stats.tickets.byStatus).map(([status, count]) => ({
-    status: status.replace('_', ' ').toUpperCase(),
-    count
-  }));
+  const ticketsDetailData = Object.entries(stats.tickets.byStatus)
+    .filter(([status, count]) => status && status !== 'undefined' && count > 0)
+    .map(([status, count]) => ({
+      status: status.replace('_', ' ').toUpperCase(),
+      count
+    }));
 
-  const portabilitesDetailData = Object.entries(stats.portabilites.byStatus).map(([status, count]) => ({
-    status: status.replace('_', ' ').toUpperCase(),
-    count
-  }));
+  const portabilitesDetailData = Object.entries(stats.portabilites.byStatus)
+    .filter(([status, count]) => status && status !== 'undefined' && count > 0)
+    .map(([status, count]) => ({
+      status: status.replace('_', ' ').toUpperCase(),
+      count
+    }));
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
