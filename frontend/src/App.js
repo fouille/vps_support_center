@@ -16,7 +16,7 @@ import './App.css';
 
 const AppContent = () => {
   const { user, loading, isAuthenticated } = useAuth();
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('tickets');
   const [currentPortabiliteId, setCurrentPortabiliteId] = useState(null);
 
   if (loading) {
