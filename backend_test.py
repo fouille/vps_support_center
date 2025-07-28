@@ -2350,20 +2350,737 @@ def test_portabilite_single_id_endpoint_fix():
     
     return results.summary()
 
-if __name__ == "__main__":
-    print("🧪 Backend API Testing - Portabilité Single ID Endpoint Fix")
-    print("=" * 60)
+def test_portabilite_delete_api():
+    """Test the DELETE /api/portabilites/{id} functionality as requested in review"""
+    results = TestResults()
     
-    # Test: Specific fix for single portability ID endpoint
-    print("\n" + "="*60)
-    print("TEST: PORTABILITÉ SINGLE ID ENDPOINT FIX")
+    print("🚀 Starting Portabilité DELETE API Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
     print("="*60)
-    portabilite_fix_success = test_portabilite_single_id_endpoint_fix()
     
-    # Overall result
-    if portabilite_fix_success:
-        print("\n🎉 Portabilité single ID endpoint fix tests passed!")
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    agent_headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    demandeur_headers = {
+        "Authorization": f"Bearer {demandeur_token}",
+        "Content-Type": "application/json"
+    } if demandeur_token else None
+    
+    # Step 2: Test GET /api/portabilites - Check if database tables exist
+    print("\n📋 STEP 2: GET Portabilités - Database Structure Check")
+    try:
+        response = requests.get(f"{API_BASE}/portabilites", headers=agent_headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results.add_result("GET - Portabilités endpoint accessible", True)
+            
+            # Validate response structure
+            if 'data' in data and 'pagination' in data:
+                results.add_result("GET - Response structure valid", True)
+                print(f"   Found {len(data['data'])} portabilités")
+            else:
+                results.add_result("GET - Response structure valid", False, "Missing 'data' or 'pagination' fields")
+                
+        elif response.status_code == 404:
+            results.add_result("GET - Portabilités endpoint accessible", False, "404 - Database tables likely don't exist")
+            print("   ❌ Database tables (portabilites, portabilite_echanges) appear to be missing")
+            print("   ⚠️  Cannot test DELETE functionality without database tables")
+            return results.summary()
+        else:
+            results.add_result("GET - Portabilités endpoint accessible", False, f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+            
+    except Exception as e:
+        results.add_result("GET - Portabilités endpoint accessible", False, str(e))
+        return results.summary()
+    
+    # Step 3: Test DELETE with non-existent ID (should return 404)
+    print("\n📋 STEP 3: DELETE Non-existent Portabilité")
+    fake_id = "ba9502eb-cc5e-4612-bb30-0e40b851f95f"
+    
+    try:
+        response = requests.delete(f"{API_BASE}/portabilites/{fake_id}", headers=agent_headers, timeout=10)
+        
+        if response.status_code == 404:
+            results.add_result("DELETE - Non-existent portabilité (agent)", True)
+        else:
+            results.add_result("DELETE - Non-existent portabilité (agent)", False, f"Expected 404, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("DELETE - Non-existent portabilité (agent)", False, str(e))
+    
+    # Step 4: Test DELETE permission for demandeur (should be forbidden)
+    print("\n📋 STEP 4: DELETE Permission Test - Demandeur")
+    
+    if demandeur_headers:
+        try:
+            response = requests.delete(f"{API_BASE}/portabilites/{fake_id}", headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 403:
+                results.add_result("DELETE - Demandeur forbidden", True)
+            else:
+                results.add_result("DELETE - Demandeur forbidden", False, f"Expected 403, got {response.status_code}")
+                
+        except Exception as e:
+            results.add_result("DELETE - Demandeur forbidden", False, str(e))
+    else:
+        results.add_result("DELETE - Demandeur forbidden", False, "No demandeur token available")
+    
+    # Step 5: Test DELETE without authentication
+    print("\n📋 STEP 5: DELETE Authentication Test")
+    
+    try:
+        response = requests.delete(f"{API_BASE}/portabilites/{fake_id}", timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("DELETE - No authentication", True)
+        else:
+            results.add_result("DELETE - No authentication", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("DELETE - No authentication", False, str(e))
+    
+    # Step 6: Test DELETE with invalid token
+    try:
+        invalid_headers = {"Authorization": "Bearer invalid_token"}
+        response = requests.delete(f"{API_BASE}/portabilites/{fake_id}", headers=invalid_headers, timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("DELETE - Invalid token", True)
+        else:
+            results.add_result("DELETE - Invalid token", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("DELETE - Invalid token", False, str(e))
+    
+    # Step 7: Try to create a test portabilité to delete (if we have clients and demandeurs)
+    print("\n📋 STEP 7: Create Test Portabilité for Deletion")
+    
+    # Get test client and demandeur
+    test_client_id = None
+    test_demandeur_id = None
+    
+    try:
+        # Get clients
+        response = requests.get(f"{API_BASE}/clients", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+                results.add_result("GET - Test client found", True)
+            else:
+                results.add_result("GET - Test client found", False, "No clients available")
+        
+        # Get demandeurs
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            if len(demandeurs) > 0:
+                test_demandeur_id = demandeurs[0]['id']
+                results.add_result("GET - Test demandeur found", True)
+            else:
+                results.add_result("GET - Test demandeur found", False, "No demandeurs available")
+                
+    except Exception as e:
+        results.add_result("GET - Test data retrieval", False, str(e))
+    
+    # Create test portabilité if we have the required data
+    created_portabilite_id = None
+    if test_client_id and test_demandeur_id:
+        portabilite_data = {
+            "client_id": test_client_id,
+            "demandeur_id": test_demandeur_id,
+            "numeros_portes": "0123456789",
+            "nom_client": "Test Client",
+            "prenom_client": "Test",
+            "email_client": "test@example.com",
+            "adresse": "123 Test Street",
+            "code_postal": "75001",
+            "ville": "Paris",
+            "date_portabilite_demandee": "2025-01-30",
+            "fiabilisation_demandee": False,
+            "demande_signee": True
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/portabilites", headers=agent_headers, 
+                                   json=portabilite_data, timeout=10)
+            
+            if response.status_code == 201:
+                created_portabilite = response.json()
+                created_portabilite_id = created_portabilite['id']
+                results.add_result("POST - Create test portabilité", True)
+                print(f"   Created test portabilité: {created_portabilite_id}")
+            else:
+                results.add_result("POST - Create test portabilité", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("POST - Create test portabilité", False, str(e))
+    else:
+        results.add_result("POST - Create test portabilité", False, "Missing required test data (client or demandeur)")
+    
+    # Step 8: Test DELETE with real portabilité (if created)
+    print("\n📋 STEP 8: DELETE Real Portabilité")
+    
+    if created_portabilite_id:
+        try:
+            response = requests.delete(f"{API_BASE}/portabilites/{created_portabilite_id}", 
+                                     headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                results.add_result("DELETE - Real portabilité (agent)", True)
+                
+                # Verify response structure
+                if 'message' in result:
+                    results.add_result("DELETE - Response structure", True)
+                else:
+                    results.add_result("DELETE - Response structure", False, "Missing success message")
+                
+                # Verify portabilité is actually deleted
+                verify_response = requests.get(f"{API_BASE}/portabilites/{created_portabilite_id}", 
+                                             headers=agent_headers, timeout=10)
+                if verify_response.status_code == 404:
+                    results.add_result("DELETE - Verification (portabilité deleted)", True)
+                else:
+                    results.add_result("DELETE - Verification (portabilité deleted)", False, 
+                                     f"Portabilité still exists, status: {verify_response.status_code}")
+                    
+            else:
+                results.add_result("DELETE - Real portabilité (agent)", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("DELETE - Real portabilité (agent)", False, str(e))
+    else:
+        results.add_result("DELETE - Real portabilité (agent)", False, "No test portabilité created")
+    
+    # Step 9: Test API endpoint structure and method support
+    print("\n📋 STEP 9: API Method Support")
+    
+    # Test unsupported method
+    try:
+        response = requests.patch(f"{API_BASE}/portabilites/{fake_id}", headers=agent_headers, timeout=10)
+        
+        if response.status_code == 405:
+            results.add_result("PATCH - Method not allowed", True)
+        else:
+            results.add_result("PATCH - Method not allowed", False, f"Expected 405, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("PATCH - Method not allowed", False, str(e))
+    
+    return results.summary()
+
+def test_clients_crud_api():
+    """Test the Clients API CRUD operations as requested in review"""
+    results = TestResults()
+    
+    print("🚀 Starting Clients CRUD API Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate agent
+    print("\n📋 STEP 1: Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Test GET /api/clients with pagination
+    print("\n📋 STEP 2: GET Clients with Pagination")
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results.add_result("GET - Clients retrieval", True)
+            
+            # Validate response structure
+            if 'data' in data and 'pagination' in data:
+                results.add_result("GET - Response structure", True)
+                print(f"   Found {len(data['data'])} clients")
+                
+                # Validate pagination structure
+                pagination = data['pagination']
+                required_fields = ['page', 'limit', 'total', 'totalPages', 'hasNext', 'hasPrev']
+                missing_fields = [field for field in required_fields if field not in pagination]
+                
+                if not missing_fields:
+                    results.add_result("GET - Pagination structure", True)
+                else:
+                    results.add_result("GET - Pagination structure", False, f"Missing fields: {missing_fields}")
+            else:
+                results.add_result("GET - Response structure", False, "Missing 'data' or 'pagination' fields")
+        else:
+            results.add_result("GET - Clients retrieval", False, f"Status: {response.status_code}, Body: {response.text}")
+            
+    except Exception as e:
+        results.add_result("GET - Clients retrieval", False, str(e))
+    
+    # Step 3: Test POST /api/clients - Create new client
+    print("\n📋 STEP 3: POST Create Client")
+    
+    test_client_data = {
+        "nom_societe": "Test Company CRUD",
+        "adresse": "123 Test CRUD Street",
+        "nom": "TestNom",
+        "prenom": "TestPrenom",
+        "numero": "CRUD123"
+    }
+    
+    created_client_id = None
+    try:
+        response = requests.post(f"{API_BASE}/clients", headers=headers, 
+                               json=test_client_data, timeout=10)
+        
+        if response.status_code == 201:
+            client = response.json()
+            created_client_id = client['id']
+            results.add_result("POST - Create client", True)
+            
+            # Validate response structure
+            required_fields = ['id', 'nom_societe', 'adresse']
+            missing_fields = [field for field in required_fields if field not in client]
+            
+            if not missing_fields:
+                results.add_result("POST - Response structure", True)
+                
+                # Validate content
+                if (client['nom_societe'] == test_client_data['nom_societe'] and 
+                    client['adresse'] == test_client_data['adresse']):
+                    results.add_result("POST - Response content", True)
+                else:
+                    results.add_result("POST - Response content", False, "Data mismatch")
+            else:
+                results.add_result("POST - Response structure", False, f"Missing fields: {missing_fields}")
+        else:
+            results.add_result("POST - Create client", False, f"Status: {response.status_code}, Body: {response.text}")
+            
+    except Exception as e:
+        results.add_result("POST - Create client", False, str(e))
+    
+    # Step 4: Test PUT /api/clients/{id} - Update client
+    print("\n📋 STEP 4: PUT Update Client")
+    
+    if created_client_id:
+        update_data = {
+            "nom_societe": "Updated Test Company CRUD",
+            "adresse": "456 Updated CRUD Street",
+            "nom": "UpdatedNom",
+            "prenom": "UpdatedPrenom",
+            "numero": "UPDATED123"
+        }
+        
+        try:
+            response = requests.put(f"{API_BASE}/clients/{created_client_id}", 
+                                  headers=headers, json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                updated_client = response.json()
+                results.add_result("PUT - Update client", True)
+                
+                # Validate updated content
+                if (updated_client['nom_societe'] == update_data['nom_societe'] and 
+                    updated_client['adresse'] == update_data['adresse']):
+                    results.add_result("PUT - Update content", True)
+                else:
+                    results.add_result("PUT - Update content", False, "Update data mismatch")
+            else:
+                results.add_result("PUT - Update client", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("PUT - Update client", False, str(e))
+    else:
+        results.add_result("PUT - Update client", False, "No client created to update")
+    
+    # Step 5: Test GET /api/clients with search
+    print("\n📋 STEP 5: GET Clients with Search")
+    
+    try:
+        response = requests.get(f"{API_BASE}/clients?search=Updated", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results.add_result("GET - Search functionality", True)
+            
+            # Check if our updated client is found
+            if created_client_id:
+                found_client = any(client['id'] == created_client_id for client in data['data'])
+                if found_client:
+                    results.add_result("GET - Search accuracy", True)
+                else:
+                    results.add_result("GET - Search accuracy", False, "Updated client not found in search")
+            else:
+                results.add_result("GET - Search accuracy", True, "No specific client to search for")
+        else:
+            results.add_result("GET - Search functionality", False, f"Status: {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("GET - Search functionality", False, str(e))
+    
+    # Step 6: Test DELETE /api/clients/{id} - Delete client
+    print("\n📋 STEP 6: DELETE Client")
+    
+    if created_client_id:
+        try:
+            response = requests.delete(f"{API_BASE}/clients/{created_client_id}", 
+                                     headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                result = response.json()
+                results.add_result("DELETE - Delete client", True)
+                
+                # Verify response structure
+                if 'message' in result:
+                    results.add_result("DELETE - Response structure", True)
+                else:
+                    results.add_result("DELETE - Response structure", False, "Missing success message")
+                
+                # Verify client is actually deleted by trying to update it
+                verify_response = requests.put(f"{API_BASE}/clients/{created_client_id}", 
+                                             headers=headers, json={"nom_societe": "Test"}, timeout=10)
+                if verify_response.status_code == 404:
+                    results.add_result("DELETE - Verification (client deleted)", True)
+                else:
+                    results.add_result("DELETE - Verification (client deleted)", False, 
+                                     f"Client still exists, status: {verify_response.status_code}")
+            else:
+                results.add_result("DELETE - Delete client", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("DELETE - Delete client", False, str(e))
+    else:
+        results.add_result("DELETE - Delete client", False, "No client created to delete")
+    
+    # Step 7: Test error handling
+    print("\n📋 STEP 7: Error Handling")
+    
+    # Test POST with missing required fields
+    try:
+        response = requests.post(f"{API_BASE}/clients", headers=headers, 
+                               json={"nom": "Test"}, timeout=10)
+        
+        if response.status_code == 400:
+            results.add_result("POST - Missing required fields", True)
+        else:
+            results.add_result("POST - Missing required fields", False, f"Expected 400, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("POST - Missing required fields", False, str(e))
+    
+    # Test PUT with non-existent ID
+    fake_id = "ba9502eb-cc5e-4612-bb30-0e40b851f95f"
+    try:
+        response = requests.put(f"{API_BASE}/clients/{fake_id}", headers=headers, 
+                              json={"nom_societe": "Test", "adresse": "Test"}, timeout=10)
+        
+        if response.status_code == 404:
+            results.add_result("PUT - Non-existent client", True)
+        else:
+            results.add_result("PUT - Non-existent client", False, f"Expected 404, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("PUT - Non-existent client", False, str(e))
+    
+    # Test DELETE with non-existent ID
+    try:
+        response = requests.delete(f"{API_BASE}/clients/{fake_id}", headers=headers, timeout=10)
+        
+        if response.status_code == 404:
+            results.add_result("DELETE - Non-existent client", True)
+        else:
+            results.add_result("DELETE - Non-existent client", False, f"Expected 404, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("DELETE - Non-existent client", False, str(e))
+    
+    # Step 8: Test authentication
+    print("\n📋 STEP 8: Authentication Tests")
+    
+    # Test without token
+    try:
+        response = requests.get(f"{API_BASE}/clients", timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - No authentication", True)
+        else:
+            results.add_result("GET - No authentication", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("GET - No authentication", False, str(e))
+    
+    # Test with invalid token
+    try:
+        invalid_headers = {"Authorization": "Bearer invalid_token"}
+        response = requests.get(f"{API_BASE}/clients", headers=invalid_headers, timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - Invalid token", True)
+        else:
+            results.add_result("GET - Invalid token", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("GET - Invalid token", False, str(e))
+    
+    return results.summary()
+
+def test_jwt_authentication():
+    """Test JWT authentication and permissions as requested in review"""
+    results = TestResults()
+    
+    print("🚀 Starting JWT Authentication Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Test agent authentication
+    print("\n📋 STEP 1: Agent Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+    else:
+        results.add_result("Agent Authentication", True)
+        
+        # Validate token structure
+        try:
+            import jwt as jwt_lib
+            decoded = jwt_lib.decode(agent_token, options={"verify_signature": False})
+            
+            required_fields = ['sub', 'id', 'type_utilisateur']
+            missing_fields = [field for field in required_fields if field not in decoded]
+            
+            if not missing_fields:
+                results.add_result("Agent Token - Structure", True)
+                
+                if decoded['type_utilisateur'] == 'agent':
+                    results.add_result("Agent Token - User type", True)
+                else:
+                    results.add_result("Agent Token - User type", False, f"Expected 'agent', got '{decoded['type_utilisateur']}'")
+            else:
+                results.add_result("Agent Token - Structure", False, f"Missing fields: {missing_fields}")
+                
+        except Exception as e:
+            results.add_result("Agent Token - Structure", False, str(e))
+    
+    # Step 2: Test demandeur authentication
+    print("\n📋 STEP 2: Demandeur Authentication")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+    else:
+        results.add_result("Demandeur Authentication", True)
+        
+        # Validate token structure
+        try:
+            import jwt as jwt_lib
+            decoded = jwt_lib.decode(demandeur_token, options={"verify_signature": False})
+            
+            if decoded['type_utilisateur'] == 'demandeur':
+                results.add_result("Demandeur Token - User type", True)
+            else:
+                results.add_result("Demandeur Token - User type", False, f"Expected 'demandeur', got '{decoded['type_utilisateur']}'")
+                
+        except Exception as e:
+            results.add_result("Demandeur Token - Structure", False, str(e))
+    
+    # Step 3: Test invalid credentials
+    print("\n📋 STEP 3: Invalid Credentials")
+    
+    invalid_credentials = {
+        "email": "invalid@example.com",
+        "password": "wrongpassword"
+    }
+    
+    try:
+        response = requests.post(
+            f"{API_BASE}/auth",
+            json=invalid_credentials,
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        
+        if response.status_code == 401:
+            results.add_result("Invalid Credentials - Rejection", True)
+        else:
+            results.add_result("Invalid Credentials - Rejection", False, f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("Invalid Credentials - Rejection", False, str(e))
+    
+    # Step 4: Test missing credentials
+    print("\n📋 STEP 4: Missing Credentials")
+    
+    try:
+        response = requests.post(
+            f"{API_BASE}/auth",
+            json={"email": "test@example.com"},
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        
+        if response.status_code == 400:
+            results.add_result("Missing Password - Validation", True)
+        else:
+            results.add_result("Missing Password - Validation", False, f"Expected 400, got {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("Missing Password - Validation", False, str(e))
+    
+    # Step 5: Test token validation
+    print("\n📋 STEP 5: Token Validation")
+    
+    if agent_token:
+        # Test with valid token
+        try:
+            headers = {"Authorization": f"Bearer {agent_token}"}
+            response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                results.add_result("Valid Token - Access granted", True)
+            else:
+                results.add_result("Valid Token - Access granted", False, f"Expected 200, got {response.status_code}")
+                
+        except Exception as e:
+            results.add_result("Valid Token - Access granted", False, str(e))
+        
+        # Test with malformed token
+        try:
+            headers = {"Authorization": "Bearer malformed.token.here"}
+            response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+            
+            if response.status_code == 401:
+                results.add_result("Malformed Token - Access denied", True)
+            else:
+                results.add_result("Malformed Token - Access denied", False, f"Expected 401, got {response.status_code}")
+                
+        except Exception as e:
+            results.add_result("Malformed Token - Access denied", False, str(e))
+        
+        # Test with missing Bearer prefix
+        try:
+            headers = {"Authorization": agent_token}
+            response = requests.get(f"{API_BASE}/clients", headers=headers, timeout=10)
+            
+            if response.status_code == 401:
+                results.add_result("Missing Bearer - Access denied", True)
+            else:
+                results.add_result("Missing Bearer - Access denied", False, f"Expected 401, got {response.status_code}")
+                
+        except Exception as e:
+            results.add_result("Missing Bearer - Access denied", False, str(e))
+    
+    # Step 6: Test permission differences between agent and demandeur
+    print("\n📋 STEP 6: Permission Tests")
+    
+    if agent_token and demandeur_token:
+        agent_headers = {"Authorization": f"Bearer {agent_token}"}
+        demandeur_headers = {"Authorization": f"Bearer {demandeur_token}"}
+        
+        # Test clients access (both should have access)
+        try:
+            agent_response = requests.get(f"{API_BASE}/clients", headers=agent_headers, timeout=10)
+            demandeur_response = requests.get(f"{API_BASE}/clients", headers=demandeur_headers, timeout=10)
+            
+            if agent_response.status_code == 200 and demandeur_response.status_code == 200:
+                results.add_result("Clients Access - Both users", True)
+            else:
+                results.add_result("Clients Access - Both users", False, 
+                                 f"Agent: {agent_response.status_code}, Demandeur: {demandeur_response.status_code}")
+                
+        except Exception as e:
+            results.add_result("Clients Access - Both users", False, str(e))
+        
+        # Test tickets access (both should have access but different data)
+        try:
+            agent_response = requests.get(f"{API_BASE}/tickets", headers=agent_headers, timeout=10)
+            demandeur_response = requests.get(f"{API_BASE}/tickets", headers=demandeur_headers, timeout=10)
+            
+            if agent_response.status_code == 200 and demandeur_response.status_code == 200:
+                results.add_result("Tickets Access - Both users", True)
+                
+                # Agent should see more tickets than demandeur (or equal)
+                agent_tickets = agent_response.json()
+                demandeur_tickets = demandeur_response.json()
+                
+                if len(agent_tickets) >= len(demandeur_tickets):
+                    results.add_result("Tickets Access - Permission filtering", True)
+                else:
+                    results.add_result("Tickets Access - Permission filtering", False, 
+                                     f"Agent sees {len(agent_tickets)}, demandeur sees {len(demandeur_tickets)}")
+            else:
+                results.add_result("Tickets Access - Both users", False, 
+                                 f"Agent: {agent_response.status_code}, Demandeur: {demandeur_response.status_code}")
+                
+        except Exception as e:
+            results.add_result("Tickets Access - Both users", False, str(e))
+    
+    return results.summary()
+
+if __name__ == "__main__":
+    print("🚀 Starting Backend API Tests - Review Request Focus")
+    print("="*60)
+    
+    # Run specific tests requested in the review
+    success = True
+    
+    # Test 1: Portabilité DELETE API
+    print("\n" + "="*60)
+    print("TEST 1: PORTABILITÉ DELETE API")
+    print("="*60)
+    success &= test_portabilite_delete_api()
+    
+    # Test 2: Clients CRUD API
+    print("\n" + "="*60)
+    print("TEST 2: CLIENTS CRUD API")
+    print("="*60)
+    success &= test_clients_crud_api()
+    
+    # Test 3: JWT Authentication
+    print("\n" + "="*60)
+    print("TEST 3: JWT AUTHENTICATION")
+    print("="*60)
+    success &= test_jwt_authentication()
+    
+    print("\n" + "="*60)
+    print("FINAL RESULT")
+    print("="*60)
+    
+    if success:
+        print("✅ ALL TESTS PASSED")
         sys.exit(0)
     else:
-        print("\n💥 Portabilité single ID endpoint fix tests failed!")
+        print("❌ SOME TESTS FAILED")
         sys.exit(1)
