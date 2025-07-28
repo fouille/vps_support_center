@@ -33,6 +33,18 @@ Implémentation complète d'une nouvelle section "Portabilités" pour la gestion
 - Ask for clarification when requirements are ambiguous
 
 backend:
+  - task: "Demandeur Transfer Functionality Before Deletion"
+    implemented: true  
+    working: false
+    file: "netlify/functions/demandeurs.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ DEMANDEUR TRANSFER FUNCTIONALITY CRITICAL ISSUE IDENTIFIED: The new transfer functionality implemented in demandeurs.js DELETE method is not working correctly. SPECIFIC PROBLEMS: 1) DELETE requests with linked tickets return 200 (success) instead of 409 (conflict) - the COUNT queries for linked tickets/portabilities are not detecting existing data 2) Demandeurs are being deleted despite having linked tickets, causing data integrity issues 3) The SQL queries `(SELECT COUNT(*) FROM tickets WHERE demandeur_id = d.id) as tickets_count` and `(SELECT COUNT(*) FROM portabilites WHERE demandeur_id = d.id) as portabilites_count` are not working as expected 4) Response structure missing required fields like 'transferred' and 'transferredData' for normal deletions. ROOT CAUSE: The database queries in the transfer logic are failing to detect linked data, causing the system to bypass the transfer requirement and delete demandeurs directly. This is a critical data integrity issue that needs immediate attention. TESTING EVIDENCE: Created test ticket successfully linked to demandeur (verified via GET /api/tickets), but DELETE /api/demandeurs/{id} returned 200 success instead of 409 conflict, and demandeur was deleted despite having linked data."
+
   - task: "Demandeurs-Société API - dual management system"
     implemented: true  
     working: true
