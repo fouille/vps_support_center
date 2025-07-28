@@ -4433,17 +4433,17 @@ def test_portabilite_file_email_notifications():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Demandeur Permissions")
+    print("🚀 Starting Backend API Tests - Portabilité File Email Notifications")
     print("="*60)
     
-    # Run specific test for the new demandeur permissions functionality
+    # Run specific test for the email notification functionality for file attachments
     success = True
     
-    # Test: Demandeur Permissions (NEW)
+    # Test: Portabilité File Email Notifications (NEW)
     print("\n" + "="*60)
-    print("TEST: DEMANDEUR PERMISSIONS - DUAL MANAGEMENT ACCESS")
+    print("TEST: PORTABILITÉ FILE EMAIL NOTIFICATIONS")
     print("="*60)
-    success &= test_demandeur_permissions()
+    success &= test_portabilite_file_email_notifications()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
