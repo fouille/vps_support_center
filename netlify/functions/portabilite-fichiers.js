@@ -139,10 +139,24 @@ exports.handler = async (event, context) => {
 
       // Vérification que l'utilisateur peut uploader sur cette portabilité
       const accessQuery = `
-        SELECT 1 FROM portabilites 
-        WHERE id = $1 AND (
-          demandeur_id = $2 OR 
-          agent_id = $2 OR 
+        SELECT 
+          p.*,
+          c.nom_societe,
+          c.nom as client_nom,
+          c.prenom as client_prenom,
+          d.nom as demandeur_nom,
+          d.prenom as demandeur_prenom,
+          d.email as demandeur_email,
+          a.nom as agent_nom,
+          a.prenom as agent_prenom,
+          a.email as agent_email
+        FROM portabilites p
+        LEFT JOIN clients c ON p.client_id = c.id
+        LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+        LEFT JOIN agents a ON p.agent_id = a.id
+        WHERE p.id = $1 AND (
+          p.demandeur_id = $2 OR 
+          p.agent_id = $2 OR 
           $3 = 'agent'
         )
       `;
