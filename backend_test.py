@@ -3136,7 +3136,7 @@ def test_demandeurs_societe_api():
     
     test_societe_data = {
         "nom_societe": "Test Société SARL",
-        "siret": "12345678901234",
+        "siret": "98765432109876",  # Different SIRET from existing one
         "adresse": "123 Rue de Test",
         "adresse_complement": "Bâtiment A",
         "code_postal": "75001",
