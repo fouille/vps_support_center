@@ -199,14 +199,47 @@ exports.handler = async (event, context) => {
       const commentQuery = `
         INSERT INTO portabilite_echanges (portabilite_id, auteur_id, auteur_type, message)
         VALUES ($1, $2, $3, $4)
+        RETURNING *
       `;
 
-      await sql(commentQuery, [
+      const commentResult = await sql(commentQuery, [
         portabiliteId,
         decoded.id,
         decoded.type_utilisateur || decoded.type,
         `📎 Fichier ajouté: ${nom_fichier}`
       ]);
+
+      const newComment = commentResult[0];
+
+      // Récupération des informations complètes du commentaire pour l'email
+      const commentDetailQuery = `
+        SELECT 
+          pe.*,
+          CASE 
+            WHEN pe.auteur_type = 'agent' THEN a.nom || ' ' || a.prenom
+            WHEN pe.auteur_type = 'demandeur' THEN d.nom || ' ' || d.prenom
+            ELSE 'Utilisateur inconnu'
+          END as auteur_nom
+        FROM portabilite_echanges pe
+        LEFT JOIN agents a ON pe.auteur_id = a.id AND pe.auteur_type = 'agent'
+        LEFT JOIN demandeurs d ON pe.auteur_id = d.id AND pe.auteur_type = 'demandeur'
+        WHERE pe.id = $1
+      `;
+
+      const commentDetailResult = await sql(commentDetailQuery, [newComment.id]);
+      const commentDetail = commentDetailResult[0];
+
+      // Envoi d'email de notification pour l'ajout de fichier
+      try {
+        await emailService.sendPortabiliteCommentEmail(
+          portabiliteInfo,
+          commentDetail,
+          decoded.type_utilisateur || decoded.type
+        );
+      } catch (emailError) {
+        console.error('Erreur envoi email fichier:', emailError);
+        // Ne pas faire échouer l'upload pour un problème d'email
+      }
 
       return {
         statusCode: 201,
