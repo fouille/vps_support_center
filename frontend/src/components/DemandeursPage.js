@@ -221,7 +221,9 @@ const DemandeursPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingDemandeur(null);
-    setFormData({
+    
+    // Si l'utilisateur est demandeur, pré-remplir sa société
+    const initialFormData = {
       nom: '',
       prenom: '',
       societe: '',
@@ -229,7 +231,18 @@ const DemandeursPage = () => {
       telephone: '',
       email: '',
       password: ''
-    });
+    };
+    
+    // Pour les demandeurs, utiliser leur propre société
+    if (!isAgent && demandeurs.length > 0) {
+      const userDemandeur = demandeurs.find(d => d.email === user.email);
+      if (userDemandeur) {
+        initialFormData.societe = userDemandeur.societe_nom || userDemandeur.societe;
+        initialFormData.societe_id = userDemandeur.societe_id;
+      }
+    }
+    
+    setFormData(initialFormData);
     setError('');
   };
 
