@@ -79,21 +79,23 @@ const DemandeursPage = () => {
       const response = await api.get(`/api/insee-api?siret=${siret}`);
       const data = response.data;
       
-      if (data && data.etablissement) {
-        const etablissement = data.etablissement;
-        const adresse = etablissement.adresseEtablissement;
-        
+      if (data && data.siret) {
+        // Utiliser la structure de réponse réelle de l'API INSEE
         setSocieteFormData(prev => ({
           ...prev,
-          nom_societe: etablissement.uniteLegale?.denominationUniteLegale || 
-                       etablissement.denominationUsuelleEtablissement || 
-                       prev.nom_societe,
-          adresse: `${adresse.numeroVoieEtablissement || ''} ${adresse.typeVoieEtablissement || ''} ${adresse.libelleVoieEtablissement || ''}`.trim(),
-          code_postal: adresse.codePostalEtablissement || '',
-          ville: adresse.libelleCommuneEtablissement || ''
+          nom_societe: data.denomination || prev.nom_societe,
+          adresse: data.adresse?.adresseComplete || prev.adresse,
+          code_postal: data.adresse?.codePostal || prev.code_postal,
+          ville: data.adresse?.commune || prev.ville
         }));
+        
+        // Clear any previous error
+        setSiretError('');
+      } else {
+        setSiretError('Aucune information trouvée pour ce SIRET');
       }
     } catch (error) {
+      console.error('Erreur SIRET lookup:', error);
       setSiretError('Erreur lors de la recherche SIRET. Vérifiez le numéro.');
     } finally {
       setSiretLoading(false);
