@@ -12,10 +12,15 @@ const DemandeursPage = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showSocieteModal, setShowSocieteModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [editingDemandeur, setEditingDemandeur] = useState(null);
   const [editingSociete, setEditingSociete] = useState(null);
+  const [deletingDemandeur, setDeletingDemandeur] = useState(null);
+  const [transferData, setTransferData] = useState(null);
+  const [selectedTransferTarget, setSelectedTransferTarget] = useState('');
   const [siretLoading, setSiretLoading] = useState(false);
   const [siretError, setSiretError] = useState('');
+  const [transferLoading, setTransferLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     nom: '',
