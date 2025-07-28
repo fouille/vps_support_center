@@ -3704,24 +3704,411 @@ def test_demandeurs_dual_management_api():
     
     return results.summary()
 
-if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Dual Management System")
+def test_demandeur_permissions():
+    """Test the new demandeur permissions functionality for accessing /api/demandeurs"""
+    results = TestResults()
+    
+    print("🚀 Starting Demandeur Permissions Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
     print("="*60)
     
-    # Run specific tests for the new dual management system
+    # Step 1: Authenticate agent to create test data
+    print("\n📋 STEP 1: Agent Authentication & Setup")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    agent_headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Create a test société as agent
+    print("\n📋 STEP 2: Create Test Société")
+    test_societe_data = {
+        "nom_societe": "TestCorp Permissions SARL",
+        "siret": "98765432109876",
+        "adresse": "456 Test Avenue",
+        "code_postal": "75009",
+        "ville": "Paris",
+        "numero_tel": "0987654321",
+        "email": "contact@testcorp-permissions.fr"
+    }
+    
+    test_societe_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs-societe", 
+                               headers=agent_headers, json=test_societe_data, timeout=10)
+        
+        if response.status_code == 201:
+            test_societe = response.json()
+            test_societe_id = test_societe['id']
+            results.add_result("POST - Create test société", True)
+            print(f"   Created test société: {test_societe_id}")
+        else:
+            results.add_result("POST - Create test société", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("POST - Create test société", False, str(e))
+        return results.summary()
+    
+    # Step 3: Create a main demandeur in this société as agent
+    print("\n📋 STEP 3: Create Main Demandeur")
+    main_demandeur_data = {
+        "nom": "Dupont",
+        "prenom": "Marie",
+        "societe_id": test_societe_id,
+        "telephone": "0123456789",
+        "email": "marie.dupont@testcorp-permissions.fr",
+        "password": "testpass123"
+    }
+    
+    main_demandeur_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs", 
+                               headers=agent_headers, json=main_demandeur_data, timeout=10)
+        
+        if response.status_code == 201:
+            main_demandeur = response.json()
+            main_demandeur_id = main_demandeur['id']
+            results.add_result("POST - Create main demandeur", True)
+            print(f"   Created main demandeur: {main_demandeur_id}")
+        else:
+            results.add_result("POST - Create main demandeur", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("POST - Create main demandeur", False, str(e))
+        return results.summary()
+    
+    # Step 4: Create another société and demandeur for restriction testing
+    print("\n📋 STEP 4: Create Other Société & Demandeur")
+    other_societe_data = {
+        "nom_societe": "OtherCorp SARL",
+        "siret": "11111111111111",
+        "adresse": "789 Other Street",
+        "code_postal": "75010",
+        "ville": "Paris",
+        "numero_tel": "0111111111",
+        "email": "contact@othercorp.fr"
+    }
+    
+    other_societe_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs-societe", 
+                               headers=agent_headers, json=other_societe_data, timeout=10)
+        
+        if response.status_code == 201:
+            other_societe = response.json()
+            other_societe_id = other_societe['id']
+            results.add_result("POST - Create other société", True)
+        else:
+            results.add_result("POST - Create other société", False, 
+                             f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("POST - Create other société", False, str(e))
+    
+    # Create demandeur in other société
+    other_demandeur_id = None
+    if other_societe_id:
+        other_demandeur_data = {
+            "nom": "Martin",
+            "prenom": "Pierre",
+            "societe_id": other_societe_id,
+            "telephone": "0111111111",
+            "email": "pierre.martin@othercorp.fr",
+            "password": "otherpass123"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/demandeurs", 
+                                   headers=agent_headers, json=other_demandeur_data, timeout=10)
+            
+            if response.status_code == 201:
+                other_demandeur = response.json()
+                other_demandeur_id = other_demandeur['id']
+                results.add_result("POST - Create other demandeur", True)
+            else:
+                results.add_result("POST - Create other demandeur", False, 
+                                 f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("POST - Create other demandeur", False, str(e))
+    
+    # Step 5: Authenticate as the main demandeur
+    print("\n📋 STEP 5: Demandeur Authentication")
+    demandeur_credentials = {
+        "email": "marie.dupont@testcorp-permissions.fr",
+        "password": "testpass123"
+    }
+    
+    demandeur_token, demandeur_info = authenticate_user(demandeur_credentials, "Demandeur")
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        return results.summary()
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    demandeur_headers = {
+        "Authorization": f"Bearer {demandeur_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 6: Test demandeur can access /api/demandeurs and only see their société
+    print("\n📋 STEP 6: Demandeur GET Access & Société Restriction")
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=demandeur_headers, timeout=10)
+        
+        if response.status_code == 200:
+            demandeurs = response.json()
+            results.add_result("GET - Demandeur access to /api/demandeurs", True)
+            
+            # Verify only sees demandeurs from their société
+            if isinstance(demandeurs, list):
+                # Check that all returned demandeurs belong to the same société
+                societe_ids = set(d.get('societe_id') for d in demandeurs if d.get('societe_id'))
+                if len(societe_ids) <= 1 and (not societe_ids or test_societe_id in societe_ids):
+                    results.add_result("GET - Société restriction working", True)
+                    print(f"   Demandeur sees {len(demandeurs)} demandeurs from their société")
+                else:
+                    results.add_result("GET - Société restriction working", False, 
+                                     f"Demandeur sees demandeurs from multiple sociétés: {societe_ids}")
+            else:
+                results.add_result("GET - Response format", False, "Response is not a list")
+        else:
+            results.add_result("GET - Demandeur access to /api/demandeurs", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("GET - Demandeur access to /api/demandeurs", False, str(e))
+    
+    # Step 7: Test demandeur can create a new demandeur in their société
+    print("\n📋 STEP 7: Demandeur Create New Demandeur")
+    new_demandeur_data = {
+        "nom": "Leroy",
+        "prenom": "Jean",
+        "telephone": "0123456790",
+        "email": "jean.leroy@testcorp-permissions.fr",
+        "password": "newpass123"
+    }
+    
+    created_demandeur_id = None
+    try:
+        response = requests.post(f"{API_BASE}/demandeurs", 
+                               headers=demandeur_headers, json=new_demandeur_data, timeout=10)
+        
+        if response.status_code == 201:
+            created_demandeur = response.json()
+            created_demandeur_id = created_demandeur['id']
+            results.add_result("POST - Demandeur create new demandeur", True)
+            
+            # Verify the created demandeur is in the same société
+            if created_demandeur.get('societe_id') == test_societe_id:
+                results.add_result("POST - New demandeur in correct société", True)
+            else:
+                results.add_result("POST - New demandeur in correct société", False, 
+                                 f"Expected société_id {test_societe_id}, got {created_demandeur.get('societe_id')}")
+        else:
+            results.add_result("POST - Demandeur create new demandeur", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("POST - Demandeur create new demandeur", False, str(e))
+    
+    # Step 8: Test demandeur can modify a demandeur from their société
+    print("\n📋 STEP 8: Demandeur Modify Demandeur")
+    if created_demandeur_id:
+        update_data = {
+            "nom": "Leroy",
+            "prenom": "Jean-Claude",  # Changed prenom
+            "telephone": "0123456791",  # Changed telephone
+            "email": "jean.leroy@testcorp-permissions.fr",
+            "password": "newpass123"
+        }
+        
+        try:
+            response = requests.put(f"{API_BASE}/demandeurs/{created_demandeur_id}", 
+                                  headers=demandeur_headers, json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                updated_demandeur = response.json()
+                results.add_result("PUT - Demandeur modify demandeur", True)
+                
+                # Verify the changes were applied
+                if updated_demandeur.get('prenom') == 'Jean-Claude':
+                    results.add_result("PUT - Modification applied correctly", True)
+                else:
+                    results.add_result("PUT - Modification applied correctly", False, 
+                                     f"Expected prenom 'Jean-Claude', got '{updated_demandeur.get('prenom')}'")
+            else:
+                results.add_result("PUT - Demandeur modify demandeur", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("PUT - Demandeur modify demandeur", False, str(e))
+    
+    # Step 9: Test demandeur cannot delete themselves
+    print("\n📋 STEP 9: Demandeur Self-Deletion Protection")
+    try:
+        response = requests.delete(f"{API_BASE}/demandeurs/{main_demandeur_id}", 
+                                 headers=demandeur_headers, timeout=10)
+        
+        if response.status_code == 400:
+            results.add_result("DELETE - Self-deletion protection", True)
+        else:
+            results.add_result("DELETE - Self-deletion protection", False, 
+                             f"Expected 400, got {response.status_code}")
+    except Exception as e:
+        results.add_result("DELETE - Self-deletion protection", False, str(e))
+    
+    # Step 10: Test demandeur can delete other demandeur from their société
+    print("\n📋 STEP 10: Demandeur Delete Other Demandeur")
+    if created_demandeur_id:
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{created_demandeur_id}", 
+                                     headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 200:
+                results.add_result("DELETE - Demandeur delete other demandeur", True)
+            else:
+                results.add_result("DELETE - Demandeur delete other demandeur", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("DELETE - Demandeur delete other demandeur", False, str(e))
+    
+    # Step 11: Test restrictions - demandeur cannot see/modify demandeurs from other sociétés
+    print("\n📋 STEP 11: Cross-Société Restrictions")
+    
+    if other_demandeur_id:
+        # Test that demandeur cannot modify demandeur from other société
+        try:
+            update_data = {
+                "nom": "Hacked",
+                "prenom": "Name",
+                "email": "hacked@example.com",
+                "password": "hacked123"
+            }
+            
+            response = requests.put(f"{API_BASE}/demandeurs/{other_demandeur_id}", 
+                                  headers=demandeur_headers, json=update_data, timeout=10)
+            
+            if response.status_code == 403:
+                results.add_result("PUT - Cross-société restriction", True)
+            else:
+                results.add_result("PUT - Cross-société restriction", False, 
+                                 f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            results.add_result("PUT - Cross-société restriction", False, str(e))
+        
+        # Test that demandeur cannot delete demandeur from other société
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{other_demandeur_id}", 
+                                     headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 403:
+                results.add_result("DELETE - Cross-société restriction", True)
+            else:
+                results.add_result("DELETE - Cross-société restriction", False, 
+                                 f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cross-société restriction", False, str(e))
+    else:
+        results.add_result("Cross-société restriction tests", False, "No other société demandeur found to test with")
+    
+    # Step 12: Test authentication validation
+    print("\n📋 STEP 12: Authentication Validation")
+    
+    # Test without token
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - No token authentication", True)
+        else:
+            results.add_result("GET - No token authentication", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - No token authentication", False, str(e))
+    
+    # Test with invalid token
+    try:
+        invalid_headers = {"Authorization": "Bearer invalid_token"}
+        response = requests.get(f"{API_BASE}/demandeurs", headers=invalid_headers, timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - Invalid token authentication", True)
+        else:
+            results.add_result("GET - Invalid token authentication", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Invalid token authentication", False, str(e))
+    
+    # Step 13: Cleanup - Delete test data
+    print("\n📋 STEP 13: Cleanup")
+    
+    # Delete main demandeur
+    if main_demandeur_id:
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{main_demandeur_id}", 
+                                     headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("DELETE - Cleanup main demandeur", True)
+            else:
+                results.add_result("DELETE - Cleanup main demandeur", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cleanup main demandeur", False, str(e))
+    
+    # Delete other demandeur if exists
+    if other_demandeur_id:
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs/{other_demandeur_id}", 
+                                     headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("DELETE - Cleanup other demandeur", True)
+            else:
+                results.add_result("DELETE - Cleanup other demandeur", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cleanup other demandeur", False, str(e))
+    
+    # Delete test société
+    if test_societe_id:
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs-societe/{test_societe_id}", 
+                                     headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("DELETE - Cleanup test société", True)
+            else:
+                results.add_result("DELETE - Cleanup test société", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cleanup test société", False, str(e))
+    
+    # Delete other société
+    if other_societe_id:
+        try:
+            response = requests.delete(f"{API_BASE}/demandeurs-societe/{other_societe_id}", 
+                                     headers=agent_headers, timeout=10)
+            if response.status_code == 200:
+                results.add_result("DELETE - Cleanup other société", True)
+            else:
+                results.add_result("DELETE - Cleanup other société", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Cleanup other société", False, str(e))
+    
+    return results.summary()
+
+if __name__ == "__main__":
+    print("🚀 Starting Backend API Tests - Demandeur Permissions")
+    print("="*60)
+    
+    # Run specific test for the new demandeur permissions functionality
     success = True
     
-    # Test 1: Demandeurs-Société API (NEW)
+    # Test: Demandeur Permissions (NEW)
     print("\n" + "="*60)
-    print("TEST 1: DEMANDEURS-SOCIÉTÉ API (DUAL MANAGEMENT)")
+    print("TEST: DEMANDEUR PERMISSIONS - DUAL MANAGEMENT ACCESS")
     print("="*60)
-    success &= test_demandeurs_societe_api()
-    
-    # Test 2: Demandeurs Dual Management API (NEW)
-    print("\n" + "="*60)
-    print("TEST 2: DEMANDEURS DUAL MANAGEMENT API")
-    print("="*60)
-    success &= test_demandeurs_dual_management_api()
+    success &= test_demandeur_permissions()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
