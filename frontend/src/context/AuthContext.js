@@ -13,6 +13,32 @@ export const useAuth = () => {
   return context;
 };
 
+// Fonction utilitaire pour décoder le JWT sans vérification (côté client)
+const decodeJWT = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+};
+
+// Fonction pour vérifier si le token est expiré
+const isTokenExpired = (token) => {
+  if (!token) return true;
+  
+  const decoded = decodeJWT(token);
+  if (!decoded || !decoded.exp) return true;
+  
+  const currentTime = Math.floor(Date.now() / 1000);
+  return decoded.exp < currentTime;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
