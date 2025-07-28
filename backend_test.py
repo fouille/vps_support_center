@@ -5206,17 +5206,17 @@ def test_portabilite_file_email_notifications():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Demandeur Transfer Functionality")
+    print("🚀 Starting Backend API Tests - Demandeur Transfer Debug")
     print("="*60)
     
-    # Run specific test for the demandeur transfer functionality before deletion
+    # Run debug test first to understand the issue
     success = True
     
-    # Test: Demandeur Transfer Functionality (NEW - PRIORITY TEST)
+    # Test: Demandeur Transfer Debug (PRIORITY DEBUG TEST)
     print("\n" + "="*60)
-    print("TEST: DEMANDEUR TRANSFER FUNCTIONALITY")
+    print("TEST: DEMANDEUR TRANSFER DEBUG")
     print("="*60)
-    success &= test_demandeur_transfer_functionality()
+    success &= test_demandeur_transfer_debug()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
