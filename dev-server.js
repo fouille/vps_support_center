@@ -230,38 +230,6 @@ app.get('/api/demandeurs', verifyToken, (req, res) => {
   res.json(demandeurs);
 });
 
-app.post('/api/demandeurs', verifyToken, async (req, res) => {
-  const { nom, prenom, societe, telephone, email, password } = req.body;
-  
-  if (!nom || !prenom || !societe || !email || !password) {
-    return res.status(400).json({ detail: 'Tous les champs obligatoires doivent être remplis' });
-  }
-
-  // Check if email exists
-  const existingUser = [...mockDB.demandeurs, ...mockDB.agents].find(u => u.email === email);
-  if (existingUser) {
-    return res.status(400).json({ detail: 'Cet email est déjà utilisé' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const demandeur = {
-    id: uuidv4(),
-    nom,
-    prenom,
-    societe,
-    telephone,
-    email,
-    password: hashedPassword
-  };
-  
-  mockDB.demandeurs.push(demandeur);
-  
-  const { password: _, ...response } = demandeur;
-  response.type_utilisateur = 'demandeur';
-  
-  res.status(201).json(response);
-});
-
 // Agents endpoints
 app.get('/api/agents', verifyToken, (req, res) => {
   const agents = mockDB.agents.map(a => ({
