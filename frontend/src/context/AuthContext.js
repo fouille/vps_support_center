@@ -139,9 +139,7 @@ export const AuthProvider = ({ children }) => {
       // Vérifier immédiatement si le token est expiré
       if (isTokenExpired(token)) {
         console.log('Token expired on app load, clearing storage');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
+        handleTokenExpiration(false); // Pas de notification au chargement
       } else {
         try {
           const parsedUser = JSON.parse(userData);
@@ -160,10 +158,7 @@ export const AuthProvider = ({ children }) => {
       const currentToken = localStorage.getItem('token');
       if (currentToken && isTokenExpired(currentToken)) {
         console.log('Token expired during session, logging out');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        window.location.href = '/';
+        handleTokenExpiration();
       }
     }, 5 * 60 * 1000); // 5 minutes
     
