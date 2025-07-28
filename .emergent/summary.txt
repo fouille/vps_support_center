@@ -1,69 +1,125 @@
 <analysis>
-The previous AI engineer successfully evolved the support ticket application into a comprehensive platform, focusing heavily on a new Portabilités section. This involved adding client management, auto-generated ticket numbers, Mailjet integration, and mirroring ticket functionalities with dedicated SQL tables, Netlify functions (CRUD, comments, file uploads), and React components. The engineer systematically addressed numerous technical challenges, including  issues, navigation conflicts, JWT authentication inconsistencies, and data display problems in modals. Key UX improvements like step-by-step forms and modern comment styles were also implemented. Most recently, the work focused on resolving API data format inconsistencies, JWT payload issues, and a major structural correction regarding file attachments, transitioning from storing them directly in the main  table to using a dedicated  table, updating both backend APIs and frontend components accordingly. A significant addition was an automatic semantic versioning system, integrated with a visible footer.
+The previous AI engineer successfully transformed a basic support ticket application into a robust platform. Initially, a major Portabilités section was developed, incorporating comprehensive CRUD, comment systems, and file management, mirroring existing ticket functionalities. The engineer systematically resolved numerous technical challenges, including fixing , navigation, and critical JWT authentication inconsistencies. A significant effort was made to restructure file attachments, moving them from the main  table to a dedicated  table, requiring extensive backend and frontend adjustments.
+
+Subsequent work focused on enhancing UX, such as step-by-step forms and modern comment styles. Key fixes addressed API data format issues,  payload discrepancies (transitioning from  to ), and implementing non-blocking form validation for new entries. A robust automatic semantic versioning system was introduced, visible via a footer and integrated into the development workflow. Most recently, the engineer implemented an INSEE API integration for SIRET-based address auto-completion in the portability form and a comprehensive token expiration handling system, including client-side checks, API interceptors, and user notifications. The overall approach was iterative, addressing user feedback directly and documenting changes with versioning.
 </analysis>
 
 <product_requirements>
-The core application is a support ticket management system with CRUD for clients, requestors, and agents, a ticket supervision page, and an edit page with file uploads and text exchanges. It uses email/password authentication. Recent enhancements include agent ticket creation, advanced filtering, a messenger-style comment system, automatic status updates, inline agent status changes, automatic comments on file uploads, loader animations, auto-generated 6-digit ticket numbers, refined client management UX (pagination, debounced search, dark mode), and Mailjet integration for notifications.
+The application serves as a comprehensive support ticket management system, facilitating CRUD operations for clients, requestors, and agents, with a supervision page for tickets, and features like file uploads and text exchanges, all secured by email/password authentication. Recent enhancements improved agent workflows (ticket creation, filtering, messenger-style comments, status updates, auto-comments on file uploads, loader animations), added auto-generated 6-digit ticket numbers, refined client management UX (pagination, debounced search, dark mode), and integrated Mailjet for notifications.
 
-A new Portabilités section was explicitly requested to manage telecom portability requests, mirroring existing ticket functionalities. This includes supervision, creation, modification, and deletion (for agents), viewing and commenting (for requestors), and auto-generated 8-digit IDs. Required fields for creation are extensive, covering client, dates, numbers, address, and PDF upload. The supervision table needs to display key portability details and support filtering. Visual alerts for effective portability date and email notifications are also required. Further refinements included correcting Demandeur selection logic, implementing step-by-step form navigation, hiding/making optional the Date effective field in creation, resolving  errors for comment APIs due to JWT issues, converting portability details to a modal, and fixing empty modal data display. Recent requests focused on enhancing comment display (date/time, modern styling), adding an Annulation button for demandeurs, fixing automatic form validation at step 3, improving button positioning in modals, and critically, correcting the file attachment storage mechanism to use a dedicated table instead of embedded fields, requiring SQL and API/frontend adjustments. A semantic versioning system with a visible footer was also requested.
+A new Portabilités section was introduced to manage telecom portability requests. This module was designed to mirror ticket functionalities, including supervision, creation, modification, and deletion for agents, and viewing/commenting for requestors. Portability requests require auto-generated 8-digit IDs and extensive fields such as client details, dates, numbers, address, and PDF uploads. The supervision table must display key portability details and support filtering, with visual alerts for effective portability dates and email notifications. Later refinements included improved Demandeur selection, step-by-step form navigation, conditional visibility for Date effective, resolution of  errors for comment APIs, conversion of portability details to a modal, and fixing empty modal data. More recent critical updates focused on enhancing comment display (date/time, modern styling), adding an Annulation button for demandeurs, fixing automatic form validation at step 3, improving modal button positioning, and crucially, correcting the file attachment storage mechanism to use a dedicated table. A semantic versioning system with a visible footer was also explicitly requested. The latest additions include INSEE API integration for SIRET-based address auto-filling and robust JWT token expiration handling.
 </product_requirements>
 
 <key_technical_concepts>
--   **React JS**: Frontend development.
--   **Netlify Functions**: Serverless backend for API endpoints.
--   **Neon Database (@netlify/neon)**: PostgreSQL database for data persistence.
--   **JWT Authentication**: Secure user authentication.
--   **Tailwind CSS**: Utility-first CSS framework for styling.
--   ****: Email sending integration.
--   **UUID/SQL Triggers**: For auto-generating unique IDs.
--   **Semantic Versioning (Semver)**: Automated version management.
+- **React JS**: Frontend development.
+- **Netlify Functions**: Serverless backend for API endpoints.
+- **Neon Database (@netlify/neon)**: PostgreSQL database.
+- **JWT Authentication**: Secure user authentication.
+- **Tailwind CSS**: Utility-first CSS framework.
+- ****: Email sending.
+- **UUID/SQL Triggers**: Auto-generating unique IDs.
+- **Semantic Versioning (Semver)**: Automated version management.
+- **INSEE API Integration**: External API for SIRET data.
 </key_technical_concepts>
 
 <code_architecture>
 The application uses a React frontend and Netlify Functions backend, connected to a Neon PostgreSQL database.
 
 
--   ****: Main page for listing portabilities. Now imports and utilizes  to display details instead of navigating to a separate page.
--   ****: Form for creating/editing portabilities. Updated to manage  selection visibility and auto-prefill. Refactored for step-by-step UI and hides  during creation. **Crucially, it has been modified to remove references to  and  from its state and submission payload, now relying on the dedicated file upload API.**
--   ****: Component to display single portability details. Modified to correctly check  and rendered within . **References to old  and  have been removed.**
--   ****: *New file*. Encapsulates portability details, comments, and file uploads within a modal. Includes logic to parse API response (). **Significantly updated to include a button Annulation visible only to demandeurs to pre-fill a comment, implement the modern chat-style comments from tickets (including full date/time), and integrate a full-featured file attachment management system identical to that of tickets, with information on the left, comments on the right, and attachments below. Buttons in the modal header have been shifted left for better UX.**
--   ****: Main layout. Modified to integrate Portabilités into navigation and adapted for state-based navigation.
--   ****: Root React component. Reverted to state-based navigation. **A new  component has been integrated at the application level to display version information.**
--   ****: Exports  directly.
--   ****: Core ticket UI. **Modified to display full date and time for comments () to ensure consistency with portability comments.**
--   ****: *New file*. Centralized configuration for the application's semantic versioning, including current version and build date.
--   ****: *New file*. Renders the application's version and copyright information dynamically from .
--   ****: CRUD API for portabilities. Fixed authentication,  handling, and optional . **Modified to return a single object (not an array) for single ID queries. Crucially, it no longer handles  and  during creation or modification, relying on  for file uploads.**
--   ****: Backend API for portability comments. Corrected JWT secret, migrated DB client to , and adjusted query result access. **Fixed the issue where  was used instead of  or the correctly passed uid=0(root) gid=0(root) groups=0(root) from the JWT token for permission checks.**
--   ****: Backend API for portability file uploads. Corrected JWT secret, migrated DB client to . **Fixed multiple issues in the GET, POST, and DELETE methods: switched from  to , updated JWT field usage from  to , adjusted result access from  to direct array/object access, corrected DELETE method to retrieve  from  instead of the request body, and added SQL joins to retrieve  and  for display.**
--   ****: SQL script for portability-related tables. Confirmed  column is nullable.
--   ****: *New file*. SQL script generated to correct the database schema by dropping the  and  columns from the  table. (Execution is pending).
--   ****: *New file*. A Node.js script to programmatically increment the application's semantic version (major, minor, or patch) and update .
--   ****: *New file*. A Node.js script used by  to automatically update the  file with new version entries and descriptions.
--   ****: *New file*. A smart Node.js script that automatically determines the type of semver increment (major, minor, patch) based on keywords in a provided description and then calls .
--   ****: *New file*. A markdown file automatically updated by the versioning scripts to keep a history of all changes and corresponding versions.
--   ****: *New file*. Documentation explaining the newly implemented automatic versioning system.
--   ****: *Modified*. Updated to include new  for version management (e.g., , , , , , ).
+
+*   ****: Central to portability creation/editing.
+    *   **Importance**: Manages form state, user input, multi-step navigation, and data submission.
+    *   **Changes**: Refactored for step-by-step UI; removed direct handling of /. Modified to make multiple fields in step 2 (SIRET, Nom, Prénom, Adresse, Code postal, Ville) mandatory with visual  indicators. Implemented client-side validation logic to prevent progression between steps if required fields are empty, showing error messages and visual cues (red borders). Integrated INSEE API lookup for SIRET, auto-filling address details, with non-blocking error display.
+*   ****: Displays detailed portability info, comments, and file uploads.
+    *   **Importance**: Provides a comprehensive view and interaction point for a single portability request.
+    *   **Changes**: New file that replaced  for displaying details; integrated chat-style comments and file attachment management. Updated to include Annulation button for demandeurs. Removed client-side logic for automatic comments on file upload/delete, relying solely on backend. Corrected  transmission for file uploads from query parameter to request body. Modified button visibility for file deletion, allowing demandeurs to delete their own attachments.
+*   ****: (Legacy usage) Component to display single portability details.
+    *   **Importance**: Original component for portability details.
+    *   **Changes**: Functionality largely absorbed by ; references to old / removed.
+*   ****: Root React component.
+    *   **Importance**: Defines main application structure and routes.
+    *   **Changes**: Integrated a new  component for version display.
+*   ****: Manages user authentication state and JWT.
+    *   **Importance**: Provides global authentication context to the application.
+    *   **Changes**: Updated to include comprehensive JWT expiration handling, including an API response interceptor to detect 401s and 500s (), client-side decoding/validation, and a periodic check. Automatically logs out user, clears session, displays a  notification, and redirects to the login page upon expiration.
+*   ****: Reusable select input with search capability.
+    *   **Importance**: Used for selecting clients/demandeurs.
+    *   **Changes**: Modified to accept a  prop, which applies a red border style to visually indicate validation errors.
+*   ****: (New File) Displays application version and copyright.
+    *   **Importance**: Provides visible version information to users.
+    *   **Changes**: Dynamically renders version from .
+*   ****: (New File) Centralized application versioning info.
+    *   **Importance**: Source of truth for semantic version.
+    *   **Changes**: Updated automatically by versioning scripts.
+*   ****: (New File) Simple notification component.
+    *   **Importance**: Provides visual feedback for system events (e.g., session expired).
+*   ****: (New File) Manages display of Toast notifications.
+    *   **Importance**: Centralized logic for showing/hiding toasts.
+*   ****: CRUD API for portabilities.
+    *   **Importance**: Handles all backend operations for portability requests.
+    *   **Changes**: Fixed authentication,  handling, optional . Modified to return single object for ID queries. **Crucially, removed all handling of / during creation/modification**, relying on . Updated  checks to  for JWT compatibility.
+*   ****: Backend API for portability file uploads.
+    *   **Importance**: Manages file attachments for portability requests.
+    *   **Changes**: Fixed JWT secret, DB client migration. Corrected multiple issues in GET, POST, DELETE methods:  to ,  to , result access. Changed DELETE method to retrieve  from . Added SQL joins for /. Modified permission check to allow  to delete their own files. Ensures automatic comments are added on file upload/delete for all user types.
+*   ****: (New File) Proxy API for INSEE SIRET lookup.
+    *   **Importance**: Facilitates secure and authorized calls to the external INSEE API from the frontend.
+*   ****: Backend API for tickets.
+    *   **Importance**: Manages ticket data.
+    *   **Changes**: Updated  checks to  to restore agent access to tickets.
+*   ****: Authentication API.
+    *   **Importance**: Handles user login and JWT token generation.
+    *   **Changes**: Corrected the JWT payload to include  instead of .
+*   ****: Email testing API.
+    *   **Importance**: Utility for email functionality.
+    *   **Changes**: Updated  checks to .
+*   ****: Backend API for portability comments.
+    *   **Importance**: Manages comments on portability requests.
+    *   **Changes**: Corrected JWT secret, DB client, query result access. Fixed  vs  issues for permission checks. Updated  checks to .
+*   ****: Backend API for ticket comments.
+    *   **Importance**: Manages comments on ticket requests.
+    *   **Changes**: Updated  checks to .
+*   ****: (New File) Endpoint for database migration.
+    *   **Importance**: Allows for executing SQL migration scripts via an API call.
+*   ****: (New File) SQL script to correct database schema.
+    *   **Importance**: Designed to drop / from  table.
+*   **, , **: Existing versioning scripts.
+    *   **Importance**: Automate semantic versioning based on commit messages.
+*   ****: (New File) Helper script for versioning automation.
+    *   **Importance**: Simplifies the process of automatically incrementing versions.
+*   ****: (New File) Combines versioning and commit.
+    *   **Importance**: Provides a single entry point for developers to version and document changes.
+*   ****: Project dependencies and scripts.
+    *   **Importance**: Defines project metadata and build/management scripts.
+    *   **Changes**: Added new  for version management (e.g., , , , , , , ).
+*   ****: (New File) Automatically generated changelog.
+    *   **Importance**: Keeps a history of all changes and corresponding versions.
+*   ****: (New File) Documentation for the versioning system.
+    *   **Importance**: Explains how to use the automated versioning.
+*   ****, ****, ****, ****, ****, ****, ****: (New Files) Markdown documentation summarizing specific feature implementations and bug fixes.
+    *   **Importance**: Provides detailed technical and functional summaries of major development cycles.
+*   ****, ****, ****: (New Files) Utility scripts for testing specific API endpoints or functionalities.
+    *   **Importance**: Aid in isolated testing and validation of new features or bug fixes.
 </code_architecture>
 
 <pending_tasks>
--   Execute the  script on the Neon Database.
--   Execute the  script on the Neon Database.
--   Execute the  script on the Neon Database (optional).
--   User to verify the display of attached files in the portability detail modal after the recent code corrections.
+- Execute the  script on the Neon Database.
+- Execute the  script on the Neon Database.
+- Execute the  script on the Neon Database (optional).
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was addressing a critical structural inconsistency regarding file attachments in the Portabilités section. Previously, file metadata (name and content) was erroneously being stored directly within the main  table, while a separate  table was intended for file management. The  API for creating/modifying portabilities was still referencing these old fields, and the frontend components were also implicitly expecting or handling them in an inconsistent manner.
+Immediately before this summary, the AI engineer completed implementing a comprehensive system to manage JWT token expiration. This directly addressed the user's issue where the site would display pages but API requests would fail silently with  after 24 hours.
 
-The AI engineer has completed the code modifications to resolve this:
-1.  **SQL Structure Correction (Script Generated):** A new SQL script, , has been created. This script is designed to remove the  and  columns from the  table, thus ensuring files are exclusively managed via the  table. This script, however, awaits user execution.
-2.  **Backend API () Update:** The  Netlify function has been modified to eliminate any handling or references to  and  during portability creation (POST) and modification (PUT) operations. This change ensures that file uploads are now solely processed through the dedicated  endpoint.
-3.  **Frontend Component Updates:** The related frontend components,  and , have been updated to remove references to the deprecated  and  fields from their internal state and data handling logic. This ensures the frontend accurately reflects the new data model where file attachments are managed separately.
+The implemented solution involves:
+1.  **Backend API ( in frontend):** A global API response interceptor was modified to explicitly catch both  errors and  responses that contain the  detail. Upon detection, it triggers a logout process.
+2.  **Client-Side Token Validation ():** A utility function was added to decode the JWT token and verify its expiration time. This check is performed before API requests and also periodically (every 5 minutes) to proactively detect expired tokens even if the user remains idle on the site.
+3.  **User Notification (, , ):** New  and  components were created. When a token is detected as expired (either via API response or client-side check), a clear Session expirée notification is displayed to the user for 3 seconds.
+4.  **Automatic Redirection ():** After the notification, the user is automatically redirected to the login page to re-authenticate, ensuring a seamless user experience instead of silent failures.
+5.  **Documentation and Testing Script:** A  file was created to document this new functionality, and a  script was provided to simulate token expiration for testing purposes.
 
-The AI engineer has made all necessary code corrections related to this file inconsistency. The user's last instruction was to continue, implying the expectation that these code changes are now complete and ready for verification by the user.
+This work ensures that the application robustly handles token expiration, providing clear feedback to the user and guiding them to re-authenticate. The user's last feedback (Parfait cela fonctionne.) indicates satisfaction with the implemented solution for JWT expiration, concluding this specific task.
 </current_work>
 
 <optional_next_step>
-Inform the user that the code corrections for the file upload inconsistency (SQL script generated, API and frontend adjustments) are complete, and prompt them to execute the SQL script and verify the attachment display.
+The previous task (JWT token expiration handling) has been completed and confirmed by the user. I am now ready for new tasks or further instructions.
 </optional_next_step>
