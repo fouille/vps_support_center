@@ -32,6 +32,20 @@
   }
 }
 
+/* Modal responsive */
+.modal-overlay {
+  padding: 1rem;
+}
+
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.max-h-90vh {
+  max-height: 90vh;
+}
+
 /* Styles personnalisés pour les composants */
 .fade-in {
   animation: fadeIn 0.3s ease-in-out;
