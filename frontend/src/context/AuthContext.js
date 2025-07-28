@@ -50,11 +50,21 @@ export const AuthProvider = ({ children }) => {
     baseURL: API_BASE_URL
   });
 
-  // Add request interceptor to ensure token is always sent
+  // Add request interceptor to ensure token is always sent and check expiration
   api.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem('token');
       if (token) {
+        // Vérifier si le token est expiré côté client
+        if (isTokenExpired(token)) {
+          console.log('Token expired on client side, logging out');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+          window.location.href = '/';
+          return Promise.reject(new Error('Token expired'));
+        }
+        
         config.headers.Authorization = `Bearer ${token}`;
       }
       return config;
