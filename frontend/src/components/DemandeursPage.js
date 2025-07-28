@@ -172,13 +172,64 @@ const DemandeursPage = () => {
   };
 
   const handleDelete = async (demandeurId) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce demandeur ?')) {
-      try {
-        await api.delete(`/api/demandeurs/${demandeurId}`);
+    try {
+      // First attempt - check if transfer is needed
+      const response = await api.delete(`/api/demandeurs/${demandeurId}`);
+      
+      // If deletion was successful without transfer
+      if (response.data.transferred === false) {
         fetchDemandeurs();
-      } catch (error) {
+        return;
+      }
+    } catch (error) {
+      if (error.response?.status === 409) {
+        // Transfer is required
+        const transferInfo = error.response.data;
+        setDeletingDemandeur(demandeurId);
+        setTransferData(transferInfo);
+        setSelectedTransferTarget('');
+        setShowTransferModal(true);
+      } else {
         setError(error.response?.data?.detail || 'Erreur lors de la suppression');
       }
+    }
+  };
+
+  const handleTransferAndDelete = async () => {
+    if (!selectedTransferTarget || !deletingDemandeur) return;
+
+    setTransferLoading(true);
+    try {
+      await api.delete(`/api/demandeurs/${deletingDemandeur}`, {
+        data: { transferTo: selectedTransferTarget }
+      });
+      
+      setShowTransferModal(false);
+      setDeletingDemandeur(null);
+      setTransferData(null);
+      setSelectedTransferTarget('');
+      fetchDemandeurs();
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors du transfert et suppression');
+    } finally {
+      setTransferLoading(false);
+    }
+  };
+
+  const handleForceDelete = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce demandeur sans transférer ses données ? Tous ses tickets et portabilités seront perdus définitivement.')) {
+      return;
+    }
+
+    setTransferLoading(true);
+    try {
+      // This would require backend modification to force delete
+      // For now, we don't allow force delete
+      setError('La suppression sans transfert n\'est pas autorisée quand des données sont liées.');
+    } catch (error) {
+      setError(error.response?.data?.detail || 'Erreur lors de la suppression forcée');
+    } finally {
+      setTransferLoading(false);
     }
   };
 
