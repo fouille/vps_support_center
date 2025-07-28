@@ -88,12 +88,10 @@ const getMockData = (userType) => {
 };
 
 exports.handler = async (event, context) => {
+  console.log('Dashboard function called:', event.httpMethod, event.path);
+  
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers,
-      body: ''
-    };
+    return { statusCode: 200, headers };
   }
 
   if (event.httpMethod !== 'GET') {
@@ -105,31 +103,14 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Vérification du token JWT
-    const authHeader = event.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ detail: 'Token d\'authentification manquant' })
-      };
-    }
-
-    const token = authHeader.split(' ')[1];
-    let decoded;
-    
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ detail: 'Token invalide' })
-      };
-    }
+    // Verify authentication - same pattern as other APIs
+    const authHeader = event.headers.authorization || event.headers.Authorization;
+    const decoded = verifyToken(authHeader);
 
     const userType = decoded.type_utilisateur || decoded.type;
     const userId = decoded.id;
+
+    console.log('Dashboard request from user:', userId, 'type:', userType);
 
     // Try to connect to database, fallback to mock data if fails
     try {
