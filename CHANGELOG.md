@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.19.4] - 2025-07-30
+### Fixed
+- 🔧 Modernisation gestion clients: affectation sociétés demandeurs, filtrage par société, correction pagination, champ société dans formulaires
+
 ## [1.19.3] - 2025-07-30
 ### Fixed
 - 🔧 Amélioration avancement productions: calcul côté serveur pour affichage immédiat sans expansion
