@@ -6666,16 +6666,16 @@ def test_productions_api_fixes():
     print("\n📋 STEP 6: Comment API Error Fix - POST /api/production-tache-commentaires")
     
     # First, try to get a task ID from the production
-    task_id = None
-    try:
-        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=headers, timeout=10)
-        if response.status_code == 200:
-            production = response.json()
-            if 'taches' in production and len(production['taches']) > 0:
-                task_id = production['taches'][0]['id']
-                print(f"   Using task ID: {task_id}")
-    except:
-        pass
+    if not task_id:
+        try:
+            response = requests.get(f"{API_BASE}/productions/{production_id}", headers=headers, timeout=10)
+            if response.status_code == 200:
+                production = response.json()
+                if 'taches' in production and len(production['taches']) > 0:
+                    task_id = production['taches'][0]['id']
+                    print(f"   Using task ID from production: {task_id}")
+        except:
+            pass
     
     if task_id:
         # Test comment creation to verify the "column ds.nom does not exist" error is fixed
@@ -6734,8 +6734,8 @@ def test_productions_api_fixes():
     else:
         results.add_result("POST - Comment creation (ds.nom fix)", False, "No task ID available for testing")
     
-    # Step 4: Test GET /api/production-tache-commentaires - Verify comments retrieval
-    print("\n📋 STEP 4: Comment Retrieval - GET /api/production-tache-commentaires")
+    # Step 7: Test GET /api/production-tache-commentaires - Verify comments retrieval
+    print("\n📋 STEP 7: Comment Retrieval - GET /api/production-tache-commentaires")
     
     if task_id:
         try:
