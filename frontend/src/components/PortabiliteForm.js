@@ -333,6 +333,14 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
         if (!formData.date_portabilite_demandee) {
           errors.push('La date de portabilité demandée est obligatoire');
           fieldErrors.date_portabilite_demandee = true;
+        } else {
+          // Vérifier que la date respecte les +11 jours ouvrés
+          const selectedDate = new Date(formData.date_portabilite_demandee);
+          const minDate = new Date(getMinPortabilityDate());
+          if (selectedDate < minDate) {
+            errors.push('La date de portabilité doit être au minimum 11 jours ouvrés après aujourd\'hui');
+            fieldErrors.date_portabilite_demandee = true;
+          }
         }
         break;
     }
