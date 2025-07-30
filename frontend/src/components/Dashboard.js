@@ -202,6 +202,60 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Cartes de statistiques Productions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Productions Non Terminées */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <Clock className="h-8 w-8 text-blue-500" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                Productions Non Terminées
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+                {stats.productions?.non_termine || 0}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Productions Terminées */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <CheckCircle className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                Productions Terminées
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+                {stats.productions?.termine || 0}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Productions Bloquées */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-8 w-8 text-orange-500" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                Productions Bloquées
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+                {stats.productions?.bloque || 0}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Graphiques principaux */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Répartition des Tickets */}
