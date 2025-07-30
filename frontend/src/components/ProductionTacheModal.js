@@ -123,7 +123,10 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
             contenu_base64: base64Content
           });
           
-          setFichiers([...fichiers, response]);
+          // S'assurer que fichiers est un tableau et ajouter le nouveau fichier
+          const currentFichiers = Array.isArray(fichiers) ? fichiers : [];
+          const newFile = response.data || response;
+          setFichiers([...currentFichiers, newFile]);
           fetchCommentaires(); // Rafraîchir pour voir le commentaire auto
           alert('Fichier uploadé avec succès');
         } catch (error) {
