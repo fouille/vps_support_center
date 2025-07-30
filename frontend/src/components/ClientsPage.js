@@ -36,7 +36,10 @@ const ClientsPage = () => {
 
   useEffect(() => {
     fetchClients();
-  }, [currentPage, searchTerm]);
+    if (user?.type_utilisateur === 'agent') {
+      fetchSocietes();
+    }
+  }, [currentPage, searchTerm, selectedSociete]);
 
   // Debounce pour la recherche - se déclenche 1 seconde après l'arrêt de la saisie
   useEffect(() => {
