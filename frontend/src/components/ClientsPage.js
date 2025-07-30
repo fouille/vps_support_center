@@ -69,13 +69,6 @@ const ClientsPage = () => {
     };
   }, [searchInput]); // Supprimer currentPage et searchTerm des dépendances
 
-  useEffect(() => {
-    // Reset to page 1 when search term changes
-    if (currentPage !== 1 && searchTerm) {
-      setCurrentPage(1);
-    }
-  }, [searchTerm]);
-
   // Fonctions de récupération des données
   const fetchSocietes = async () => {
     try {
