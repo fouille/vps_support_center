@@ -155,6 +155,16 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
     return date.toDateString() === today.toDateString();
   };
 
+  // Fonction pour vérifier si la date est dépassée (alerte rouge)
+  const isPastDue = (dateString) => {
+    if (!dateString) return false;
+    const today = new Date();
+    const date = new Date(dateString);
+    today.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour comparer seulement les dates
+    date.setHours(0, 0, 0, 0);
+    return date < today;
+  };
+
   // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
     setSelectedPortabiliteId(portabiliteId);
