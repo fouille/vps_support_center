@@ -51,6 +51,11 @@ const ProductionsPage = () => {
     }
   }, []);
 
+  // Actualiser automatiquement lors du changement de filtres
+  useEffect(() => {
+    fetchProductions();
+  }, [statusFilter, clientFilter, searchFilter]);
+
   const fetchProductions = async (showRefreshingIndicator = false) => {
     if (showRefreshingIndicator) setRefreshingProductions(true);
     else setLoading(true);
