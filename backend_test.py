@@ -5878,18 +5878,626 @@ def test_demandeur_transfer_functionality():
     
     return results.summary()
 
-if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Demandeur Transfer Functionality")
+def test_productions_api():
+    """Test complet des nouvelles API Productions"""
+    results = TestResults()
+    
+    print("🚀 Starting Productions API Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
     print("="*60)
     
-    # Run demandeur transfer functionality test as requested in review
+    # Step 1: Authenticate users
+    print("\n📋 STEP 1: Authentication Tests")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    demandeur_token, demandeur_info = authenticate_user(DEMANDEUR_CREDENTIALS, "Demandeur")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    if not demandeur_token:
+        results.add_result("Demandeur Authentication", False, "Failed to authenticate demandeur")
+        # Continue with agent tests only
+    else:
+        results.add_result("Demandeur Authentication", True)
+    
+    agent_headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    demandeur_headers = {
+        "Authorization": f"Bearer {demandeur_token}",
+        "Content-Type": "application/json"
+    } if demandeur_token else None
+    
+    # Step 2: Get test data (clients and demandeurs)
+    print("\n📋 STEP 2: Get Test Data")
+    
+    # Get a client for production creation
+    try:
+        response = requests.get(f"{API_BASE}/clients", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            clients_data = response.json()
+            if 'data' in clients_data and len(clients_data['data']) > 0:
+                test_client_id = clients_data['data'][0]['id']
+                results.add_result("Get Test Client", True)
+            else:
+                # Try direct array response format
+                if isinstance(clients_data, list) and len(clients_data) > 0:
+                    test_client_id = clients_data[0]['id']
+                    results.add_result("Get Test Client", True)
+                else:
+                    results.add_result("Get Test Client", False, "No clients found")
+                    return results.summary()
+        else:
+            results.add_result("Get Test Client", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Client", False, str(e))
+        return results.summary()
+    
+    # Get a demandeur for production creation
+    try:
+        response = requests.get(f"{API_BASE}/demandeurs", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            demandeurs = response.json()
+            if len(demandeurs) > 0:
+                test_demandeur_id = demandeurs[0]['id']
+                results.add_result("Get Test Demandeur", True)
+            else:
+                results.add_result("Get Test Demandeur", False, "No demandeurs found")
+                return results.summary()
+        else:
+            results.add_result("Get Test Demandeur", False, f"Status: {response.status_code}")
+            return results.summary()
+    except Exception as e:
+        results.add_result("Get Test Demandeur", False, str(e))
+        return results.summary()
+    
+    # Step 3: Test GET /api/productions - Liste des productions
+    print("\n📋 STEP 3: GET /api/productions - Liste des productions")
+    
+    # Test with agent
+    try:
+        response = requests.get(f"{API_BASE}/productions", headers=agent_headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            results.add_result("GET - Productions list (agent)", True)
+            
+            # Validate response structure
+            if 'data' in data and 'pagination' in data:
+                results.add_result("GET - Response structure", True)
+                print(f"   Found {len(data['data'])} productions")
+            else:
+                results.add_result("GET - Response structure", False, "Missing 'data' or 'pagination' fields")
+        elif response.status_code == 404:
+            results.add_result("GET - Productions list (agent)", False, "404 - Database tables likely don't exist")
+            print("   ❌ Database tables (productions, production_taches) appear to be missing")
+            return results.summary()
+        else:
+            results.add_result("GET - Productions list (agent)", False, f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("GET - Productions list (agent)", False, str(e))
+    
+    # Test pagination
+    try:
+        response = requests.get(f"{API_BASE}/productions?page=1&limit=5", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data['pagination']['page'] == 1 and data['pagination']['limit'] == 5:
+                results.add_result("GET - Pagination parameters", True)
+            else:
+                results.add_result("GET - Pagination parameters", False, "Pagination values incorrect")
+        else:
+            results.add_result("GET - Pagination parameters", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Pagination parameters", False, str(e))
+    
+    # Test filters
+    try:
+        response = requests.get(f"{API_BASE}/productions?status=en_cours", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            results.add_result("GET - Status filter", True)
+        else:
+            results.add_result("GET - Status filter", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Status filter", False, str(e))
+    
+    # Test search by numero
+    try:
+        response = requests.get(f"{API_BASE}/productions?search=12345", headers=agent_headers, timeout=10)
+        if response.status_code == 200:
+            results.add_result("GET - Search by numero", True)
+        else:
+            results.add_result("GET - Search by numero", False, f"Status: {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Search by numero", False, str(e))
+    
+    # Test with demandeur (permissions)
+    if demandeur_headers:
+        try:
+            response = requests.get(f"{API_BASE}/productions", headers=demandeur_headers, timeout=10)
+            if response.status_code in [200, 403]:  # 403 acceptable if no access
+                results.add_result("GET - Demandeur permissions", True)
+            else:
+                results.add_result("GET - Demandeur permissions", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("GET - Demandeur permissions", False, str(e))
+    
+    # Step 4: Test POST /api/productions - Création production
+    print("\n📋 STEP 4: POST /api/productions - Création production")
+    
+    created_productions = []
+    
+    # Test with agent (must specify demandeur_id + client_id)
+    production_data = {
+        "client_id": test_client_id,
+        "demandeur_id": test_demandeur_id,
+        "titre": "Test Production Agent",
+        "description": "Production créée par agent pour test",
+        "priorite": "normale",
+        "date_livraison_prevue": "2025-02-15"
+    }
+    
+    try:
+        response = requests.post(f"{API_BASE}/productions", headers=agent_headers, 
+                               json=production_data, timeout=10)
+        
+        if response.status_code == 201:
+            production = response.json()
+            created_productions.append(production)
+            results.add_result("POST - Agent create production", True)
+            
+            # Verify numero_production is generated (8 digits)
+            if 'numero_production' in production and len(production['numero_production']) == 8:
+                results.add_result("POST - Auto-generation numero_production", True)
+            else:
+                results.add_result("POST - Auto-generation numero_production", False, 
+                                 f"Expected 8-digit numero, got: {production.get('numero_production')}")
+        else:
+            results.add_result("POST - Agent create production", False, 
+                             f"Status: {response.status_code}, Body: {response.text}")
+    except Exception as e:
+        results.add_result("POST - Agent create production", False, str(e))
+    
+    # Test with demandeur (demandeur_id auto, société auto)
+    if demandeur_headers:
+        demandeur_production_data = {
+            "client_id": test_client_id,
+            "titre": "Test Production Demandeur",
+            "description": "Production créée par demandeur pour test"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/productions", headers=demandeur_headers, 
+                                   json=demandeur_production_data, timeout=10)
+            
+            if response.status_code == 201:
+                production = response.json()
+                created_productions.append(production)
+                results.add_result("POST - Demandeur create production", True)
+            else:
+                results.add_result("POST - Demandeur create production", False, 
+                                 f"Status: {response.status_code}, Body: {response.text}")
+        except Exception as e:
+            results.add_result("POST - Demandeur create production", False, str(e))
+    
+    # Test validation - missing required fields
+    try:
+        response = requests.post(f"{API_BASE}/productions", headers=agent_headers, 
+                               json={"titre": "Test sans client"}, timeout=10)
+        
+        if response.status_code == 400:
+            results.add_result("POST - Validation required fields", True)
+        else:
+            results.add_result("POST - Validation required fields", False, 
+                             f"Expected 400, got {response.status_code}")
+    except Exception as e:
+        results.add_result("POST - Validation required fields", False, str(e))
+    
+    # Step 5: Test GET /api/productions/{id} - Détail production
+    print("\n📋 STEP 5: GET /api/productions/{id} - Détail production")
+    
+    if created_productions:
+        test_production = created_productions[0]
+        production_id = test_production['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/productions/{production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                production = response.json()
+                results.add_result("GET - Production detail", True)
+                
+                # Verify taches are included
+                if 'taches' in production:
+                    if len(production['taches']) == 12:
+                        results.add_result("GET - Auto-created 12 taches", True)
+                    else:
+                        results.add_result("GET - Auto-created 12 taches", False, 
+                                         f"Expected 12 taches, got {len(production['taches'])}")
+                else:
+                    results.add_result("GET - Taches included", False, "No taches in response")
+            else:
+                results.add_result("GET - Production detail", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("GET - Production detail", False, str(e))
+        
+        # Test permissions with demandeur
+        if demandeur_headers:
+            try:
+                response = requests.get(f"{API_BASE}/productions/{production_id}", 
+                                      headers=demandeur_headers, timeout=10)
+                
+                if response.status_code in [200, 403]:  # 403 acceptable if no access
+                    results.add_result("GET - Detail demandeur permissions", True)
+                else:
+                    results.add_result("GET - Detail demandeur permissions", False, 
+                                     f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result("GET - Detail demandeur permissions", False, str(e))
+    
+    # Step 6: Test PUT /api/productions/{id} - Modification production
+    print("\n📋 STEP 6: PUT /api/productions/{id} - Modification production")
+    
+    if created_productions:
+        production_id = created_productions[0]['id']
+        update_data = {
+            "titre": "Production Modifiée",
+            "status": "en_cours",
+            "priorite": "haute"
+        }
+        
+        try:
+            response = requests.put(f"{API_BASE}/productions/{production_id}", 
+                                  headers=agent_headers, json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                updated_production = response.json()
+                results.add_result("PUT - Update production", True)
+                
+                # Verify status change
+                if updated_production.get('status') == 'en_cours':
+                    results.add_result("PUT - Status change", True)
+                else:
+                    results.add_result("PUT - Status change", False, 
+                                     f"Expected 'en_cours', got {updated_production.get('status')}")
+            else:
+                results.add_result("PUT - Update production", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("PUT - Update production", False, str(e))
+    
+    # Step 7: Test GET /api/production-taches - Tâches par production
+    print("\n📋 STEP 7: GET /api/production-taches - Tâches par production")
+    
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                results.add_result("GET - Production taches", True)
+                
+                # Verify 12 taches
+                if len(taches) == 12:
+                    results.add_result("GET - 12 taches created", True)
+                    
+                    # Verify tache structure
+                    if taches[0].get('nom_tache') and taches[0].get('ordre_tache'):
+                        results.add_result("GET - Tache structure", True)
+                    else:
+                        results.add_result("GET - Tache structure", False, "Missing required fields")
+                else:
+                    results.add_result("GET - 12 taches created", False, f"Expected 12, got {len(taches)}")
+            else:
+                results.add_result("GET - Production taches", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("GET - Production taches", False, str(e))
+    
+    # Step 8: Test PUT /api/production-taches/{id} - Modification tâche
+    print("\n📋 STEP 8: PUT /api/production-taches/{id} - Modification tâche")
+    
+    # First get a tache ID
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                if len(taches) > 0:
+                    tache_id = taches[0]['id']
+                    
+                    # Update tache
+                    tache_update = {
+                        "status": "en_cours",
+                        "descriptif": "Tâche mise à jour pour test",
+                        "date_livraison": "2025-02-10"
+                    }
+                    
+                    try:
+                        response = requests.put(f"{API_BASE}/production-taches/{tache_id}", 
+                                              headers=agent_headers, json=tache_update, timeout=10)
+                        
+                        if response.status_code == 200:
+                            results.add_result("PUT - Update tache", True)
+                        else:
+                            results.add_result("PUT - Update tache", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        results.add_result("PUT - Update tache", False, str(e))
+        except Exception as e:
+            results.add_result("PUT - Update tache setup", False, str(e))
+    
+    # Step 9: Test GET /api/production-tache-commentaires - Commentaires tâche
+    print("\n📋 STEP 9: GET /api/production-tache-commentaires - Commentaires tâche")
+    
+    # Get a tache ID first
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                if len(taches) > 0:
+                    tache_id = taches[0]['id']
+                    
+                    # Get comments for this tache
+                    try:
+                        response = requests.get(f"{API_BASE}/production-tache-commentaires?production_tache_id={tache_id}", 
+                                              headers=agent_headers, timeout=10)
+                        
+                        if response.status_code == 200:
+                            commentaires = response.json()
+                            results.add_result("GET - Tache commentaires", True)
+                            print(f"   Found {len(commentaires)} commentaires")
+                        else:
+                            results.add_result("GET - Tache commentaires", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        results.add_result("GET - Tache commentaires", False, str(e))
+        except Exception as e:
+            results.add_result("GET - Tache commentaires setup", False, str(e))
+    
+    # Step 10: Test POST /api/production-tache-commentaires - Ajout commentaire
+    print("\n📋 STEP 10: POST /api/production-tache-commentaires - Ajout commentaire")
+    
+    # Get a tache ID first
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                if len(taches) > 0:
+                    tache_id = taches[0]['id']
+                    
+                    # Create comment
+                    comment_data = {
+                        "production_tache_id": tache_id,
+                        "contenu": f"Commentaire de test - {datetime.now().isoformat()}",
+                        "type_commentaire": "commentaire"
+                    }
+                    
+                    try:
+                        response = requests.post(f"{API_BASE}/production-tache-commentaires", 
+                                               headers=agent_headers, json=comment_data, timeout=10)
+                        
+                        if response.status_code == 201:
+                            commentaire = response.json()
+                            results.add_result("POST - Create tache comment", True)
+                            
+                            # Verify structure
+                            if commentaire.get('contenu') and commentaire.get('auteur_nom'):
+                                results.add_result("POST - Comment structure", True)
+                            else:
+                                results.add_result("POST - Comment structure", False, "Missing required fields")
+                        else:
+                            results.add_result("POST - Create tache comment", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        results.add_result("POST - Create tache comment", False, str(e))
+        except Exception as e:
+            results.add_result("POST - Create tache comment setup", False, str(e))
+    
+    # Step 11: Test GET /api/production-tache-fichiers - Gestion fichiers
+    print("\n📋 STEP 11: GET /api/production-tache-fichiers - Gestion fichiers")
+    
+    # Get a tache ID first
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                if len(taches) > 0:
+                    tache_id = taches[0]['id']
+                    
+                    # Get files for this tache
+                    try:
+                        response = requests.get(f"{API_BASE}/production-tache-fichiers?production_tache_id={tache_id}", 
+                                              headers=agent_headers, timeout=10)
+                        
+                        if response.status_code == 200:
+                            fichiers = response.json()
+                            results.add_result("GET - Tache fichiers", True)
+                            print(f"   Found {len(fichiers)} fichiers")
+                        else:
+                            results.add_result("GET - Tache fichiers", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        results.add_result("GET - Tache fichiers", False, str(e))
+        except Exception as e:
+            results.add_result("GET - Tache fichiers setup", False, str(e))
+    
+    # Step 12: Test POST /api/production-tache-fichiers - Upload fichier
+    print("\n📋 STEP 12: POST /api/production-tache-fichiers - Upload fichier")
+    
+    # Get a tache ID first
+    uploaded_file_id = None
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.get(f"{API_BASE}/production-taches?production_id={production_id}", 
+                                  headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                taches = response.json()
+                if len(taches) > 0:
+                    tache_id = taches[0]['id']
+                    
+                    # Upload file
+                    file_data = {
+                        "production_tache_id": tache_id,
+                        "nom_fichier": "test_document.txt",
+                        "type_fichier": "text/plain",
+                        "contenu_base64": "VGVzdCBkb2N1bWVudCBjb250ZW50"  # "Test document content" in base64
+                    }
+                    
+                    try:
+                        response = requests.post(f"{API_BASE}/production-tache-fichiers", 
+                                               headers=agent_headers, json=file_data, timeout=10)
+                        
+                        if response.status_code == 201:
+                            fichier = response.json()
+                            results.add_result("POST - Upload fichier", True)
+                            
+                            # Store file ID for deletion test
+                            uploaded_file_id = fichier.get('id')
+                            
+                            # Verify structure
+                            if fichier.get('nom_fichier') and fichier.get('taille_fichier'):
+                                results.add_result("POST - File structure", True)
+                            else:
+                                results.add_result("POST - File structure", False, "Missing required fields")
+                        else:
+                            results.add_result("POST - Upload fichier", False, f"Status: {response.status_code}")
+                    except Exception as e:
+                        results.add_result("POST - Upload fichier", False, str(e))
+        except Exception as e:
+            results.add_result("POST - Upload fichier setup", False, str(e))
+    
+    # Step 13: Test DELETE /api/production-tache-fichiers - Suppression fichier
+    print("\n📋 STEP 13: DELETE /api/production-tache-fichiers - Suppression fichier")
+    
+    if uploaded_file_id:
+        try:
+            response = requests.delete(f"{API_BASE}/production-tache-fichiers/{uploaded_file_id}", 
+                                     headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                results.add_result("DELETE - Fichier suppression", True)
+            else:
+                results.add_result("DELETE - Fichier suppression", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Fichier suppression", False, str(e))
+    
+    # Step 14: Test DELETE /api/productions/{id} - Suppression (agents only)
+    print("\n📋 STEP 14: DELETE /api/productions/{id} - Suppression (agents only)")
+    
+    # Test with demandeur (should be 403)
+    if demandeur_headers and created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.delete(f"{API_BASE}/productions/{production_id}", 
+                                     headers=demandeur_headers, timeout=10)
+            
+            if response.status_code == 403:
+                results.add_result("DELETE - Demandeur forbidden", True)
+            else:
+                results.add_result("DELETE - Demandeur forbidden", False, 
+                                 f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Demandeur forbidden", False, str(e))
+    
+    # Test with agent (should work)
+    if created_productions:
+        production_id = created_productions[0]['id']
+        
+        try:
+            response = requests.delete(f"{API_BASE}/productions/{production_id}", 
+                                     headers=agent_headers, timeout=10)
+            
+            if response.status_code == 200:
+                results.add_result("DELETE - Agent allowed", True)
+            else:
+                results.add_result("DELETE - Agent allowed", False, f"Status: {response.status_code}")
+        except Exception as e:
+            results.add_result("DELETE - Agent allowed", False, str(e))
+    
+    # Step 15: Test authentication on all endpoints
+    print("\n📋 STEP 15: Authentication Validation")
+    
+    # Test without token
+    try:
+        response = requests.get(f"{API_BASE}/productions", timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("AUTH - No token", True)
+        else:
+            results.add_result("AUTH - No token", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("AUTH - No token", False, str(e))
+    
+    # Test with invalid token
+    try:
+        invalid_headers = {"Authorization": "Bearer invalid_token"}
+        response = requests.get(f"{API_BASE}/productions", headers=invalid_headers, timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("AUTH - Invalid token", True)
+        else:
+            results.add_result("AUTH - Invalid token", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("AUTH - Invalid token", False, str(e))
+    
+    # Cleanup remaining productions
+    print("\n📋 CLEANUP: Delete remaining test productions")
+    for i, production in enumerate(created_productions[1:], 2):  # Skip first one already deleted
+        if 'id' in production:
+            try:
+                response = requests.delete(f"{API_BASE}/productions/{production['id']}", 
+                                         headers=agent_headers, timeout=10)
+                if response.status_code == 200:
+                    results.add_result(f"CLEANUP - Delete production {i}", True)
+                else:
+                    results.add_result(f"CLEANUP - Delete production {i}", False, 
+                                     f"Status: {response.status_code}")
+            except Exception as e:
+                results.add_result(f"CLEANUP - Delete production {i}", False, str(e))
+    
+    return results.summary()
+
+if __name__ == "__main__":
+    print("🚀 Starting Backend API Tests - Productions API")
+    print("="*60)
+    
+    # Run Productions API test as requested in review
     success = True
     
-    # Test: Demandeur Transfer Functionality (PRIORITY TEST)
+    # Test: Productions API Functionality (PRIORITY TEST)
     print("\n" + "="*60)
-    print("TEST: DEMANDEUR TRANSFER FUNCTIONALITY")
+    print("TEST: PRODUCTIONS API FUNCTIONALITY")
     print("="*60)
-    success &= test_demandeur_transfer_functionality()
+    success &= test_productions_api()
     
     print("\n" + "="*60)
     print("FINAL RESULT")
