@@ -168,7 +168,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Client</span>
-                <p className="font-semibold text-gray-900 dark:text-dark-text">{production.client_display}</p>
+                <p className="font-semibold text-gray-900 dark:text-dark-text">{production.client_display || production.nom_societe || 'Client non défini'}</p>
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Demandeur</span>
