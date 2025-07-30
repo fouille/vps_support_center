@@ -125,7 +125,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         {/* En-tête */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-lg">
           <div className="flex items-center justify-between">
@@ -147,18 +147,18 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
         {/* Corps du modal */}
         <div className="p-6">
           {/* Informations générales */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <span className="text-sm font-medium text-gray-600">Client</span>
-                <p className="font-semibold text-gray-900">{production.client_display}</p>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Client</span>
+                <p className="font-semibold text-gray-900 dark:text-dark-text">{production.client_display}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-600">Demandeur</span>
-                <p className="font-semibold text-gray-900">{production.demandeur_prenom} {production.demandeur_nom}</p>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Demandeur</span>
+                <p className="font-semibold text-gray-900 dark:text-dark-text">{production.demandeur_prenom} {production.demandeur_nom}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-600">Statut</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Statut</span>
                 <div className="mt-1">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(production.status)}`}>
                     {getStatusLabel(production.status)}
@@ -166,7 +166,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
                 </div>
               </div>
               <div>
-                <span className="text-sm font-medium text-gray-600">Priorité</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Priorité</span>
                 <div className="mt-1">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPrioriteBadgeClass(production.priorite)}`}>
                     {getPrioriteLabel(production.priorite)}
@@ -175,10 +175,10 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
               <div>
-                <span className="text-sm font-medium text-gray-600">Date de création</span>
-                <p className="font-semibold text-gray-900">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Date de création</span>
+                <p className="font-semibold text-gray-900 dark:text-dark-text">
                   {new Date(production.date_creation).toLocaleDateString('fr-FR', {
                     year: 'numeric',
                     month: 'long',
@@ -190,8 +190,8 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
               </div>
               {production.date_livraison_prevue && (
                 <div>
-                  <span className="text-sm font-medium text-gray-600">Livraison prévue</span>
-                  <p className="font-semibold text-gray-900">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Livraison prévue</span>
+                  <p className="font-semibold text-gray-900 dark:text-dark-text">
                     {new Date(production.date_livraison_prevue).toLocaleDateString('fr-FR')}
                   </p>
                 </div>
@@ -199,9 +199,9 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
             </div>
 
             {production.description && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <span className="text-sm font-medium text-gray-600">Description</span>
-                <p className="text-gray-900 mt-1">{production.description}</p>
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Description</span>
+                <p className="text-gray-900 dark:text-dark-text mt-1">{production.description}</p>
               </div>
             )}
           </div>
@@ -209,10 +209,10 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
           {/* Barre de progression */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-900">📊 Avancement des tâches</h3>
-              <span className="text-sm font-medium text-gray-600">{calculateProgress()}% terminé</span>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">📊 Avancement des tâches</h3>
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{calculateProgress()}% terminé</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
               <div
                 className="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${calculateProgress()}%` }}
@@ -222,32 +222,32 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
 
           {/* Liste des tâches */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">📋 Tâches de production</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-4">📋 Tâches de production</h3>
             
             {loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-                <p className="text-gray-600 mt-2">Chargement des tâches...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">Chargement des tâches...</p>
               </div>
             ) : taches.length === 0 ? (
               <div className="text-center py-8">
                 <div className="text-4xl mb-2">📋</div>
-                <p className="text-gray-600">Aucune tâche disponible</p>
+                <p className="text-gray-600 dark:text-gray-400">Aucune tâche disponible</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {taches.map(tache => (
                   <div
                     key={tache.id}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                    className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => openTacheDetails(tache)}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center">
-                        <span className="text-sm font-medium text-gray-600 mr-2">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300 mr-2">
                           #{tache.ordre_tache}
                         </span>
-                        <h4 className="font-medium text-gray-900 text-sm">
+                        <h4 className="font-medium text-gray-900 dark:text-dark-text text-sm">
                           {tache.nom_tache}
                         </h4>
                       </div>
@@ -256,7 +256,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                       <div className="flex items-center space-x-3">
                         {tache.nb_commentaires > 0 && (
                           <span className="flex items-center">
@@ -269,19 +269,19 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
                           </span>
                         )}
                       </div>
-                      <span className="text-blue-600 hover:text-blue-700 font-medium">
+                      <span className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
                         Voir détails →
                       </span>
                     </div>
                     
                     {tache.descriptif && (
-                      <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
                         {tache.descriptif}
                       </p>
                     )}
                     
                     {tache.date_livraison && (
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         📅 Livraison: {new Date(tache.date_livraison).toLocaleDateString('fr-FR')}
                       </p>
                     )}
@@ -293,10 +293,10 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
         </div>
 
         {/* Pied de page */}
-        <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end">
+        <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 rounded-b-lg flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
           >
             Fermer
           </button>
