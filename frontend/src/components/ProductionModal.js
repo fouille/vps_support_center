@@ -174,17 +174,17 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         {/* En-tête */}
-        <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-lg">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 p-6 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-dark-text">
                 🏭 Production #{production.numero_production || 'N/A'}
               </h2>
-              <p className="opacity-90">{production.titre || 'Titre non défini'}</p>
+              <p className="text-gray-600 dark:text-gray-400">{production.titre || 'Titre non défini'}</p>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-primary-200 transition-colors"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
             >
               <span className="text-2xl">×</span>
             </button>
