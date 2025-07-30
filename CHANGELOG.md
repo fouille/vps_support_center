@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.19.3] - 2025-07-30
+### Fixed
+- 🔧 Amélioration avancement productions: calcul côté serveur pour affichage immédiat sans expansion
+
 ## [1.19.2] - 2025-07-30
 ### Fixed
 - 🔧 Améliorations UX Productions et Portabilités: affichage avancement dans vue globale, auto-date hors scope, contrainte +11 jours ouvrés portabilités
