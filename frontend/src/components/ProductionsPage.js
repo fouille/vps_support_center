@@ -176,6 +176,7 @@ const ProductionsPage = () => {
   const openProductionDetails = async (production) => {
     try {
       const response = await api.get(`/api/productions/${production.id}`);
+      // La réponse contient directement les données
       setSelectedProduction(response);
       setShowProductionModal(true);
     } catch (error) {
