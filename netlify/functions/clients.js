@@ -46,48 +46,88 @@ exports.handler = async (event, context) => {
         const page = parseInt(queryParams.page) || 1;
         const limit = parseInt(queryParams.limit) || 10;
         const search = queryParams.search || '';
+        const societeFilter = queryParams.societe || ''; // Nouveau filtre pour les agents
         const offset = (page - 1) * limit;
 
-        let baseQuery = 'SELECT * FROM clients';
-        let countQuery = 'SELECT COUNT(*) as total FROM clients';
-        let whereClause = '';
-        let orderClause = ' ORDER BY nom_societe, nom, prenom';
-        let paginationClause = ` LIMIT ${limit} OFFSET ${offset}`;
+        // Construire la requête de base avec jointure sur demandeurs_societe
+        let baseQuery = `
+          SELECT 
+            c.*,
+            ds.nom_societe as societe_nom
+          FROM clients c
+          LEFT JOIN demandeurs_societe ds ON c.societe_id = ds.id
+        `;
+        let countQuery = `
+          SELECT COUNT(*) as total 
+          FROM clients c
+          LEFT JOIN demandeurs_societe ds ON c.societe_id = ds.id
+        `;
+
+        let whereConditions = [];
+        let queryParameters = [];
+        let paramCount = 0;
+
+        // Filtrage par société selon le type d'utilisateur
+        if (userType === 'demandeur') {
+          // Pour les demandeurs, récupérer leur societe_id et filtrer
+          const demandeur = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${userId}
+          `;
+          
+          if (demandeur.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ error: 'Utilisateur non trouvé' })
+            };
+          }
+
+          if (demandeur[0].societe_id) {
+            paramCount++;
+            whereConditions.push(`c.societe_id = $${paramCount}`);
+            queryParameters.push(demandeur[0].societe_id);
+          }
+        } else if (userType === 'agent' && societeFilter) {
+          // Filtre société pour les agents
+          paramCount++;
+          whereConditions.push(`c.societe_id = $${paramCount}`);
+          queryParameters.push(societeFilter);
+        }
 
         // Ajouter la recherche si présente
         if (search) {
-          whereClause = ` WHERE (
-            nom_societe ILIKE ${'%' + search + '%'} OR 
-            COALESCE(nom, '') ILIKE ${'%' + search + '%'} OR 
-            COALESCE(prenom, '') ILIKE ${'%' + search + '%'} OR 
-            COALESCE(numero, '') ILIKE ${'%' + search + '%'}
-          )`;
+          paramCount++;
+          const searchPattern = `%${search}%`;
+          whereConditions.push(`(
+            c.nom_societe ILIKE $${paramCount} OR 
+            COALESCE(c.nom, '') ILIKE $${paramCount} OR 
+            COALESCE(c.prenom, '') ILIKE $${paramCount} OR 
+            COALESCE(c.numero, '') ILIKE $${paramCount} OR
+            COALESCE(ds.nom_societe, '') ILIKE $${paramCount}
+          )`);
+          queryParameters.push(searchPattern);
         }
+
+        // Construire la clause WHERE
+        let whereClause = '';
+        if (whereConditions.length > 0) {
+          whereClause = ' WHERE ' + whereConditions.join(' AND ');
+        }
+
+        let orderClause = ' ORDER BY c.nom_societe, c.nom, c.prenom';
+        let paginationClause = ` LIMIT ${limit} OFFSET ${offset}`;
 
         // Construire les requêtes finales
         const finalQuery = baseQuery + whereClause + orderClause + paginationClause;
         const finalCountQuery = countQuery + whereClause;
 
+        console.log('Final query:', finalQuery);
+        console.log('Query parameters:', queryParameters);
+
         // Exécuter les requêtes
         const [clients, countResult] = await Promise.all([
-          search ? 
-            sql`SELECT * FROM clients 
-                WHERE (nom_societe ILIKE ${`%${search}%`} OR 
-                       COALESCE(nom, '') ILIKE ${`%${search}%`} OR 
-                       COALESCE(prenom, '') ILIKE ${`%${search}%`} OR 
-                       COALESCE(numero, '') ILIKE ${`%${search}%`})
-                ORDER BY nom_societe, nom, prenom 
-                LIMIT ${limit} OFFSET ${offset}` :
-            sql`SELECT * FROM clients 
-                ORDER BY nom_societe, nom, prenom 
-                LIMIT ${limit} OFFSET ${offset}`,
-          search ?
-            sql`SELECT COUNT(*) as total FROM clients 
-                WHERE (nom_societe ILIKE ${`%${search}%`} OR 
-                       COALESCE(nom, '') ILIKE ${`%${search}%`} OR 
-                       COALESCE(prenom, '') ILIKE ${`%${search}%`} OR 
-                       COALESCE(numero, '') ILIKE ${`%${search}%`})` :
-            sql`SELECT COUNT(*) as total FROM clients`
+          sql(finalQuery, queryParameters),
+          sql(finalCountQuery, queryParameters)
         ]);
 
         const total = parseInt(countResult[0].total);
