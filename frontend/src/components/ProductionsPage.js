@@ -79,7 +79,11 @@ const ProductionsPage = () => {
       if (statusFilter === 'active') {
         // Filtrer les productions actives (non terminées/annulées)
         params.append('status', 'en_attente,en_cours,bloque');
+      } else if (statusFilter === 'termine') {
+        // Filtrer seulement les productions terminées
+        params.append('status', 'termine');
       }
+      // Si statusFilter === 'all', pas de filtre de statut
       if (clientFilter) params.append('client', clientFilter);
       if (searchFilter) params.append('search', searchFilter);
 
