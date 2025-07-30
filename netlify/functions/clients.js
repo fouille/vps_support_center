@@ -212,7 +212,7 @@ exports.handler = async (event, context) => {
               prenom = ${upd_prenom || null}, 
               numero = ${upd_numero || null}, 
               societe_id = ${finalUpdateSocieteId || null},
-              updated_at = CURRENT_TIMESTAMP
+              updated_at = NOW()
           WHERE id = ${clientId}
           RETURNING *
         `;
