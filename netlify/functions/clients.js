@@ -191,7 +191,7 @@ exports.handler = async (event, context) => {
         const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom, numero: upd_numero, societe_id: upd_societe_id } = updateData;
         
         // Déterminer le societe_id selon le type d'utilisateur
-        let finalSocieteId = upd_societe_id;
+        let finalUpdateSocieteId = upd_societe_id;
         
         if (userType === 'demandeur') {
           // Pour les demandeurs, forcer leur propre société
@@ -200,13 +200,13 @@ exports.handler = async (event, context) => {
           `;
           
           if (demandeur.length > 0 && demandeur[0].societe_id) {
-            finalSocieteId = demandeur[0].societe_id;
+            finalUpdateSocieteId = demandeur[0].societe_id;
           }
         }
 
         const updatedClient = await sql`
           UPDATE clients 
-          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}, societe_id = ${finalSocieteId || null}
+          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}, societe_id = ${finalUpdateSocieteId || null}
           WHERE id = ${clientId}
           RETURNING *
         `;
