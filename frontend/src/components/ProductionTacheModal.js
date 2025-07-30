@@ -285,7 +285,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                     value={tacheData.commentaire_interne}
                     onChange={(e) => setTacheData({...tacheData, commentaire_interne: e.target.value})}
                     rows={2}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Notes internes sur cette tâche..."
                   />
                 </div>
