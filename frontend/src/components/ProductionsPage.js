@@ -64,7 +64,9 @@ const ProductionsPage = () => {
       if (searchFilter) params.append('search', searchFilter);
 
       const response = await api.get(`/api/productions?${params.toString()}`);
-      setProductions(response.data || []);
+      // La réponse a la structure {data: [], pagination: {}}
+      const responseData = response.data || response;
+      setProductions(responseData.data || responseData || []);
       setError('');
     } catch (error) {
       console.error('Erreur lors du chargement des productions:', error);
