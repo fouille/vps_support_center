@@ -216,13 +216,30 @@ const ClientsPage = () => {
   }
 
   return (
-    <div className="fade-in">
-      <div className="max-w-7xl mx-auto">
-        {/* En-tête - toujours visible */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
-            Gestion des Clients
-          </h1>
+    <div className="space-y-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Building className="h-8 w-8 text-primary-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+              Gestion des Clients
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Gestion de la base clients et affectation aux sociétés
+            </p>
+          </div>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => fetchClients()}
+            className="btn-secondary flex items-center"
+            title="Actualiser la liste"
+            disabled={initialLoading || searchLoading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${(initialLoading || searchLoading) ? 'animate-spin' : ''}`} />
+            Actualiser
+          </button>
           <button
             onClick={() => setShowModal(true)}
             className="btn-primary flex items-center"
@@ -231,8 +248,9 @@ const ClientsPage = () => {
             Nouveau Client
           </button>
         </div>
+      </div>
 
-        {/* Zone de recherche - toujours visible */}
+      {/* Zone de recherche et filtres */}
         {/* Recherche et Filtres */}
         <div className="mb-6 space-y-4">
           {/* Barre de recherche */}
