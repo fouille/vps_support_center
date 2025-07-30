@@ -141,7 +141,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
                 type="text"
                 value={formData.titre}
                 onChange={(e) => handleChange('titre', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: Installation télécom complète"
                 required
               />
