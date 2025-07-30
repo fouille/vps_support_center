@@ -154,7 +154,7 @@ exports.handler = async (event, context) => {
       case 'POST':
         console.log('Creating client...');
         const newClient = JSON.parse(event.body);
-        const { nom_societe, adresse, nom, prenom, numero } = newClient;
+        const { nom_societe, adresse, nom, prenom, numero, societe_id } = newClient;
         
         if (!nom_societe || !adresse) {
           return {
@@ -164,9 +164,23 @@ exports.handler = async (event, context) => {
           };
         }
 
+        // Déterminer le societe_id selon le type d'utilisateur
+        let finalSocieteId = societe_id;
+        
+        if (userType === 'demandeur') {
+          // Pour les demandeurs, forcer leur propre société
+          const demandeur = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${userId}
+          `;
+          
+          if (demandeur.length > 0 && demandeur[0].societe_id) {
+            finalSocieteId = demandeur[0].societe_id;
+          }
+        }
+
         const createdClient = await sql`
-          INSERT INTO clients (id, nom_societe, adresse, nom, prenom, numero)
-          VALUES (${uuidv4()}, ${nom_societe}, ${adresse}, ${nom || null}, ${prenom || null}, ${numero || null})
+          INSERT INTO clients (id, nom_societe, adresse, nom, prenom, numero, societe_id)
+          VALUES (${uuidv4()}, ${nom_societe}, ${adresse}, ${nom || null}, ${prenom || null}, ${numero || null}, ${finalSocieteId || null})
           RETURNING *
         `;
         console.log('Client created:', createdClient[0]);
