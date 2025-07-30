@@ -369,7 +369,7 @@ exports.handler = async (event, context) => {
           d.nom as demandeur_nom,
           d.prenom as demandeur_prenom,
           d.email as demandeur_email,
-          ds.nom as societe_nom,
+          ds.nom_societe as societe_nom,
           pt.nom_tache
         FROM productions p
         LEFT JOIN clients c ON p.client_id = c.id
