@@ -323,6 +323,11 @@ const ClientsPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
                       {client.adresse}
                     </td>
+                    {user?.type_utilisateur === 'agent' && (
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text">
+                        {client.societe_nom || '-'}
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleEdit(client)}
