@@ -93,6 +93,19 @@ const Dashboard = () => {
       count
     }));
 
+  const productionsChartData = stats.productions ? [
+    { name: 'Non Terminé', value: stats.productions.non_termine, color: COLORS.warning },
+    { name: 'Terminé', value: stats.productions.termine, color: COLORS.success },
+    { name: 'Bloqué', value: stats.productions.bloque, color: COLORS.danger }
+  ].filter(item => item.value > 0) : []; // Filtrer les valeurs à 0
+
+  const productionsDetailData = stats.productions ? Object.entries(stats.productions.byStatus)
+    .filter(([status, count]) => status && status !== 'undefined' && count > 0)
+    .map(([status, count]) => ({
+      status: status.replace('_', ' ').toUpperCase(),
+      count
+    })) : [];
+
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const data = payload[0];
