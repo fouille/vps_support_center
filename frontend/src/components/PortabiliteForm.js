@@ -707,6 +707,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       name="date_portabilite_demandee"
                       value={formData.date_portabilite_demandee}
                       onChange={handleInputChange}
+                      min={getMinPortabilityDate()}
                       required
                       className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
                         validationErrors.date_portabilite_demandee ? 'border-red-500' : 'border-gray-300'
