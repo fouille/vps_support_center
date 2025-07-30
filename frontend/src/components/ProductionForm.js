@@ -188,7 +188,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
                   type="date"
                   value={formData.date_livraison_prevue}
                   onChange={(e) => handleChange('date_livraison_prevue', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
             </div>
