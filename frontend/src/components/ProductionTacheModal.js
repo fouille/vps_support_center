@@ -247,12 +247,14 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getTacheStatusBadgeClass(tacheData.status)}`}>
                 {getTacheStatusLabel(tacheData.status)}
               </span>
-              <button
-                onClick={() => setEditingTache(!editingTache)}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
-              >
-                {editingTache ? 'Annuler' : '✏️ Modifier'}
-              </button>
+              {user?.type_utilisateur === 'agent' && (
+                <button
+                  onClick={() => setEditingTache(!editingTache)}
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                >
+                  {editingTache ? 'Annuler' : '✏️ Modifier'}
+                </button>
+              )}
               <button
                 onClick={onClose}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
