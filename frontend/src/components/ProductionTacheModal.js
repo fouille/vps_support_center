@@ -448,7 +448,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                   <p className="text-xs text-gray-500">Ajoutez des fichiers à cette tâche</p>
                 </div>
               ) : (
-                fichiers.map(fichier => (
+                (Array.isArray(fichiers) ? fichiers : []).map(fichier => (
                   <div key={fichier.id} className="bg-white border border-gray-200 rounded-lg p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
