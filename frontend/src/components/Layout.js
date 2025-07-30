@@ -31,12 +31,14 @@ const Layout = ({ children, currentPage, onNavigate }) => {
     ...(isAgent ? [
       { name: 'Supervision Tickets', icon: Ticket, key: 'tickets' },
       { name: 'Portabilités', icon: Phone, key: 'portabilites' },
+      { name: 'Productions', icon: Factory, key: 'productions' },
       { name: 'Clients', icon: Users, key: 'clients' },
       { name: 'Demandeurs', icon: UserCheck, key: 'demandeurs' },
       { name: 'Agents', icon: Shield, key: 'agents' },
     ] : [
       { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
       { name: 'Mes Portabilités', icon: Phone, key: 'portabilites' },
+      { name: 'Mes Productions', icon: Factory, key: 'productions' },
       { name: 'Mes Collaborateurs', icon: UserCheck, key: 'demandeurs' },
     ])
   ];
