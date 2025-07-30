@@ -210,8 +210,18 @@ exports.handler = async (event, context) => {
         // Filtrage par statut
         if (status) {
           paramCount++;
-          baseQuery += ` AND p.status = $${paramCount}`;
-          queryParams.push(status);
+          if (status.includes(',')) {
+            // Statuts multiples séparés par virgule
+            const statuses = status.split(',').map(s => s.trim());
+            const placeholders = statuses.map((_, index) => `$${paramCount + index}`).join(', ');
+            baseQuery += ` AND p.status IN (${placeholders})`;
+            queryParams.push(...statuses);
+            paramCount += statuses.length - 1; // -1 car on a déjà incrémenté paramCount
+          } else {
+            // Statut unique
+            baseQuery += ` AND p.status = $${paramCount}`;
+            queryParams.push(status);
+          }
         }
 
         // Filtrage par client
