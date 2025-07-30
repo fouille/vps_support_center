@@ -38,6 +38,23 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
 
   const [validationErrors, setValidationErrors] = useState({});
 
+  // Fonction pour calculer +11 jours ouvrés (sans samedi/dimanche)
+  const getMinPortabilityDate = () => {
+    const today = new Date();
+    let workingDays = 0;
+    let currentDate = new Date(today);
+    
+    while (workingDays < 11) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      // 0 = Dimanche, 6 = Samedi
+      if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+        workingDays++;
+      }
+    }
+    
+    return currentDate.toISOString().split('T')[0];
+  };
+
 
 
   // Fonction pour récupérer les clients
