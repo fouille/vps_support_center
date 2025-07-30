@@ -350,6 +350,228 @@ const createEmailTemplate = {
     text: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}\n\nDe: ${comment.auteur_nom}\nMessage: ${comment.message}`
   }),
 
+  // Template pour la création d'une production
+  productionCreated: (production) => ({
+    subject: `Nouvelle demande de production #${production.numero_production} - ${production.titre}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .production-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #e74c3c; }
+          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+          .status-en-attente { background: #fff3cd; color: #856404; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🏭 Nouvelle Demande de Production</h1>
+            <p>Une nouvelle demande de production a été créée</p>
+          </div>
+          <div class="content">
+            <div class="production-info">
+              <h2>Production #${production.numero_production}</h2>
+              <p><strong>Titre:</strong> ${production.titre}</p>
+              <p><strong>Client:</strong> ${production.nom_societe}</p>
+              <p><strong>Demandeur:</strong> ${production.demandeur_prenom} ${production.demandeur_nom}</p>
+              <p><strong>Société:</strong> ${production.societe_nom}</p>
+              <p><strong>Statut:</strong> <span class="status-badge status-en-attente">En attente</span></p>
+              <p><strong>Priorité:</strong> ${production.priorite}</p>
+              <p><strong>Date de création:</strong> ${new Date(production.date_creation).toLocaleDateString('fr-FR', { 
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}</p>
+              ${production.date_livraison_prevue ? `<p><strong>Date de livraison prévue:</strong> ${new Date(production.date_livraison_prevue).toLocaleDateString('fr-FR')}</p>` : ''}
+            </div>
+            ${production.description ? `
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h4>Description:</h4>
+              <p style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 3px solid #e74c3c;">
+                ${production.description}
+              </p>
+            </div>` : ''}
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des productions</p>
+            <p>Cet email a été envoyé automatiquement.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouvelle demande de production #${production.numero_production}\n\nTitre: ${production.titre}\nClient: ${production.nom_societe}\nDemandeur: ${production.demandeur_prenom} ${production.demandeur_nom}`
+  }),
+
+  // Template pour les commentaires sur production
+  productionCommentAdded: (production, tache, comment, author) => ({
+    subject: `Nouveau commentaire sur la production #${production.numero_production} - Tâche: ${tache.nom_tache}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .comment-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #e67e22; }
+          .author-info { display: flex; align-items: center; margin-bottom: 15px; }
+          .avatar { width: 40px; height: 40px; border-radius: 50%; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>💬 Nouveau Commentaire</h1>
+            <p>Un commentaire a été ajouté à la production #${production.numero_production}</p>
+          </div>
+          <div class="content">
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3>Production #${production.numero_production}</h3>
+              <p><strong>Titre:</strong> ${production.titre}</p>
+              <p><strong>Client:</strong> ${production.nom_societe}</p>
+              <p><strong>Tâche:</strong> ${tache.nom_tache}</p>
+            </div>
+            <div class="comment-box">
+              <div class="author-info">
+                <div class="avatar">${author.nom ? author.nom.split(' ').map(n => n[0]).join('') : 'A'}</div>
+                <div>
+                  <strong>${author.nom} ${author.prenom}</strong>
+                  <div style="font-size: 12px; color: #666;">
+                    ${new Date(comment.date_creation).toLocaleDateString('fr-FR', { 
+                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              </div>
+              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+                ${comment.contenu}
+              </div>
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des productions</p>
+            <p>Pour répondre, connectez-vous au système de gestion des productions.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouveau commentaire sur la production #${production.numero_production}\n\nTâche: ${tache.nom_tache}\nDe: ${author.nom} ${author.prenom}\nMessage: ${comment.contenu}`
+  }),
+
+  // Template pour upload de fichier
+  productionFileUploaded: (production, tache, fichier, author) => ({
+    subject: `Nouveau fichier sur la production #${production.numero_production} - Tâche: ${tache.nom_tache}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #27ae60 0%, #16a085 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .file-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #27ae60; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📎 Nouveau Fichier</h1>
+            <p>Un fichier a été ajouté à la production #${production.numero_production}</p>
+          </div>
+          <div class="content">
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3>Production #${production.numero_production}</h3>
+              <p><strong>Titre:</strong> ${production.titre}</p>
+              <p><strong>Client:</strong> ${production.nom_societe}</p>
+              <p><strong>Tâche:</strong> ${tache.nom_tache}</p>
+            </div>
+            <div class="file-box">
+              <h4>📎 Fichier ajouté</h4>
+              <p><strong>Nom:</strong> ${fichier.nom_fichier}</p>
+              <p><strong>Type:</strong> ${fichier.type_fichier || 'Non spécifié'}</p>
+              <p><strong>Taille:</strong> ${Math.round(fichier.taille_fichier / 1024)} KB</p>
+              <p><strong>Ajouté par:</strong> ${author.nom} ${author.prenom}</p>
+              <p><strong>Date:</strong> ${new Date(fichier.date_upload).toLocaleDateString('fr-FR', { 
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}</p>
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des productions</p>
+            <p>Pour accéder au fichier, connectez-vous au système de gestion.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouveau fichier sur la production #${production.numero_production}\n\nTâche: ${tache.nom_tache}\nFichier: ${fichier.nom_fichier}\nAjouté par: ${author.nom} ${author.prenom}`
+  }),
+
+  // Template pour changement de statut de production
+  productionStatusChanged: (production, oldStatus, newStatus) => ({
+    subject: `Changement de statut - Production #${production.numero_production}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+          .status-change { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3498db; }
+          .status-old { background: #ffeaa7; color: #2d3436; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-right: 10px; }
+          .status-new { background: #00b894; color: white; padding: 8px 12px; border-radius: 4px; display: inline-block; }
+          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>📊 Changement de Statut</h1>
+            <p>Le statut de votre production a été mis à jour</p>
+          </div>
+          <div class="content">
+            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+              <h3>Production #${production.numero_production}</h3>
+              <p><strong>Titre:</strong> ${production.titre}</p>
+              <p><strong>Client:</strong> ${production.nom_societe}</p>
+            </div>
+            <div class="status-change">
+              <h4>Changement de statut</h4>
+              <p>
+                <span class="status-old">${oldStatus}</span> → <span class="status-new">${newStatus}</span>
+              </p>
+              <p><strong>Date de mise à jour:</strong> ${new Date().toLocaleDateString('fr-FR', { 
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              })}</p>
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de gestion des productions</p>
+            <p>Pour plus de détails, connectez-vous au système de gestion.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Changement de statut - Production #${production.numero_production}\n\nStatut: ${oldStatus} → ${newStatus}\nTitre: ${production.titre}\nClient: ${production.nom_societe}`
+  }),
+
   // Template pour les changements de statut de portabilité
   portabiliteStatusChanged: (portabilite, oldStatus) => {
     const statusLabels = {
