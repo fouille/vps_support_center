@@ -21,17 +21,6 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-// Fonction pour calculer l'avancement d'une production
-const calculateProgress = (taches) => {
-  if (!taches || !Array.isArray(taches) || taches.length === 0) return 0;
-  
-  // Filtrer les tâches hors scope du calcul
-  const tachesInScope = taches.filter(t => t.status !== 'hors_scope');
-  if (tachesInScope.length === 0) return 0;
-  
-  const terminatedTasks = tachesInScope.filter(t => t.status === 'termine').length;
-  return Math.round((terminatedTasks / tachesInScope.length) * 100);
-};
 
 const ProductionsPage = () => {
   const { api, user, isAgent } = useAuth();
