@@ -441,7 +441,12 @@ const ProductionsPage = () => {
                         <ChevronDown className="h-4 w-4 mr-1" />
                         Tâches de production
                       </h4>
-                      {production.taches && production.taches.length > 0 ? (
+                      {loadingTaches === production.id ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                          <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement des tâches...</span>
+                        </div>
+                      ) : production.taches && production.taches.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           {production.taches.map(tache => (
                             <div
