@@ -204,7 +204,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${calculateProgress()}%` }}
               ></div>
             </div>
