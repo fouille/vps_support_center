@@ -363,7 +363,7 @@ const Dashboard = () => {
       </div>
 
       {/* Graphiques détaillés */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Détail par statut - Tickets */}
         <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
           <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-4">
