@@ -47,7 +47,9 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const fetchFichiers = async () => {
     try {
       const response = await api.get(`/api/production-tache-fichiers?production_tache_id=${tache.id}`);
-      setFichiers(response || []);
+      // S'assurer que la réponse est un tableau
+      const fichiersData = response.data || response;
+      setFichiers(Array.isArray(fichiersData) ? fichiersData : []);
     } catch (error) {
       console.error('Erreur lors du chargement des fichiers:', error);
       setFichiers([]);
