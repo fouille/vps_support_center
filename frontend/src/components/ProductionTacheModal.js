@@ -426,7 +426,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingFile}
-                  className="bg-orange-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
+                  className="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
                 >
                   {uploadingFile ? '⏳' : '➕'} Ajouter
                 </button>
