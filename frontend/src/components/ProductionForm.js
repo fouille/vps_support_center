@@ -80,7 +80,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           {/* En-tête */}
-          <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-t-lg">
+          <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold">
@@ -93,7 +93,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
               <button
                 type="button"
                 onClick={onClose}
-                className="text-white hover:text-red-200 transition-colors"
+                className="text-white hover:text-primary-200 transition-colors"
               >
                 <span className="text-2xl">×</span>
               </button>
