@@ -10,6 +10,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const [nouveauCommentaire, setNouveauCommentaire] = useState('');
   const [editingTache, setEditingTache] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [message, setMessage] = useState({ type: '', content: '' }); // Pour les messages d'erreur/succès
   const fileInputRef = useRef(null);
   const commentsEndRef = useRef(null);
 
