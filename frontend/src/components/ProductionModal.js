@@ -142,6 +142,29 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
     return Math.round((terminatedTasks / taches.length) * 100);
   };
 
+  // Fonction pour mettre à jour le statut de la production (agents seulement)
+  const handleStatusChange = async (newStatus) => {
+    if (user?.type_utilisateur !== 'agent') return;
+    
+    setUpdatingStatus(true);
+    try {
+      await api.put(`/api/productions/${production.id}`, {
+        ...production,
+        status: newStatus
+      });
+      
+      // Mettre à jour le statut local
+      production.status = newStatus;
+      
+      // Rafraîchir la liste si possible
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error);
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
