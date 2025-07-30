@@ -248,11 +248,18 @@ exports.handler = async (event, context) => {
               if (productionInfo.length > 0) {
                 const emailService = loadEmailService();
                 if (emailService) {
+                  // Enrichir les données auteur avec les informations complètes
+                  const enrichedAuthor = {
+                    ...decoded,
+                    nom: decoded.nom || commentResult[0].auteur_nom,
+                    prenom: decoded.prenom || commentResult[0].auteur_prenom
+                  };
+                  
                   await emailService.sendProductionCommentEmail(
                     productionInfo[0],
                     updatedTache,
                     commentResult[0],
-                    decoded
+                    enrichedAuthor
                   );
                 }
               }
