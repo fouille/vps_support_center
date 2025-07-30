@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.18.4] - 2025-07-30
+### Fixed
+- 🔧 Amélioration UX recherche productions: validation sur Entrée et actualisation tableau uniquement
+
 ## [1.18.3] - 2025-07-30
 ### Fixed
 - 🔧 Corrections productions: compteurs fichiers, actualisation menus, recherche automatique et gestion messages UI
