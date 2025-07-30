@@ -363,6 +363,7 @@ const ProductionsPage = () => {
             className="input w-full"
           >
             <option value="active">Actives (En attente, En cours, Bloqué)</option>
+            <option value="termine">Terminées</option>
             <option value="all">Toutes les productions</option>
           </select>
         </div>
