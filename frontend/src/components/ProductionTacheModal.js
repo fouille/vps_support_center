@@ -64,7 +64,10 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
         type_commentaire: 'commentaire'
       });
       
-      setCommentaires([...commentaires, response]);
+      // S'assurer que commentaires est un tableau et ajouter le nouveau commentaire
+      const currentCommentaires = Array.isArray(commentaires) ? commentaires : [];
+      const newComment = response.data || response;
+      setCommentaires([...currentCommentaires, newComment]);
       setNouveauCommentaire('');
       setTimeout(scrollToBottom, 100);
     } catch (error) {
