@@ -222,7 +222,7 @@ exports.handler = async (event, context) => {
           // Envoyer un email pour le changement de statut
           if (commentResult.length > 0) {
             try {
-              // Récupération des informations pour l'email
+              // Récupération des informations pour l'email avec les données de l'auteur
               const emailInfoQuery = `
                 SELECT 
                   p.*,
@@ -233,17 +233,21 @@ exports.handler = async (event, context) => {
                   d.prenom as demandeur_prenom,
                   d.email as demandeur_email,
                   ds.nom_societe as societe_nom,
-                  pt.nom_tache
+                  pt.nom_tache,
+                  COALESCE(da.nom, aa.nom) as auteur_nom,
+                  COALESCE(da.prenom, aa.prenom) as auteur_prenom
                 FROM productions p
                 LEFT JOIN clients c ON p.client_id = c.id
                 LEFT JOIN demandeurs d ON p.demandeur_id = d.id
                 LEFT JOIN demandeurs_societe ds ON p.societe_id = ds.id
                 LEFT JOIN production_taches pt ON p.id = pt.production_id
+                LEFT JOIN demandeurs da ON da.id = $2
+                LEFT JOIN agents aa ON aa.id = $2
                 WHERE p.id = (SELECT production_id FROM production_taches WHERE id = $1)
                 AND pt.id = $1
               `;
 
-              const productionInfo = await sql(emailInfoQuery, [tacheId]);
+              const productionInfo = await sql(emailInfoQuery, [tacheId, decoded.id]);
 
               if (productionInfo.length > 0) {
                 const emailService = loadEmailService();
@@ -251,8 +255,8 @@ exports.handler = async (event, context) => {
                   // Enrichir les données auteur avec les informations complètes
                   const enrichedAuthor = {
                     ...decoded,
-                    nom: decoded.nom || commentResult[0].auteur_nom,
-                    prenom: decoded.prenom || commentResult[0].auteur_prenom
+                    nom: productionInfo[0].auteur_nom,
+                    prenom: productionInfo[0].auteur_prenom
                   };
                   
                   await emailService.sendProductionCommentEmail(
