@@ -86,7 +86,15 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.put(`/api/production-taches/${tache.id}`, tacheData);
+      const response = await api.put(`/api/production-taches/${tache.id}`, tacheData);
+      
+      // Mettre à jour l'objet tache local avec les nouvelles données
+      const updatedTache = response.data || response;
+      tache.status = updatedTache.status || tacheData.status;
+      tache.descriptif = updatedTache.descriptif || tacheData.descriptif;
+      tache.date_livraison = updatedTache.date_livraison || tacheData.date_livraison;
+      tache.commentaire_interne = updatedTache.commentaire_interne || tacheData.commentaire_interne;
+      
       setEditingTache(false);
       if (onRefresh) onRefresh();
       alert('Tâche mise à jour avec succès');
