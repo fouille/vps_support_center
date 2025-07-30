@@ -359,7 +359,12 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               </div>
               
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {commentaires.length === 0 ? (
+                {loadingCommentaires ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                    <p className="text-gray-600 dark:text-gray-400 mt-2">Chargement des commentaires...</p>
+                  </div>
+                ) : commentaires.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">💭</div>
                     <p className="text-gray-600 dark:text-gray-400">Aucun commentaire pour l'instant</p>
