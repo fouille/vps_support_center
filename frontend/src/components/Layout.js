@@ -70,7 +70,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
           <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-            Support & Portabilités
+            Support & Production
           </h1>
           <button
             onClick={() => setSidebarOpen(false)}
