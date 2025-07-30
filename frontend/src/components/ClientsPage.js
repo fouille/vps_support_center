@@ -51,10 +51,13 @@ const ClientsPage = () => {
     const timer = setTimeout(() => {
       // Déclencher la recherche seulement si au moins 3 caractères ou si vide (pour reset)
       if (searchInput.length >= 3 || searchInput.length === 0) {
-        setSearchTerm(searchInput);
-        // Remettre à la page 1 lors d'une nouvelle recherche
-        if (currentPage !== 1) {
-          setCurrentPage(1);
+        // Seulement changer searchTerm si c'est différent
+        if (searchTerm !== searchInput) {
+          setSearchTerm(searchInput);
+          // Remettre à la page 1 seulement si on n'y est pas déjà
+          if (currentPage !== 1) {
+            setCurrentPage(1);
+          }
         }
       }
       setIsSearching(false);
@@ -64,7 +67,7 @@ const ClientsPage = () => {
       clearTimeout(timer);
       setIsSearching(false);
     };
-  }, [searchInput, currentPage]);
+  }, [searchInput]); // Supprimer currentPage et searchTerm des dépendances
 
   useEffect(() => {
     // Reset to page 1 when search term changes
