@@ -35,7 +35,9 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const fetchCommentaires = async () => {
     try {
       const response = await api.get(`/api/production-tache-commentaires?production_tache_id=${tache.id}`);
-      setCommentaires(response || []);
+      // S'assurer que la réponse est un tableau
+      const commentairesData = response.data || response;
+      setCommentaires(Array.isArray(commentairesData) ? commentairesData : []);
     } catch (error) {
       console.error('Erreur lors du chargement des commentaires:', error);
       setCommentaires([]);
