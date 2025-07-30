@@ -211,8 +211,7 @@ exports.handler = async (event, context) => {
               nom = ${upd_nom || null}, 
               prenom = ${upd_prenom || null}, 
               numero = ${upd_numero || null}, 
-              societe_id = ${finalUpdateSocieteId || null},
-              updated_at = NOW()
+              societe_id = ${finalUpdateSocieteId || null}
           WHERE id = ${clientId}
           RETURNING *
         `;
