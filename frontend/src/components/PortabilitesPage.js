@@ -364,8 +364,11 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
                           <span className="text-sm font-medium text-gray-900 dark:text-dark-text">
                             #{portabilite.numero_portabilite}
                           </span>
-                          {isToday(portabilite.date_portabilite_effective) && (
-                            <span className="ml-2 text-red-500">🚨</span>
+                          {isPastDue(portabilite.date_portabilite_effective) && (
+                            <span className="ml-2 text-red-600" title="Date effective dépassée">⚠️</span>
+                          )}
+                          {isToday(portabilite.date_portabilite_effective) && !isPastDue(portabilite.date_portabilite_effective) && (
+                            <span className="ml-2 text-red-500" title="Date effective aujourd'hui">🚨</span>
                           )}
                         </div>
                       </td>
