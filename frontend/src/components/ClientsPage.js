@@ -3,8 +3,10 @@ import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2, Building, AlertCircle, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ClientsPage = () => {
-  const { api } = useAuth();
+  const { api, user } = useAuth();
   const [clients, setClients] = useState([]);
+  const [societes, setSocietes] = useState([]); // Liste des sociétés
+  const [selectedSociete, setSelectedSociete] = useState(''); // Filtre société pour agents
   const [initialLoading, setInitialLoading] = useState(true); // Chargement initial
   const [searchLoading, setSearchLoading] = useState(false); // Chargement lors des recherches  
   const [isFirstLoad, setIsFirstLoad] = useState(true); // Flag pour identifier le premier chargement
@@ -28,7 +30,8 @@ const ClientsPage = () => {
     adresse: '',
     nom: '',
     prenom: '',
-    numero: ''
+    numero: '',
+    societe_id: '' // Nouveau champ
   });
 
   useEffect(() => {
