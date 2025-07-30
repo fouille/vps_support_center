@@ -40,7 +40,7 @@ const ProductionsPage = () => {
   const [refreshingProductions, setRefreshingProductions] = useState(false);
 
   // États pour les filtres
-  const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
+  const [statusFilter, setStatusFilter] = useState('active'); // 'active', 'all', ou 'termine'
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Filtre de recherche actif
   const [searchInput, setSearchInput] = useState(''); // Saisie en cours (avant validation)
