@@ -15,7 +15,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const [tacheData, setTacheData] = useState({
     status: tache.status,
     descriptif: tache.descriptif || '',
-    date_livraison: tache.date_livraison || '',
+    date_livraison: tache.date_livraison ? tache.date_livraison.split('T')[0] : '',
     commentaire_interne: tache.commentaire_interne || ''
   });
 
