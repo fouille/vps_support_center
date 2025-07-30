@@ -202,9 +202,24 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
               <div>
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Statut</span>
                 <div className="mt-1">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(production.status)}`}>
-                    {getStatusLabel(production.status)}
-                  </span>
+                  {user?.type_utilisateur === 'agent' ? (
+                    <select
+                      value={production.status}
+                      onChange={(e) => handleStatusChange(e.target.value)}
+                      disabled={updatingStatus}
+                      className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary-500 disabled:opacity-50"
+                    >
+                      <option value="en_attente">En attente</option>
+                      <option value="en_cours">En cours</option>
+                      <option value="termine">Terminé</option>
+                      <option value="bloque">Bloqué</option>
+                      <option value="annule">Annulé</option>
+                    </select>
+                  ) : (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(production.status)}`}>
+                      {getStatusLabel(production.status)}
+                    </span>
+                  )}
                 </div>
               </div>
               <div>
