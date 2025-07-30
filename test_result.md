@@ -7,7 +7,43 @@ L'utilisateur a demandé une interface de gestion de tickets de support avec int
 **Date**: 2025-07-30 12:50:00
 **Status**: 🔧 Bug Fixes Applied - Requires Database Setup for Testing
 
-### Corrections de bugs appliquées le 30/07/2025:
+### Corrections de bugs appliquées le 30/07/2025 - MISE À JOUR:
+
+**1. Erreur API 500 "column ds.nom does not exist" - ✅ CORRIGÉ**
+- **Fichier**: `/app/netlify/functions/production-tache-commentaires.js`
+- **Problème**: La requête SQL faisait référence à `ds.nom` au lieu de `ds.nom_societe`
+- **Solution**: Ligne 222 corrigée de `ds.nom as societe_nom` vers `ds.nom_societe as societe_nom`
+
+**2. Problème affichage modal de détail production - ✅ CORRIGÉ**
+- **Fichier**: `/app/frontend/src/components/ProductionsPage.js`
+- **Problème**: La réponse API n'était pas correctement traitée dans `openProductionDetails`
+- **Solution**: Amélioration de la gestion de la réponse API avec `response.data || response` et ajout de logs de debug
+
+**3. Loader manquant pour les tâches - ✅ AJOUTÉ**
+- **Fichier**: `/app/frontend/src/components/ProductionsPage.js`
+- **Ajouté**: État `loadingTaches` pour gérer l'affichage du loader
+- **Ajouté**: Spinner animé avec le texte "Chargement des tâches..."
+- **Ajouté**: Gestion d'erreur avec fallback vers mock data
+
+**4. Format de date incorrect dans le formulaire d'édition - ✅ CORRIGÉ**
+- **Fichier**: `/app/frontend/src/components/ProductionForm.js`
+- **Problème**: L'API retourne "2025-07-31T00:00:00.000Z" mais le champ HTML input[type="date"] attend "2025-07-31"
+- **Solution**: Ajouté fonction `formatDateForInput()` qui extrait la partie date avec `.split('T')[0]`
+
+**5. Erreur 500 "record new has no field updated_at" - ✅ CORRIGÉ**
+- **Fichier**: `/app/setup_productions_database.sql` mis à jour
+- **Problème**: Les triggers automatiques interfèrent avec les mises à jour manuelles dans les APIs
+- **Solution**: Désactivation des triggers automatiques car les APIs gèrent `date_modification` manuellement
+
+**6. Script SQL unifié créé - ✅ NOUVEAU**
+- **Fichier**: `/app/setup_productions_database.sql`
+- **Contenu**: Script complet qui combine la création des tables ET la correction des contraintes
+- **Fonctionnalités**: Création automatique des 12 tâches, génération numéro 8 chiffres, triggers désactivés pour éviter les conflits
+
+**7. Script de correction du trigger - ✅ NOUVEAU**
+- **Fichier**: `/app/fix_production_taches_trigger.sql`
+- **Objectif**: Supprimer le trigger automatique pour les tâches qui causait l'erreur 500
+- **Usage**: À exécuter après le script principal si le problème persiste
 
 **1. Erreur API 500 "column ds.nom does not exist" - ✅ CORRIGÉ**
 - **Fichier**: `/app/netlify/functions/production-tache-commentaires.js`
