@@ -302,7 +302,18 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
                     <select
                       value={tacheData.status}
-                      onChange={(e) => setTacheData({...tacheData, status: e.target.value})}
+                      onChange={(e) => {
+                        const newStatus = e.target.value;
+                        const updatedData = {...tacheData, status: newStatus};
+                        
+                        // Si on sélectionne "hors scope" et qu'il n'y a pas de date, mettre la date du jour  
+                        if (newStatus === 'hors_scope' && !tacheData.date_livraison) {
+                          const today = new Date().toISOString().split('T')[0];
+                          updatedData.date_livraison = today;
+                        }
+                        
+                        setTacheData(updatedData);
+                      }}
                       className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value="a_faire">À faire</option>
