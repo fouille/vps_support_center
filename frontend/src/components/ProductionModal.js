@@ -10,14 +10,24 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchTaches();
+    // Si les tâches sont déjà présentes dans l'objet production, les utiliser
+    if (production && production.taches && Array.isArray(production.taches)) {
+      setTaches(production.taches);
+      setLoading(false);
+    } else {
+      // Sinon, les charger via API
+      fetchTaches();
+    }
   }, [production]);
 
   const fetchTaches = async () => {
+    if (!production || !production.id) return;
+    
     setLoading(true);
     try {
       const response = await api.get(`/api/production-taches?production_id=${production.id}`);
-      setTaches(response || []);
+      const taches = Array.isArray(response) ? response : response.data || [];
+      setTaches(taches);
     } catch (error) {
       console.error('Erreur lors du chargement des tâches:', error);
       // Mock data pour le développement local
