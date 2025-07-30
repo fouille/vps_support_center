@@ -4,6 +4,16 @@ const { v4: uuidv4 } = require('uuid');
 
 const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
 
+// Import conditionnel du service email
+const loadEmailService = () => {
+  try {
+    return require('./email-service');
+  } catch (error) {
+    console.error('Failed to load email service:', error);
+    return null;
+  }
+};
+
 const headers = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
