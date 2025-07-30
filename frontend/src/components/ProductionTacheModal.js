@@ -156,9 +156,9 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Erreur lecture fichier:', error);
+      console.error('Erreur lors de la lecture du fichier:', error);
+      setMessage({ type: 'error', content: 'Erreur lors de la lecture du fichier' });
       setUploadingFile(false);
-      alert('Erreur lors de la lecture du fichier');
     }
   };
 
