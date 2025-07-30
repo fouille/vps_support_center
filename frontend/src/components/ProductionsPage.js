@@ -3,14 +3,31 @@ import { useAuth } from '../context/AuthContext';
 import ProductionModal from './ProductionModal';
 import ProductionForm from './ProductionForm';
 import ProductionTacheModal from './ProductionTacheModal';
+import SearchableSelect from './SearchableSelect';
 import { formatClientDisplay } from '../utils/clientUtils';
+import { 
+  Plus, 
+  Eye, 
+  Edit, 
+  Trash2, 
+  Factory, 
+  AlertCircle, 
+  Calendar,
+  User,
+  Building,
+  Clock,
+  RefreshCw,
+  ChevronRight,
+  ChevronDown
+} from 'lucide-react';
 
 const ProductionsPage = () => {
-  const { api, user } = useAuth();
+  const { api, user, isAgent } = useAuth();
   const [productions, setProductions] = useState([]);
   const [clients, setClients] = useState([]);
   const [demandeurs, setDemandeurs] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [selectedProduction, setSelectedProduction] = useState(null);
   const [selectedTache, setSelectedTache] = useState(null);
   const [showProductionModal, setShowProductionModal] = useState(false);
@@ -18,34 +35,40 @@ const ProductionsPage = () => {
   const [showTacheModal, setShowTacheModal] = useState(false);
   const [editingProduction, setEditingProduction] = useState(null);
   const [expandedProduction, setExpandedProduction] = useState(null);
+  const [refreshingProductions, setRefreshingProductions] = useState(false);
 
   // États pour les filtres
-  const [filters, setFilters] = useState({
-    status: '',
-    client: '',
-    search: ''
-  });
+  const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
+  const [clientFilter, setClientFilter] = useState('');
+  const [searchFilter, setSearchFilter] = useState('');
 
   useEffect(() => {
     fetchProductions();
     fetchClients();
-    if (user?.type_utilisateur === 'agent') {
+    if (isAgent) {
       fetchDemandeurs();
     }
   }, []);
 
-  const fetchProductions = async () => {
-    setLoading(true);
+  const fetchProductions = async (showRefreshingIndicator = false) => {
+    if (showRefreshingIndicator) setRefreshingProductions(true);
+    else setLoading(true);
+    
     try {
       const params = new URLSearchParams();
-      if (filters.status) params.append('status', filters.status);
-      if (filters.client) params.append('client', filters.client);
-      if (filters.search) params.append('search', filters.search);
+      if (statusFilter === 'active') {
+        // Filtrer les productions actives (non terminées/annulées)
+        params.append('status', 'en_attente,en_cours,bloque');
+      }
+      if (clientFilter) params.append('client', clientFilter);
+      if (searchFilter) params.append('search', searchFilter);
 
       const response = await api.get(`/api/productions?${params.toString()}`);
       setProductions(response.data || []);
+      setError('');
     } catch (error) {
       console.error('Erreur lors du chargement des productions:', error);
+      setError('Erreur lors du chargement des productions');
       // Mock data pour le développement local
       setProductions([
         {
@@ -63,6 +86,7 @@ const ProductionsPage = () => {
       ]);
     } finally {
       setLoading(false);
+      setRefreshingProductions(false);
     }
   };
 
@@ -86,17 +110,65 @@ const ProductionsPage = () => {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  const clientOptions = [
+    { value: '', label: 'Tous les clients', subtitle: '', searchText: '' },
+    ...clients.map(client => ({
+      value: client.id,
+      label: formatClientDisplay(client),
+      subtitle: client.email || '',
+      searchText: `${client.nom_societe} ${client.nom} ${client.prenom}`.toLowerCase()
+    }))
+  ];
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      'en_attente': { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300', label: 'En attente' },
+      'en_cours': { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300', label: 'En cours' },
+      'termine': { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300', label: 'Terminé' },
+      'bloque': { color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300', label: 'Bloqué' },
+      'annule': { color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300', label: 'Annulé' }
+    };
+    
+    const config = statusConfig[status] || statusConfig['en_attente'];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    );
   };
 
-  const applyFilters = () => {
-    fetchProductions();
+  const getPrioriteBadge = (priorite) => {
+    const prioriteConfig = {
+      'urgente': { color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300', label: 'Urgente' },
+      'haute': { color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300', label: 'Haute' },
+      'normale': { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300', label: 'Normale' },
+      'basse': { color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300', label: 'Basse' }
+    };
+    
+    const config = prioriteConfig[priorite] || prioriteConfig['normale'];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    );
   };
 
-  const clearFilters = () => {
-    setFilters({ status: '', client: '', search: '' });
-    setTimeout(fetchProductions, 100);
+  const getTacheStatusBadge = (status) => {
+    const statusConfig = {
+      'a_faire': { color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300', label: 'À faire' },
+      'en_cours': { color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300', label: 'En cours' },
+      'termine': { color: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300', label: 'Terminé' },
+      'bloque': { color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300', label: 'Bloqué' },
+      'hors_scope': { color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300', label: 'Hors scope' },
+      'attente_installation': { color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300', label: 'Attente installation' }
+    };
+    
+    const config = statusConfig[status] || statusConfig['a_faire'];
+    return (
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    );
   };
 
   const openProductionDetails = async (production) => {
@@ -174,287 +246,254 @@ const ProductionsPage = () => {
     }
   };
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case 'en_attente': return 'bg-yellow-100 text-yellow-800';
-      case 'en_cours': return 'bg-blue-100 text-blue-800';
-      case 'termine': return 'bg-green-100 text-green-800';
-      case 'bloque': return 'bg-red-100 text-red-800';
-      case 'annule': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getPrioriteBadgeClass = (priorite) => {
-    switch (priorite) {
-      case 'urgente': return 'bg-red-100 text-red-800';
-      case 'haute': return 'bg-orange-100 text-orange-800';
-      case 'normale': return 'bg-blue-100 text-blue-800';
-      case 'basse': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getTacheStatusBadgeClass = (status) => {
-    switch (status) {
-      case 'a_faire': return 'bg-gray-100 text-gray-800';
-      case 'en_cours': return 'bg-blue-100 text-blue-800';
-      case 'termine': return 'bg-green-100 text-green-800';
-      case 'bloque': return 'bg-red-100 text-red-800';
-      case 'hors_scope': return 'bg-yellow-100 text-yellow-800';
-      case 'attente_installation': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusLabel = (status) => {
-    const labels = {
-      'en_attente': 'En attente',
-      'en_cours': 'En cours',
-      'termine': 'Terminé',
-      'bloque': 'Bloqué',
-      'annule': 'Annulé'
-    };
-    return labels[status] || status;
-  };
-
-  const getPrioriteLabel = (priorite) => {
-    const labels = {
-      'urgente': 'Urgente',
-      'haute': 'Haute',
-      'normale': 'Normale',
-      'basse': 'Basse'
-    };
-    return labels[priorite] || priorite;
-  };
-
-  const getTacheStatusLabel = (status) => {
-    const labels = {
-      'a_faire': 'À faire',
-      'en_cours': 'En cours',
-      'termine': 'Terminé',
-      'bloque': 'Bloqué',
-      'hors_scope': 'Hors scope',
-      'attente_installation': 'Attente installation'
-    };
-    return labels[status] || status;
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement des productions...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="bg-white shadow-lg rounded-lg">
-        {/* En-tête */}
-        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-t-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">🏭 Gestion des Productions</h1>
-              <p className="opacity-90">Suivi et gestion des demandes de production</p>
+    <div className="space-y-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Factory className="h-8 w-8 text-primary-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+              {isAgent ? 'Gestion des Productions' : 'Mes Productions'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Suivi et gestion des demandes de production
+            </p>
+          </div>
+        </div>
+        <div className="flex space-x-3">
+          <button
+            onClick={() => fetchProductions(true)}
+            className="btn-secondary flex items-center"
+            title="Actualiser la liste"
+            disabled={refreshingProductions}
+          >
+            <RefreshCw className={`h-5 w-5 mr-2 ${refreshingProductions ? 'animate-spin' : ''}`} />
+            {refreshingProductions ? 'Actualisation...' : 'Actualiser'}
+          </button>
+          <button
+            onClick={openNewProductionForm}
+            className="btn-primary flex items-center"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            Nouvelle Production
+          </button>
+        </div>
+      </div>
+
+      {/* Filtres */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Statut des productions
+          </label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="input w-full"
+          >
+            <option value="active">Actives (En attente, En cours, Bloqué)</option>
+            <option value="all">Toutes les productions</option>
+          </select>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Filtrer par client
+          </label>
+          <SearchableSelect
+            options={clientOptions}
+            value={clientFilter}
+            onChange={setClientFilter}
+            placeholder="Tous les clients"
+            className="w-full"
+            displayKey="label"
+            valueKey="value"
+            searchKeys={["label", "subtitle", "searchText"]}
+            emptyMessage="Aucun client trouvé"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+            Rechercher par numéro
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Ex: 12345678"
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              className="input w-full pr-10"
+              maxLength={8}
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
             </div>
+          </div>
+          {searchFilter && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Recherche par numéro de production
+            </p>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
+          <span className="text-red-700 dark:text-red-300">{error}</span>
+        </div>
+      )}
+
+      {/* Liste des productions */}
+      <div className="grid gap-4">
+        {productions.length === 0 ? (
+          <div className="text-center py-12">
+            <Factory className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text mb-2">Aucune production trouvée</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">Créez votre première demande de production</p>
             <button
               onClick={openNewProductionForm}
-              className="bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors"
+              className="btn-primary"
             >
-              ➕ Nouvelle Production
+              <Plus className="h-5 w-5 mr-2" />
+              Nouvelle Production
             </button>
           </div>
-        </div>
-
-        {/* Filtres */}
-        <div className="p-6 bg-gray-50 border-b">
-          <div className="flex flex-wrap gap-4 items-end">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Statut
-              </label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                <option value="">Tous les statuts</option>
-                <option value="en_attente">En attente</option>
-                <option value="en_cours">En cours</option>
-                <option value="termine">Terminé</option>
-                <option value="bloque">Bloqué</option>
-                <option value="annule">Annulé</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Client
-              </label>
-              <select
-                value={filters.client}
-                onChange={(e) => handleFilterChange('client', e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                <option value="">Tous les clients</option>
-                {clients.map(client => (
-                  <option key={client.id} value={client.id}>
-                    {formatClientDisplay(client)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Numéro de production
-              </label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Rechercher..."
-                className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                onClick={applyFilters}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-              >
-                Filtrer
-              </button>
-              <button
-                onClick={clearFilters}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
-              >
-                Réinitialiser
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Liste des productions */}
-        <div className="p-6">
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
-              <p className="text-gray-600 mt-2">Chargement...</p>
-            </div>
-          ) : productions.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">🏭</div>
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Aucune production trouvée</h3>
-              <p className="text-gray-600 mb-4">Créez votre première demande de production</p>
-              <button
-                onClick={openNewProductionForm}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
-              >
-                ➕ Nouvelle Production
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {productions.map(production => (
-                <div key={production.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <button
-                            onClick={() => toggleExpandProduction(production.id)}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                          >
-                            {expandedProduction === production.id ? '📋' : '📄'}
-                          </button>
-                          <h3 className="font-semibold text-lg text-gray-900">
-                            #{production.numero_production} - {production.titre}
-                          </h3>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(production.status)}`}>
-                            {getStatusLabel(production.status)}
-                          </span>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPrioriteBadgeClass(production.priorite)}`}>
-                            {getPrioriteLabel(production.priorite)}
-                          </span>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                          <div>
-                            <span className="font-medium">Client:</span> {production.client_display}
-                          </div>
-                          <div>
-                            <span className="font-medium">Demandeur:</span> {production.demandeur_prenom} {production.demandeur_nom}
-                          </div>
-                          <div>
-                            <span className="font-medium">Créé le:</span> {new Date(production.date_creation).toLocaleDateString('fr-FR')}
-                          </div>
-                        </div>
-                        
-                        {production.date_livraison_prevue && (
-                          <div className="mt-2 text-sm text-gray-600">
-                            <span className="font-medium">Livraison prévue:</span> {new Date(production.date_livraison_prevue).toLocaleDateString('fr-FR')}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 ml-4">
-                        <button
-                          onClick={() => openProductionDetails(production)}
-                          className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
-                        >
-                          👁️ Voir détails
-                        </button>
-                        
-                        {user?.type_utilisateur === 'agent' && (
-                          <>
-                            <button
-                              onClick={() => openEditProductionForm(production)}
-                              className="bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-yellow-200 transition-colors"
-                            >
-                              ✏️ Modifier
-                            </button>
-                            <button
-                              onClick={() => handleDeleteProduction(production.id)}
-                              className="bg-red-100 text-red-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
-                            >
-                              🗑️ Supprimer
-                            </button>
-                          </>
-                        )}
-                      </div>
+        ) : (
+          productions.map(production => (
+            <div key={production.id} className="card p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Factory className="h-5 w-5 text-primary-600" />
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
+                      {production.titre}
+                    </h3>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                      #{production.numero_production}
+                    </span>
+                    {getStatusBadge(production.status)}
+                    {getPrioriteBadge(production.priorite)}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <Building className="h-4 w-4 mr-2" />
+                      <span className="font-medium">Client:</span>
+                      <span className="ml-1">{production.client_display}</span>
                     </div>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <User className="h-4 w-4 mr-2" />
+                      <span className="font-medium">Demandeur:</span>
+                      <span className="ml-1">{production.demandeur_prenom} {production.demandeur_nom}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <span className="font-medium">Créé le:</span>
+                      <span className="ml-1">{new Date(production.date_creation).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                  </div>
+                  
+                  {production.date_livraison_prevue && (
+                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      <Clock className="h-4 w-4 mr-2" />
+                      <span className="font-medium">Livraison prévue:</span>
+                      <span className="ml-1">{new Date(production.date_livraison_prevue).toLocaleDateString('fr-FR')}</span>
+                    </div>
+                  )}
 
-                    {/* Tâches expandables */}
-                    {expandedProduction === production.id && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <h4 className="font-medium text-gray-900 mb-3">📋 Tâches de production</h4>
-                        {production.taches && production.taches.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {production.taches.map(tache => (
-                              <div
-                                key={tache.id}
-                                className="bg-gray-50 border border-gray-200 rounded-lg p-3 hover:shadow-sm transition-shadow cursor-pointer"
-                                onClick={() => openTacheDetails({ ...tache, production })}
-                              >
-                                <div className="flex items-center justify-between mb-2">
-                                  <h5 className="font-medium text-sm text-gray-900 truncate">{tache.nom_tache}</h5>
-                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getTacheStatusBadgeClass(tache.status)}`}>
-                                    {getTacheStatusLabel(tache.status)}
-                                  </span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs text-gray-500">
-                                  <span>Ordre: {tache.ordre_tache}</span>
+                  {/* Tâches expandables */}
+                  {expandedProduction === production.id && (
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="font-medium text-gray-900 dark:text-dark-text mb-3 flex items-center">
+                        <ChevronDown className="h-4 w-4 mr-1" />
+                        Tâches de production
+                      </h4>
+                      {production.taches && production.taches.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {production.taches.map(tache => (
+                            <div
+                              key={tache.id}
+                              className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-sm transition-shadow cursor-pointer"
+                              onClick={() => openTacheDetails({ ...tache, production })}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <h5 className="font-medium text-sm text-gray-900 dark:text-dark-text truncate">{tache.nom_tache}</h5>
+                                {getTacheStatusBadge(tache.status)}
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span>Ordre: {tache.ordre_tache}</span>
+                                <div className="flex items-center space-x-2">
                                   {tache.nb_commentaires > 0 && <span>💬 {tache.nb_commentaires}</span>}
                                   {tache.nb_fichiers > 0 && <span>📎 {tache.nb_fichiers}</span>}
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 text-sm">Aucune tâche disponible</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune tâche disponible</p>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ))}
+
+                <div className="flex items-center space-x-2 ml-4">
+                  <button
+                    onClick={() => toggleExpandProduction(production.id)}
+                    className="btn-secondary p-2"
+                    title={expandedProduction === production.id ? "Réduire les tâches" : "Voir les tâches"}
+                  >
+                    {expandedProduction === production.id ? 
+                      <ChevronDown className="h-4 w-4" /> : 
+                      <ChevronRight className="h-4 w-4" />
+                    }
+                  </button>
+                  
+                  <button
+                    onClick={() => openProductionDetails(production)}
+                    className="btn-secondary flex items-center"
+                  >
+                    <Eye className="h-4 w-4 mr-1" />
+                    Détails
+                  </button>
+                  
+                  {isAgent && (
+                    <>
+                      <button
+                        onClick={() => openEditProductionForm(production)}
+                        className="btn-secondary flex items-center"
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Modifier
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduction(production.id)}
+                        className="btn-danger flex items-center"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Supprimer
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          ))
+        )}
       </div>
 
       {/* Modals */}
