@@ -17,13 +17,20 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
 
   useEffect(() => {
     if (production) {
+      // Convertir la date ISO en format YYYY-MM-DD pour le champ input[type="date"]
+      const formatDateForInput = (isoDate) => {
+        if (!isoDate) return '';
+        // Extraire seulement la partie date (YYYY-MM-DD) de l'ISO string
+        return isoDate.split('T')[0];
+      };
+
       setFormData({
         client_id: production.client_id || '',
         demandeur_id: production.demandeur_id || '',
         titre: production.titre || '',
         description: production.description || '',
         priorite: production.priorite || 'normale',
-        date_livraison_prevue: production.date_livraison_prevue || ''
+        date_livraison_prevue: formatDateForInput(production.date_livraison_prevue)
       });
     }
   }, [production]);
