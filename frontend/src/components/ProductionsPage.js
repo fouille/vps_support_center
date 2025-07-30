@@ -207,10 +207,12 @@ const ProductionsPage = () => {
       if (production && !production.taches) {
         try {
           const response = await api.get(`/api/production-taches?production_id=${productionId}`);
+          // La réponse est un array direct
+          const taches = Array.isArray(response) ? response : response.data || [];
           // Mettre à jour la production avec les tâches
           setProductions(prev => prev.map(p => 
             p.id === productionId 
-              ? { ...p, taches: response } 
+              ? { ...p, taches: taches } 
               : p
           ));
         } catch (error) {
