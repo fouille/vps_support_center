@@ -145,10 +145,11 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
           const newFile = response.data || response;
           setFichiers([...currentFichiers, newFile]);
           fetchCommentaires(); // Rafraîchir pour voir le commentaire auto
-          alert('Fichier uploadé avec succès');
+          setMessage({ type: 'success', content: 'Fichier uploadé avec succès' });
+          setTimeout(() => setMessage({ type: '', content: '' }), 3000);
         } catch (error) {
           console.error('Erreur lors de l\'upload:', error);
-          alert('Erreur lors de l\'upload du fichier');
+          setMessage({ type: 'error', content: 'Erreur lors de l\'upload du fichier' });
         } finally {
           setUploadingFile(false);
         }
