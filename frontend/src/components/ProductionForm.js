@@ -156,7 +156,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez les besoins et spécificités de cette production..."
               />
             </div>
