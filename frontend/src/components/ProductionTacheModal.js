@@ -204,7 +204,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col">
         {/* En-tête */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-t-lg">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">
@@ -226,7 +226,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               </button>
               <button
                 onClick={onClose}
-                className="text-white hover:text-orange-200 transition-colors"
+                className="text-white hover:text-primary-200 transition-colors"
               >
                 <span className="text-2xl">×</span>
               </button>
