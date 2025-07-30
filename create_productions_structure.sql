@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS production_taches (
 CREATE TABLE IF NOT EXISTS production_tache_commentaires (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     production_tache_id UUID NOT NULL REFERENCES production_taches(id) ON DELETE CASCADE,
-    auteur_id UUID NOT NULL REFERENCES demandeurs(id),
+    auteur_id UUID NOT NULL,  -- Peut être soit un agent soit un demandeur, pas de FK contrainte
     contenu TEXT NOT NULL,
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     type_commentaire VARCHAR(50) DEFAULT 'commentaire' CHECK (type_commentaire IN ('commentaire', 'status_change', 'file_upload', 'file_delete'))
