@@ -412,13 +412,13 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                     
                     return (
                       <div key={commentaire.id} className={`flex ${isAgent ? 'justify-start' : 'justify-end'} mb-4`}>
-                        <div className={`flex max-w-xs md:max-w-md lg:max-w-lg ${isAgent ? 'flex-row' : 'flex-row-reverse'} space-x-3`}>
+                        <div className={`flex max-w-xs md:max-w-md lg:max-w-lg ${isAgent ? 'flex-row' : 'flex-row-reverse'}`}>
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 ${
                             isAgent ? 'bg-blue-500' : 'bg-green-500'
-                          }`}>
+                          } ${isAgent ? 'mr-3' : 'ml-3'}`}>
                             {commentaire.auteur_nom ? commentaire.auteur_nom.charAt(0).toUpperCase() : 'U'}
                           </div>
-                          <div className={`${isAgent ? 'ml-3' : 'mr-3'} bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 ${
+                          <div className={`bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 ${
                             isAgent ? 'rounded-tl-sm' : 'rounded-tr-sm'
                           }`}>
                             <div className="flex items-center justify-between mb-2">
