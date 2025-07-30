@@ -387,13 +387,25 @@ const ProductionsPage = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Ex: 12345678"
-              value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
-              className="input w-full pr-10"
+              placeholder="Ex: 12345678 (appuyez sur Entrée)"
+              value={searchInput}
+              onChange={handleSearchInputChange}
+              onKeyPress={handleSearchKeyPress}
+              className="input w-full pr-20"
               maxLength={8}
             />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+              {searchInput && (
+                <button
+                  onClick={clearSearch}
+                  className="text-gray-400 hover:text-gray-600 mr-2"
+                  title="Effacer"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
               <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -401,7 +413,12 @@ const ProductionsPage = () => {
           </div>
           {searchFilter && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Recherche par numéro de production
+              Recherche active: #{searchFilter}
+            </p>
+          )}
+          {searchInput && !searchFilter && (
+            <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">
+              Appuyez sur Entrée pour rechercher
             </p>
           )}
         </div>
