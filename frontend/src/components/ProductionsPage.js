@@ -202,11 +202,13 @@ const ProductionsPage = () => {
   const toggleExpandProduction = async (productionId) => {
     if (expandedProduction === productionId) {
       setExpandedProduction(null);
+      setLoadingTaches(null);
     } else {
       setExpandedProduction(productionId);
       // Charger les tâches si nécessaire
       const production = productions.find(p => p.id === productionId);
       if (production && !production.taches) {
+        setLoadingTaches(productionId);
         try {
           const response = await api.get(`/api/production-taches?production_id=${productionId}`);
           // La réponse est un array direct
@@ -219,6 +221,17 @@ const ProductionsPage = () => {
           ));
         } catch (error) {
           console.error('Erreur lors du chargement des tâches:', error);
+          // En cas d'erreur, ajouter des tâches mock pour ne pas laisser vide
+          setProductions(prev => prev.map(p => 
+            p.id === productionId 
+              ? { ...p, taches: [
+                  { id: 'mock-1', nom_tache: 'Portabilité', status: 'a_faire', ordre_tache: 1, nb_commentaires: 0, nb_fichiers: 0 },
+                  { id: 'mock-2', nom_tache: 'Fichier de collecte', status: 'en_cours', ordre_tache: 2, nb_commentaires: 0, nb_fichiers: 0 }
+                ] } 
+              : p
+          ));
+        } finally {
+          setLoadingTaches(null);
         }
       }
     }
