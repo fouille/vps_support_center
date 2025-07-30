@@ -265,6 +265,22 @@ const ProductionsPage = () => {
     fetchProductions();
   };
 
+  // Gestion de la recherche par numéro
+  const handleSearchInputChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      setSearchFilter(searchInput);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearchFilter('');
+  };
+
   const handleDeleteProduction = async (productionId) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette production ?')) {
       try {
