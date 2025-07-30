@@ -168,11 +168,24 @@ exports.handler = async (event, context) => {
             c.prenom as client_prenom,
             d.nom as demandeur_nom,
             d.prenom as demandeur_prenom,
-            ds.nom_societe as societe_nom
+            ds.nom_societe as societe_nom,
+            -- Calcul de l'avancement (tâches terminées / tâches non hors scope)
+            CASE 
+              WHEN COALESCE(pt_stats.total_in_scope, 0) = 0 THEN 0
+              ELSE ROUND((COALESCE(pt_stats.termine, 0)::float / pt_stats.total_in_scope::float) * 100)
+            END as avancement_pourcentage
           FROM productions p
           LEFT JOIN clients c ON p.client_id = c.id
           LEFT JOIN demandeurs d ON p.demandeur_id = d.id
           LEFT JOIN demandeurs_societe ds ON p.societe_id = ds.id
+          LEFT JOIN (
+            SELECT 
+              production_id,
+              COUNT(CASE WHEN status != 'hors_scope' THEN 1 END) as total_in_scope,
+              COUNT(CASE WHEN status = 'termine' THEN 1 END) as termine
+            FROM production_taches
+            GROUP BY production_id
+          ) pt_stats ON p.id = pt_stats.production_id
           WHERE 1=1
         `;
 
