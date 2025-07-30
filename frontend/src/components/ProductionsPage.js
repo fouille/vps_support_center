@@ -432,12 +432,25 @@ const ProductionsPage = () => {
       )}
 
       {/* Liste des productions */}
-      <div className="grid gap-4">
-        {productions.length === 0 ? (
-          <div className="text-center py-12">
-            <Factory className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text mb-2">Aucune production trouvée</h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">Créez votre première demande de production</p>
+      <div className="relative">
+        {/* Indicateur de chargement du tableau */}
+        {loadingProductions && (
+          <div className="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center z-10">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+              <span className="text-gray-600 dark:text-gray-400">Actualisation des résultats...</span>
+            </div>
+          </div>
+        )}
+        
+        <div className="grid gap-4">
+          {productions.length === 0 && !loadingProductions ? (
+            <div className="text-center py-12">
+              <Factory className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text mb-2">Aucune production trouvée</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
+                {searchFilter ? 'Aucune production ne correspond à votre recherche' : 'Créez votre première demande de production'}
+              </p>
             <button
               onClick={openNewProductionForm}
               className="btn-primary"
