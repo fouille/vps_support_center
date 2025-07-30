@@ -7,7 +7,40 @@ L'utilisateur a demandé une interface de gestion de tickets de support avec int
 **Date**: 2025-07-30 12:50:00
 **Status**: 🔧 Bug Fixes Applied - Requires Database Setup for Testing
 
-### Nouvelle fonctionnalité "Productions" implémentée:
+### Corrections de bugs appliquées le 30/07/2025:
+
+**1. Erreur API 500 "column ds.nom does not exist" - ✅ CORRIGÉ**
+- **Fichier**: `/app/netlify/functions/production-tache-commentaires.js`
+- **Problème**: La requête SQL faisait référence à `ds.nom` au lieu de `ds.nom_societe`
+- **Solution**: Ligne 222 corrigée de `ds.nom as societe_nom` vers `ds.nom_societe as societe_nom`
+
+**2. Problème affichage modal de détail production - ✅ CORRIGÉ**
+- **Fichier**: `/app/frontend/src/components/ProductionsPage.js`
+- **Problème**: La réponse API n'était pas correctement traitée dans `openProductionDetails`
+- **Solution**: Amélioration de la gestion de la réponse API avec `response.data || response` et ajout de logs de debug
+
+**3. Loader manquant pour les tâches - ✅ AJOUTÉ**
+- **Fichier**: `/app/frontend/src/components/ProductionsPage.js`
+- **Ajouté**: État `loadingTaches` pour gérer l'affichage du loader
+- **Ajouté**: Spinner animé pendant le chargement des tâches
+- **Ajouté**: Gestion d'erreur avec fallback vers mock data
+
+**4. Script SQL unifié créé - ✅ NOUVEAU**
+- **Fichier**: `/app/setup_productions_database.sql`
+- **Contenu**: Script complet qui combine la création des tables ET la correction des contraintes
+- **Fonctionnalités**: Création automatique des 12 tâches, génération numéro 8 chiffres, triggers
+
+### Problème principal identifié:
+**🚨 REQUIS: La base de données Neon doit être mise à jour**
+- Les tables `productions`, `production_taches`, `production_tache_commentaires`, `production_tache_fichiers` n'existent pas
+- L'utilisateur doit exécuter le script `/app/setup_productions_database.sql` sur sa base Neon
+- Sans cette étape, les APIs retournent 404 et les tests ne peuvent pas être effectués
+
+### Prochaines étapes:
+1. **CRITIQUE**: Utilisateur doit exécuter `/app/setup_productions_database.sql` sur Neon
+2. **Test backend**: Vérifier que les APIs fonctionnent après création BDD
+3. **Test frontend**: Vérifier que les corrections d'interface fonctionnent
+4. **Validation**: Confirmer que tous les bugs mentionnés sont résolus
 - **Interface complète** : Page principale, formulaires, modals de détails et gestion des tâches
 - **12 tâches prédéfinies** : Portabilité, Fichier de collecte, Poste fixe, Lien internet, Netgate (reception/config/retour), Déploiement Siprouter, SIP2/3/4, Routages, Trunk Only, Facturation
 - **Système de commentaires** : Interface temps réel avec zones de commentaires par tâche
