@@ -329,10 +329,10 @@ const ProductionsPage = () => {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={() => fetchProductions(true)}
+            onClick={() => fetchProductions(false, true)}
             className="btn-secondary flex items-center"
             title="Actualiser la liste"
-            disabled={refreshingProductions}
+            disabled={refreshingProductions || loadingProductions}
           >
             <RefreshCw className={`h-5 w-5 mr-2 ${refreshingProductions ? 'animate-spin' : ''}`} />
             {refreshingProductions ? 'Actualisation...' : 'Actualiser'}
