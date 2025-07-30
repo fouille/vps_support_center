@@ -55,6 +55,10 @@ const ProductionsPage = () => {
     if (showRefreshingIndicator) setRefreshingProductions(true);
     else setLoading(true);
     
+    // Fermer tous les menus d'expansion lors de l'actualisation
+    setExpandedProduction(null);
+    setLoadingTaches(null);
+    
     try {
       const params = new URLSearchParams();
       if (statusFilter === 'active') {
