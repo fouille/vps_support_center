@@ -35,6 +35,7 @@ const ProductionsPage = () => {
   const [showTacheModal, setShowTacheModal] = useState(false);
   const [editingProduction, setEditingProduction] = useState(null);
   const [expandedProduction, setExpandedProduction] = useState(null);
+  const [loadingTaches, setLoadingTaches] = useState(null); // null quand pas de chargement, id de production sinon
   const [refreshingProductions, setRefreshingProductions] = useState(false);
 
   // États pour les filtres
