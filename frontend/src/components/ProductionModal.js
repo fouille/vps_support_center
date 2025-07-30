@@ -148,9 +148,9 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">
-                🏭 Production #{production.numero_production}
+                🏭 Production #{production.numero_production || 'N/A'}
               </h2>
-              <p className="opacity-90">{production.titre}</p>
+              <p className="opacity-90">{production.titre || 'Titre non défini'}</p>
             </div>
             <button
               onClick={onClose}
