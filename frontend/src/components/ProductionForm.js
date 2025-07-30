@@ -77,7 +77,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit}>
           {/* En-tête */}
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-lg">
@@ -104,7 +104,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
           <div className="p-6 space-y-6">
             {/* Sélection du client */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Client *
               </label>
               <SearchableSelect
@@ -119,7 +119,7 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
             {/* Sélection du demandeur (agents uniquement) */}
             {user?.type_utilisateur === 'agent' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Demandeur *
                 </label>
                 <SearchableSelect
@@ -134,14 +134,14 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
 
             {/* Titre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Titre *
               </label>
               <input
                 type="text"
                 value={formData.titre}
                 onChange={(e) => handleChange('titre', e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Ex: Installation télécom complète"
                 required
               />
@@ -149,14 +149,14 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Description
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={4}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Décrivez les besoins et spécificités de cette production..."
               />
             </div>
@@ -164,13 +164,13 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Priorité */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Priorité
                 </label>
                 <select
                   value={formData.priorite}
                   onChange={(e) => handleChange('priorite', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="basse">Basse</option>
                   <option value="normale">Normale</option>
@@ -181,31 +181,31 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
 
               {/* Date de livraison prévue */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Date de livraison prévue
                 </label>
                 <input
                   type="date"
                   value={formData.date_livraison_prevue}
                   onChange={(e) => handleChange('date_livraison_prevue', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
             </div>
 
             {/* Informations sur les tâches automatiques */}
             {!production && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start">
-                  <div className="text-blue-400 mr-3">
+                  <div className="text-blue-400 dark:text-blue-300 mr-3">
                     <span className="text-xl">ℹ️</span>
                   </div>
                   <div>
-                    <h4 className="font-medium text-blue-900 mb-2">Tâches automatiques</h4>
-                    <p className="text-sm text-blue-700 mb-2">
+                    <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Tâches automatiques</h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-400 mb-2">
                       Les 12 tâches suivantes seront automatiquement créées pour cette production :
                     </p>
-                    <ul className="text-xs text-blue-600 grid grid-cols-2 gap-1">
+                    <ul className="text-xs text-blue-600 dark:text-blue-400 grid grid-cols-2 gap-1">
                       <li>1. Portabilité</li>
                       <li>2. Fichier de collecte</li>
                       <li>3. Poste fixe</li>
@@ -226,11 +226,11 @@ const ProductionForm = ({ production, clients, demandeurs, onClose, onSave }) =>
           </div>
 
           {/* Pied de page */}
-          <div className="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
+          <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 rounded-b-lg flex justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 transition-colors"
               disabled={loading}
             >
               Annuler
