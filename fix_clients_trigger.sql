@@ -1,14 +1,11 @@
--- Script de correction pour le trigger update_updated_at_column
+-- Script de correction CIBLÉ pour le trigger clients uniquement
 -- À exécuter dans votre base de données Neon
 
--- Supprimer le trigger existant sur la table clients (au cas où il serait corrompu)
+-- 1. Supprimer seulement le trigger sur la table clients
 DROP TRIGGER IF EXISTS update_clients_updated_at ON clients;
 
--- Supprimer la fonction existante si elle est corrompue
-DROP FUNCTION IF EXISTS update_updated_at_column();
-
--- Recréer la fonction correctement
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- 2. Créer une fonction spécifique pour les clients (pour éviter les conflits)
+CREATE OR REPLACE FUNCTION update_clients_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
@@ -16,11 +13,23 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Recréer le trigger pour la table clients
+-- 3. Recréer le trigger clients avec la fonction spécifique
 CREATE TRIGGER update_clients_updated_at 
     BEFORE UPDATE ON clients 
     FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+    EXECUTE FUNCTION update_clients_updated_at_column();
 
--- Note: Ce script corrige le problème du trigger qui référençait 'date_modification' 
--- au lieu de 'updated_at' dans la table clients
+-- Alternative si vous préférez corriger la fonction globale :
+-- Décommentez les lignes suivantes SEULEMENT si vous êtes sûr que 
+-- la fonction globale fait référence à 'date_modification' au lieu de 'updated_at'
+
+-- CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     NEW.updated_at = CURRENT_TIMESTAMP;
+--     RETURN NEW;
+-- END;
+-- $$ language 'plpgsql';
+
+-- Note: Ce script crée une fonction spécifique pour éviter d'affecter 
+-- les autres tables qui utilisent update_updated_at_column()
