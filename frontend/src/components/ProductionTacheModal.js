@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const { api, user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [loadingCommentaires, setLoadingCommentaires] = useState(true);
   const [commentaires, setCommentaires] = useState([]);
   const [fichiers, setFichiers] = useState([]);
   const [nouveauCommentaire, setNouveauCommentaire] = useState('');
