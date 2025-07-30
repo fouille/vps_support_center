@@ -387,6 +387,7 @@ exports.handler = async (event, context) => {
           userType,
           tickets: ticketsData,
           portabilites: portabilitesData,
+          productions: productionsData,
           additional: additionalStats
         })
       };
