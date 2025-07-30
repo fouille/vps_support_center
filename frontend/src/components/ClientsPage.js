@@ -170,6 +170,11 @@ const ClientsPage = () => {
     }
   };
 
+  const handleSocieteFilterChange = (societeId) => {
+    setSelectedSociete(societeId);
+    setCurrentPage(1); // Reset à la page 1 lors du changement de filtre
+  };
+
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
   };
@@ -181,7 +186,8 @@ const ClientsPage = () => {
       adresse: client.adresse,
       nom: client.nom || '',
       prenom: client.prenom || '',
-      numero: client.numero || ''
+      numero: client.numero || '',
+      societe_id: client.societe_id || ''
     });
     setShowModal(true);
   };
