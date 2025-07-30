@@ -90,6 +90,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const handleUpdateTache = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setMessage({ type: '', content: '' }); // Réinitialiser les messages
     try {
       const response = await api.put(`/api/production-taches/${tache.id}`, tacheData);
       
@@ -101,11 +102,14 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
       tache.commentaire_interne = updatedTache.commentaire_interne || tacheData.commentaire_interne;
       
       setEditingTache(false);
+      setMessage({ type: 'success', content: 'Tâche mise à jour avec succès' });
       if (onRefresh) onRefresh();
-      alert('Tâche mise à jour avec succès');
+      
+      // Masquer le message de succès après 3 secondes
+      setTimeout(() => setMessage({ type: '', content: '' }), 3000);
     } catch (error) {
       console.error('Erreur lors de la mise à jour:', error);
-      alert('Erreur lors de la mise à jour de la tâche');
+      setMessage({ type: 'error', content: 'Erreur lors de la mise à jour de la tâche' });
     } finally {
       setLoading(false);
     }
