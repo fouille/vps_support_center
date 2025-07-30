@@ -41,7 +41,8 @@ const ProductionsPage = () => {
   // États pour les filtres
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
   const [clientFilter, setClientFilter] = useState('');
-  const [searchFilter, setSearchFilter] = useState('');
+  const [searchFilter, setSearchFilter] = useState(''); // Filtre de recherche actif
+  const [searchInput, setSearchInput] = useState(''); // Saisie en cours (avant validation)
 
   useEffect(() => {
     fetchProductions();
