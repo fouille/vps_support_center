@@ -117,7 +117,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         {/* En-tête */}
-        <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-t-lg">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-6 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">
@@ -127,7 +127,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-red-200 transition-colors"
+              className="text-white hover:text-primary-200 transition-colors"
             >
               <span className="text-2xl">×</span>
             </button>
