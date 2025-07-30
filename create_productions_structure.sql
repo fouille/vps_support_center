@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS production_tache_fichiers (
     type_fichier VARCHAR(100),
     taille_fichier INTEGER,
     contenu_base64 TEXT NOT NULL,
-    uploaded_by UUID NOT NULL REFERENCES demandeurs(id),
+    uploaded_by UUID NOT NULL,  -- Peut être soit un agent soit un demandeur, pas de FK contrainte
     date_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
