@@ -398,7 +398,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                       onChange={(e) => setNouveauCommentaire(e.target.value)}
                       placeholder="Ajouter un commentaire..."
                       rows={2}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
                     />
                     <div className="flex justify-between items-center mt-2">
                       <div className="text-xs text-gray-500">
