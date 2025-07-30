@@ -51,6 +51,18 @@ const getMockData = (userType) => {
         rejete: 1
       }
     },
+    productions: {
+      non_termine: 8,
+      termine: 5,
+      bloque: 2,
+      total: 15,
+      byStatus: {
+        en_attente: 3,
+        en_cours: 5,
+        termine: 5,
+        bloque: 2
+      }
+    },
     additional: userType === 'agent' ? {
       parSociete: [
         { societe: 'Société A', demandeurs: 3, tickets: 8, portabilites: 5 },
