@@ -73,6 +73,7 @@ const ClientsPage = () => {
     }
   }, [searchTerm]);
 
+  // Fonctions de récupération des données
   const fetchSocietes = async () => {
     try {
       const response = await api.get('/api/demandeurs-societe?limit=100');
