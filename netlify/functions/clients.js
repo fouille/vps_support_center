@@ -30,10 +30,12 @@ exports.handler = async (event, context) => {
   try {
     // Verify authentication
     const authHeader = event.headers.authorization || event.headers.Authorization;
-    verifyToken(authHeader);
+    const decoded = verifyToken(authHeader);
 
     const pathParts = event.path.split('/');
     const clientId = pathParts[pathParts.length - 1];
+    const userType = decoded.type_utilisateur || decoded.type;
+    const userId = decoded.id;
 
     switch (event.httpMethod) {
       case 'GET':
