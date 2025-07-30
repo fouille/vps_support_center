@@ -200,7 +200,8 @@ const ClientsPage = () => {
       adresse: '',
       nom: '',
       prenom: '',
-      numero: ''
+      numero: '',
+      societe_id: ''
     });
     setError('');
   };
