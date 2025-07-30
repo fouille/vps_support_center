@@ -138,8 +138,13 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
 
   const calculateProgress = () => {
     if (taches.length === 0) return 0;
-    const terminatedTasks = taches.filter(t => t.status === 'termine').length;
-    return Math.round((terminatedTasks / taches.length) * 100);
+    
+    // Filtrer les tâches hors scope du calcul
+    const tachesInScope = taches.filter(t => t.status !== 'hors_scope');
+    if (tachesInScope.length === 0) return 0;
+    
+    const terminatedTasks = tachesInScope.filter(t => t.status === 'termine').length;
+    return Math.round((terminatedTasks / tachesInScope.length) * 100);
   };
 
   // Fonction pour mettre à jour le statut de la production (agents seulement)
