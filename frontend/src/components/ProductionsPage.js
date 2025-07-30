@@ -46,16 +46,17 @@ const ProductionsPage = () => {
   const [searchInput, setSearchInput] = useState(''); // Saisie en cours (avant validation)
 
   useEffect(() => {
-    fetchProductions();
+    fetchProductions(true); // Chargement initial
     fetchClients();
     if (isAgent) {
       fetchDemandeurs();
     }
   }, []);
 
-  // Actualiser automatiquement lors du changement de filtres
+  // Actualiser automatiquement lors du changement de filtres (sauf chargement initial)
   useEffect(() => {
-    fetchProductions();
+    if (loading) return; // Ne pas déclencher pendant le chargement initial
+    fetchProductions(false); // Chargement des filtres seulement
   }, [statusFilter, clientFilter, searchFilter]);
 
   const fetchProductions = async (isInitialLoad = false, showRefreshingIndicator = false) => {
