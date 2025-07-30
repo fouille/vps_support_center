@@ -188,11 +188,25 @@ exports.handler = async (event, context) => {
 
       case 'PUT':
         const updateData = JSON.parse(event.body);
-        const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom, numero: upd_numero } = updateData;
+        const { nom_societe: upd_societe, adresse: upd_adresse, nom: upd_nom, prenom: upd_prenom, numero: upd_numero, societe_id: upd_societe_id } = updateData;
         
+        // Déterminer le societe_id selon le type d'utilisateur
+        let finalSocieteId = upd_societe_id;
+        
+        if (userType === 'demandeur') {
+          // Pour les demandeurs, forcer leur propre société
+          const demandeur = await sql`
+            SELECT societe_id FROM demandeurs WHERE id = ${userId}
+          `;
+          
+          if (demandeur.length > 0 && demandeur[0].societe_id) {
+            finalSocieteId = demandeur[0].societe_id;
+          }
+        }
+
         const updatedClient = await sql`
           UPDATE clients 
-          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}
+          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}, societe_id = ${finalSocieteId || null}
           WHERE id = ${clientId}
           RETURNING *
         `;
