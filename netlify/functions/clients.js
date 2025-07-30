@@ -206,7 +206,13 @@ exports.handler = async (event, context) => {
 
         const updatedClient = await sql`
           UPDATE clients 
-          SET nom_societe = ${upd_societe}, adresse = ${upd_adresse}, nom = ${upd_nom || null}, prenom = ${upd_prenom || null}, numero = ${upd_numero || null}, societe_id = ${finalUpdateSocieteId || null}
+          SET nom_societe = ${upd_societe}, 
+              adresse = ${upd_adresse}, 
+              nom = ${upd_nom || null}, 
+              prenom = ${upd_prenom || null}, 
+              numero = ${upd_numero || null}, 
+              societe_id = ${finalUpdateSocieteId || null},
+              updated_at = CURRENT_TIMESTAMP
           WHERE id = ${clientId}
           RETURNING *
         `;
