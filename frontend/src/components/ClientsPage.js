@@ -237,7 +237,9 @@ const ClientsPage = () => {
         </div>
 
         {/* Zone de recherche - toujours visible */}
-        <div className="mb-6">
+        {/* Recherche et Filtres */}
+        <div className="mb-6 space-y-4">
+          {/* Barre de recherche */}
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
@@ -255,13 +257,36 @@ const ClientsPage = () => {
               </div>
             )}
           </div>
+
+          {/* Filtre société pour les agents */}
+          {user?.type_utilisateur === 'agent' && (
+            <div className="max-w-md">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Filtrer par société
+              </label>
+              <select
+                value={selectedSociete}
+                onChange={(e) => handleSocieteFilterChange(e.target.value)}
+                className="input w-full"
+              >
+                <option value="">Toutes les sociétés</option>
+                {societes.map((societe) => (
+                  <option key={societe.id} value={societe.id}>
+                    {societe.nom_societe}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Messages informatifs */}
           {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
-            <p className="text-sm text-orange-500 dark:text-orange-400 mt-2">
+            <p className="text-sm text-orange-500 dark:text-orange-400">
               Tapez au moins 3 caractères pour rechercher
             </p>
           )}
           {searchTerm && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {pagination.total} résultat{pagination.total > 1 ? 's' : ''} pour "{searchTerm}"
             </p>
           )}
