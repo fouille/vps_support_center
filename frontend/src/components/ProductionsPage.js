@@ -375,7 +375,7 @@ const ProductionsPage = () => {
             </button>
           </div>
         ) : (
-          productions.map(production => (
+          (Array.isArray(productions) ? productions : []).map(production => (
             <div key={production.id} className="card p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
