@@ -179,10 +179,12 @@ CREATE TRIGGER trigger_create_default_tasks
 -- 9. Supprimer les contraintes problématiques si elles existent
 ALTER TABLE productions DROP CONSTRAINT IF EXISTS productions_created_by_fkey;
 ALTER TABLE production_tache_commentaires DROP CONSTRAINT IF EXISTS production_tache_commentaires_auteur_id_fkey;
+ALTER TABLE production_tache_fichiers DROP CONSTRAINT IF EXISTS production_tache_fichiers_uploaded_by_fkey;
 
 -- 10. Commentaires pour clarifier les champs sans contrainte FK
 COMMENT ON COLUMN productions.created_by IS 'ID de l''utilisateur qui a créé la production (peut être un agent ou un demandeur)';
 COMMENT ON COLUMN production_tache_commentaires.auteur_id IS 'ID de l''utilisateur qui a écrit le commentaire (peut être un agent ou un demandeur)';
+COMMENT ON COLUMN production_tache_fichiers.uploaded_by IS 'ID de l''utilisateur qui a uploadé le fichier (peut être un agent ou un demandeur)';
 
 -- 11. Créer une production de test UNIQUEMENT si les tables requises existent
 DO $$
