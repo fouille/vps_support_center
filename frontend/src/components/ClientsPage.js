@@ -476,6 +476,27 @@ const ClientsPage = () => {
                 />
               </div>
 
+              {/* Champ société - visible seulement pour les agents */}
+              {user?.type_utilisateur === 'agent' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                    Société de demandeur
+                  </label>
+                  <select
+                    value={formData.societe_id}
+                    onChange={(e) => setFormData({ ...formData, societe_id: e.target.value })}
+                    className="input"
+                  >
+                    <option value="">Aucune société assignée</option>
+                    {societes.map((societe) => (
+                      <option key={societe.id} value={societe.id}>
+                        {societe.nom_societe}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
