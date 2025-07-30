@@ -42,6 +42,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
 
   // Debug: vérifier la structure des données reçues
   console.log('ProductionModal - production:', production);
+  console.log('ProductionModal - production.taches:', production?.taches);
 
   // Guard: vérifier que production existe APRÈS les hooks
   if (!production) {
