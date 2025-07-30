@@ -233,13 +233,13 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col">
         {/* En-tête */}
-        <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 rounded-t-lg">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-dark-text">
                 📋 Tâche #{tache.ordre_tache} - {tache.nom_tache}
               </h2>
-              <p className="opacity-90 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Production #{tache.production?.numero_production} - {tache.production?.titre}
               </p>
             </div>
@@ -249,13 +249,13 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               </span>
               <button
                 onClick={() => setEditingTache(!editingTache)}
-                className="bg-white bg-opacity-20 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-opacity-30 transition-colors"
+                className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
               >
                 {editingTache ? 'Annuler' : '✏️ Modifier'}
               </button>
               <button
                 onClick={onClose}
-                className="text-white hover:text-primary-200 transition-colors"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
               >
                 <span className="text-2xl">×</span>
               </button>
