@@ -450,11 +450,13 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Productions API - Complete Implementation Testing"
     - "Demandeur Transfer Functionality Before Deletion"
   stuck_tasks:
+    - "Productions API - Complete Implementation Testing"
     - "Demandeur Transfer Functionality Before Deletion"
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "testing"
