@@ -419,6 +419,34 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Détail par statut - Productions */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-4">
+            Productions par Statut
+          </h3>
+          {productionsDetailData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={productionsDetailData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="status" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  className="text-xs"
+                />
+                <YAxis />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="count" fill={COLORS.secondary} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-dark-text-secondary">
+              Aucune donnée
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Statistiques supplémentaires pour les agents */}
