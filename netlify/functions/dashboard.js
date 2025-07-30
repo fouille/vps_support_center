@@ -192,6 +192,34 @@ exports.handler = async (event, context) => {
 
       const portabilitesStats = await sql(portabilitesQuery, filterParams);
 
+      // Récupérer les statistiques des productions
+      const productionsQuery = ticketFilter
+        ? `
+          SELECT 
+            status,
+            COUNT(*) as count
+          FROM productions pr
+          JOIN demandeurs d ON pr.demandeur_id = d.id 
+          WHERE d.societe_id = $1
+          GROUP BY status
+        `
+        : `
+          SELECT 
+            status,
+            COUNT(*) as count
+          FROM productions
+          GROUP BY status
+        `;
+
+      let productionsStats = [];
+      try {
+        productionsStats = await sql(productionsQuery, filterParams);
+      } catch (error) {
+        // Si la table productions n'existe pas encore, ignorer
+        console.log('Table productions non disponible:', error.message);
+        productionsStats = [];
+      }
+
       // Traitement des statistiques tickets
       const ticketsData = {
         ouverts: 0,
