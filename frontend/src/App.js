@@ -12,6 +12,7 @@ import TicketsPage from './components/TicketsPage';
 import PortabilitesPage from './components/PortabilitesPage';
 import PortabiliteForm from './components/PortabiliteForm';
 import PortabiliteDetail from './components/PortabiliteDetail';
+import ProductionsPage from './components/ProductionsPage';
 import './App.css';
 
 const AppContent = () => {
