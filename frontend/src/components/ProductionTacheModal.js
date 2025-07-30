@@ -169,10 +169,11 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
       await api.delete(`/api/production-tache-fichiers/${fileId}`);
       setFichiers(fichiers.filter(f => f.id !== fileId));
       fetchCommentaires(); // Rafraîchir pour voir le commentaire auto
-      alert('Fichier supprimé avec succès');
+      setMessage({ type: 'success', content: 'Fichier supprimé avec succès' });
+      setTimeout(() => setMessage({ type: '', content: '' }), 3000);
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-      alert('Erreur lors de la suppression du fichier');
+      console.error('Erreur lors de la suppression du fichier:', error);
+      setMessage({ type: 'error', content: 'Erreur lors de la suppression du fichier' });
     }
   };
 
