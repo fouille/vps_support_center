@@ -107,13 +107,20 @@ exports.handler = async (event, context) => {
       const tachesQuery = `
         SELECT 
           pt.*,
-          COUNT(ptc.id) as nb_commentaires,
-          COUNT(ptf.id) as nb_fichiers
+          COALESCE(commentaires.nb_commentaires, 0) as nb_commentaires,
+          COALESCE(fichiers.nb_fichiers, 0) as nb_fichiers
         FROM production_taches pt
-        LEFT JOIN production_tache_commentaires ptc ON pt.id = ptc.production_tache_id
-        LEFT JOIN production_tache_fichiers ptf ON pt.id = ptf.production_tache_id
+        LEFT JOIN (
+          SELECT production_tache_id, COUNT(*) as nb_commentaires
+          FROM production_tache_commentaires
+          GROUP BY production_tache_id
+        ) commentaires ON pt.id = commentaires.production_tache_id
+        LEFT JOIN (
+          SELECT production_tache_id, COUNT(*) as nb_fichiers
+          FROM production_tache_fichiers
+          GROUP BY production_tache_id
+        ) fichiers ON pt.id = fichiers.production_tache_id
         WHERE pt.production_id = $1
-        GROUP BY pt.id
         ORDER BY pt.ordre_tache ASC
       `;
 
