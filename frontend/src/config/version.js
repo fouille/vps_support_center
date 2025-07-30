@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 19,      // Version mineure - nouvelles fonctionnalités
-  patch: 8,      // Version patch - corrections de bugs
+  minor: 20,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-30", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.20.0",
+    date: "2025-07-30",
+    type: "MINOR",
+    description: "Correction navigation: ajout menu 'Mes Clients' pour les demandeurs"
+  },
+{
     version: "1.19.8",
     date: "2025-07-30",
     type: "PATCH",
