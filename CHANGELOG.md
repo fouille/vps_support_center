@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.19.0] - 2025-07-30
+### Added
+- ✨ Améliorations UX Portabilités, Productions et Dashboard - Dates dépassées, suppression infos test login, style modal productions, édition statut production agents, nouvelles statistiques productions
+
 ## [1.18.4] - 2025-07-30
 ### Fixed
 - 🔧 Amélioration UX recherche productions: validation sur Entrée et actualisation tableau uniquement

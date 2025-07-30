@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 18,      // Version mineure - nouvelles fonctionnalités
-  patch: 4,      // Version patch - corrections de bugs
+  minor: 19,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-30", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.19.0",
+    date: "2025-07-30",
+    type: "MINOR",
+    description: "Améliorations UX Portabilités, Productions et Dashboard - Dates dépassées, suppression infos test login, style modal productions, édition statut production agents, nouvelles statistiques productions"
+  },
+{
     version: "1.18.4",
     date: "2025-07-30",
     type: "PATCH",
