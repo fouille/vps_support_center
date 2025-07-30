@@ -586,6 +586,7 @@ const ProductionsPage = () => {
             </div>
           ))
         )}
+        </div>
       </div>
 
       {/* Modals */}
