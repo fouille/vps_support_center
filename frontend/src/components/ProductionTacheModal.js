@@ -186,8 +186,8 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.error('Erreur lors du téléchargement:', error);
-      alert('Erreur lors du téléchargement du fichier');
+      console.error('Erreur lors du téléchargement du fichier:', error);
+      setMessage({ type: 'error', content: 'Erreur lors du téléchargement du fichier' });
     }
   };
 
