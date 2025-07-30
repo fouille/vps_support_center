@@ -8,6 +8,7 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
   const [selectedTache, setSelectedTache] = useState(null);
   const [showTacheModal, setShowTacheModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     // Si les tâches sont déjà présentes dans l'objet production, les utiliser
