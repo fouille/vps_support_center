@@ -6789,8 +6789,8 @@ def test_productions_api_fixes():
     else:
         results.add_result("GET - Comments retrieval", False, "No task ID available for testing")
     
-    # Step 5: Test parameter validation
-    print("\n📋 STEP 5: Parameter Validation Tests")
+    # Step 8: Test parameter validation
+    print("\n📋 STEP 8: Parameter Validation Tests")
     
     # Test missing production_tache_id parameter
     try:
@@ -6822,12 +6822,12 @@ def test_productions_api_fixes():
         except Exception as e:
             results.add_result("POST - Empty content validation", False, str(e))
     
-    # Step 6: Test authentication validation
-    print("\n📋 STEP 6: Authentication Validation")
+    # Step 9: Test authentication validation
+    print("\n📋 STEP 9: Authentication Validation")
     
     # Test without token
     try:
-        response = requests.get(f"{API_BASE}/productions/{test_production_id}", timeout=10)
+        response = requests.get(f"{API_BASE}/productions/{production_id if production_id else test_production_id}", timeout=10)
         
         if response.status_code == 401:
             results.add_result("GET - No token authentication", True)
@@ -6839,7 +6839,7 @@ def test_productions_api_fixes():
     # Test with invalid token
     try:
         invalid_headers = {"Authorization": "Bearer invalid_token"}
-        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=invalid_headers, timeout=10)
+        response = requests.get(f"{API_BASE}/productions/{production_id if production_id else test_production_id}", headers=invalid_headers, timeout=10)
         
         if response.status_code == 401:
             results.add_result("GET - Invalid token authentication", True)
