@@ -81,7 +81,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Erreur lors de l\'ajout du commentaire:', error);
-      alert('Erreur lors de l\'ajout du commentaire');
+      setMessage({ type: 'error', content: 'Erreur lors de l\'ajout du commentaire' });
     } finally {
       setLoading(false);
     }
