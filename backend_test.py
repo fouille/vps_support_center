@@ -6754,25 +6754,61 @@ def test_productions_api_fixes():
     return results.summary()
 
 if __name__ == "__main__":
-    print("🚀 Starting Backend API Tests - Productions API")
-    print("="*60)
+    import sys
     
-    # Run Productions API test as requested in review
-    success = True
-    
-    # Test: Productions API Functionality (PRIORITY TEST)
-    print("\n" + "="*60)
-    print("TEST: PRODUCTIONS API FUNCTIONALITY")
-    print("="*60)
-    success &= test_productions_api()
-    
-    print("\n" + "="*60)
-    print("FINAL RESULT")
-    print("="*60)
-    
-    if success:
-        print("✅ ALL TESTS PASSED")
-        sys.exit(0)
+    if len(sys.argv) > 1:
+        test_name = sys.argv[1]
+        
+        if test_name == "ticket-echanges":
+            success = test_ticket_echanges_api()
+        elif test_name == "clients-pagination":
+            success = test_clients_pagination_search_api()
+        elif test_name == "tickets-numero":
+            success = test_tickets_numero_and_search_api()
+        elif test_name == "portabilite":
+            success = test_portabilite_apis()
+        elif test_name == "database-debug":
+            success = test_database_query_debug()
+        elif test_name == "demandeur-transfer-debug":
+            success = test_demandeur_transfer_debug()
+        elif test_name == "demandeur-transfer":
+            success = test_demandeur_transfer_functionality()
+        elif test_name == "mailjet":
+            success = test_mailjet_email_integration()
+        elif test_name == "productions-fixes":
+            success = test_productions_api_fixes()
+        else:
+            print(f"Unknown test: {test_name}")
+            print("Available tests: ticket-echanges, clients-pagination, tickets-numero, portabilite, database-debug, demandeur-transfer-debug, demandeur-transfer, mailjet, productions-fixes")
+            sys.exit(1)
     else:
-        print("❌ SOME TESTS FAILED")
-        sys.exit(1)
+        # Run all tests by default
+        print("Running all available tests...")
+        success = True
+        
+        tests = [
+            ("Ticket Comments API", test_ticket_echanges_api),
+            ("Clients Pagination & Search API", test_clients_pagination_search_api),
+            ("Tickets numero_ticket & Search API", test_tickets_numero_and_search_api),
+            ("Portabilité APIs", test_portabilite_apis),
+            ("Database Query Debug", test_database_query_debug),
+            ("Demandeur Transfer Debug", test_demandeur_transfer_debug),
+            ("Demandeur Transfer Functionality", test_demandeur_transfer_functionality),
+            ("Mailjet Email Integration", test_mailjet_email_integration),
+            ("Productions API Fixes", test_productions_api_fixes)
+        ]
+        
+        for test_name, test_func in tests:
+            print(f"\n{'='*80}")
+            print(f"RUNNING: {test_name}")
+            print(f"{'='*80}")
+            
+            try:
+                test_success = test_func()
+                if not test_success:
+                    success = False
+            except Exception as e:
+                print(f"❌ Test {test_name} failed with exception: {e}")
+                success = False
+    
+    sys.exit(0 if success else 1)
