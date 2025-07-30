@@ -777,6 +777,107 @@ const emailService = {
     };
     
     return await sendEmail([recipient], template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de la création d'une production
+  sendProductionCreationEmail: async (production) => {
+    const template = createEmailTemplate.productionCreated(production);
+    
+    // Envoyer à contact@voipservices.fr et au demandeur
+    const recipients = [
+      { Email: 'contact@voipservices.fr', Name: 'Support VoIP Services' },
+      { Email: production.demandeur_email, Name: `${production.demandeur_prenom} ${production.demandeur_nom}` }
+    ];
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de l'ajout d'un commentaire sur une production
+  sendProductionCommentEmail: async (production, tache, comment, author) => {
+    const template = createEmailTemplate.productionCommentAdded(production, tache, comment, author);
+    
+    // Déterminer le destinataire selon l'auteur
+    let recipient;
+    if ((author.type_utilisateur || author.type) === 'agent') {
+      // Si l'agent commente, envoyer au demandeur
+      recipient = { 
+        Email: production.demandeur_email, 
+        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
+      };
+    } else {
+      // Si le demandeur commente, envoyer au support
+      recipient = { 
+        Email: 'contact@voipservices.fr', 
+        Name: 'Support VoIP Services'
+      };
+    }
+    
+    return await sendEmail([recipient], template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de l'upload d'un fichier sur une production
+  sendProductionFileUploadEmail: async (production, tache, fichier, author) => {
+    const template = createEmailTemplate.productionFileUploaded(production, tache, fichier, author);
+    
+    // Déterminer le destinataire selon l'auteur
+    let recipient;
+    if ((author.type_utilisateur || author.type) === 'agent') {
+      // Si l'agent upload, envoyer au demandeur
+      recipient = { 
+        Email: production.demandeur_email, 
+        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
+      };
+    } else {
+      // Si le demandeur upload, envoyer au support
+      recipient = { 
+        Email: 'contact@voipservices.fr', 
+        Name: 'Support VoIP Services'
+      };
+    }
+    
+    return await sendEmail([recipient], template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de la suppression d'un fichier sur une production
+  sendProductionFileDeleteEmail: async (production, fichier, author) => {
+    const template = createEmailTemplate.productionFileUploaded(production, { nom_tache: 'Fichier supprimé' }, fichier, author);
+    // Modifier le sujet pour indiquer la suppression
+    const deleteTemplate = {
+      ...template,
+      subject: `Fichier supprimé sur la production #${production.numero_production}`,
+      html: template.html.replace('📎 Nouveau Fichier', '🗑️ Fichier Supprimé').replace('Un fichier a été ajouté', 'Un fichier a été supprimé')
+    };
+    
+    // Déterminer le destinataire selon l'auteur
+    let recipient;
+    if ((author.type_utilisateur || author.type) === 'agent') {
+      // Si l'agent supprime, envoyer au demandeur
+      recipient = { 
+        Email: production.demandeur_email, 
+        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
+      };
+    } else {
+      // Si le demandeur supprime, envoyer au support
+      recipient = { 
+        Email: 'contact@voipservices.fr', 
+        Name: 'Support VoIP Services'
+      };
+    }
+    
+    return await sendEmail([recipient], deleteTemplate.subject, deleteTemplate.html, deleteTemplate.text);
+  },
+
+  // Envoi d'email lors du changement de statut d'une production
+  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus) => {
+    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus);
+    
+    // Envoyer seulement au demandeur
+    const recipient = { 
+      Email: production.demandeur_email, 
+      Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
+    };
+    
+    return await sendEmail([recipient], template.subject, template.html, template.text);
   }
 };
 
