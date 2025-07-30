@@ -116,16 +116,19 @@ CREATE TRIGGER trigger_set_production_number
     FOR EACH ROW
     EXECUTE FUNCTION set_production_number();
 
--- 6. Trigger pour mettre à jour automatiquement updated_at
-CREATE TRIGGER update_productions_updated_at 
-    BEFORE UPDATE ON productions 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+-- 6. Trigger pour mettre à jour automatiquement date_modification
+-- Note: Les triggers sont supprimés car les APIs gèrent manuellement date_modification
+-- CREATE TRIGGER update_productions_updated_at 
+--     BEFORE UPDATE ON productions 
+--     FOR EACH ROW 
+--     EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_production_taches_updated_at 
-    BEFORE UPDATE ON production_taches 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+-- CREATE TRIGGER update_production_taches_updated_at 
+--     BEFORE UPDATE ON production_taches 
+--     FOR EACH ROW 
+--     EXECUTE FUNCTION update_updated_at_column();
+
+-- Les triggers automatiques sont désactivés pour éviter les conflits avec les mises à jour manuelles dans les APIs
 
 -- 7. Fonction pour créer automatiquement les 12 taches prédéfinies
 CREATE OR REPLACE FUNCTION create_default_production_tasks(production_id_param UUID)
