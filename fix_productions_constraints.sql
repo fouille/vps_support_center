@@ -4,10 +4,14 @@
 -- Supprimer la contrainte foreign key sur created_by si elle existe
 ALTER TABLE productions DROP CONSTRAINT IF EXISTS productions_created_by_fkey;
 
--- Le champ created_by peut maintenant contenir l'ID d'un agent ou d'un demandeur
--- sans contrainte de foreign key car il peut référencer deux tables différentes
+-- Supprimer la contrainte foreign key sur auteur_id dans production_tache_commentaires
+ALTER TABLE production_tache_commentaires DROP CONSTRAINT IF EXISTS production_tache_commentaires_auteur_id_fkey;
 
--- Optionnel: Ajouter un commentaire pour clarifier
+-- Les champs created_by et auteur_id peuvent maintenant contenir l'ID d'un agent ou d'un demandeur
+-- sans contrainte de foreign key car ils peuvent référencer deux tables différentes
+
+-- Optionnel: Ajouter des commentaires pour clarifier
 COMMENT ON COLUMN productions.created_by IS 'ID de l''utilisateur qui a créé la production (peut être un agent ou un demandeur)';
+COMMENT ON COLUMN production_tache_commentaires.auteur_id IS 'ID de l''utilisateur qui a écrit le commentaire (peut être un agent ou un demandeur)';
 
 COMMIT;
