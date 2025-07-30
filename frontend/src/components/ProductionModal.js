@@ -9,6 +9,23 @@ const ProductionModal = ({ production, onClose, onRefresh }) => {
   const [showTacheModal, setShowTacheModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Debug: vérifier la structure des données reçues
+  console.log('ProductionModal - production:', production);
+
+  // Guard: vérifier que production existe
+  if (!production) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6">
+          <p className="text-gray-900 dark:text-dark-text">Aucune donnée de production disponible</p>
+          <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg">
+            Fermer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     // Si les tâches sont déjà présentes dans l'objet production, les utiliser
     if (production && production.taches && Array.isArray(production.taches)) {
