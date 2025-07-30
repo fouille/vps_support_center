@@ -202,7 +202,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-hidden flex flex-col">
         {/* En-tête */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
@@ -239,14 +239,14 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
           <div className="flex-1 flex flex-col">
             {/* Informations de la tâche */}
             {editingTache ? (
-              <form onSubmit={handleUpdateTache} className="p-4 border-b bg-gray-50">
+              <form onSubmit={handleUpdateTache} className="p-4 border-b bg-gray-50 dark:bg-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
                     <select
                       value={tacheData.status}
                       onChange={(e) => setTacheData({...tacheData, status: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value="a_faire">À faire</option>
                       <option value="en_cours">En cours</option>
@@ -258,34 +258,34 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date de livraison</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date de livraison</label>
                     <input
                       type="date"
                       value={tacheData.date_livraison}
                       onChange={(e) => setTacheData({...tacheData, date_livraison: e.target.value})}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
                 </div>
                 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Descriptif</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descriptif</label>
                   <textarea
                     value={tacheData.descriptif}
                     onChange={(e) => setTacheData({...tacheData, descriptif: e.target.value})}
                     rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Décrivez les spécificités de cette tâche..."
                   />
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Commentaire interne</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Commentaire interne</label>
                   <textarea
                     value={tacheData.commentaire_interne}
                     onChange={(e) => setTacheData({...tacheData, commentaire_interne: e.target.value})}
                     rows={2}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Notes internes sur cette tâche..."
                   />
                 </div>
@@ -301,30 +301,30 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                   <button
                     type="button"
                     onClick={() => setEditingTache(false)}
-                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                    className="bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Annuler
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="p-4 border-b bg-gray-50">
+              <div className="p-4 border-b bg-gray-50 dark:bg-gray-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-600">Descriptif:</span>
-                    <p className="text-gray-900 mt-1">{tache.descriptif || 'Aucun descriptif'}</p>
+                    <span className="font-medium text-gray-600 dark:text-gray-300">Descriptif:</span>
+                    <p className="text-gray-900 dark:text-dark-text mt-1">{tache.descriptif || 'Aucun descriptif'}</p>
                   </div>
                   {tache.date_livraison && (
                     <div>
-                      <span className="font-medium text-gray-600">Date de livraison:</span>
-                      <p className="text-gray-900 mt-1">{new Date(tache.date_livraison).toLocaleDateString('fr-FR')}</p>
+                      <span className="font-medium text-gray-600 dark:text-gray-300">Date de livraison:</span>
+                      <p className="text-gray-900 dark:text-dark-text mt-1">{new Date(tache.date_livraison).toLocaleDateString('fr-FR')}</p>
                     </div>
                   )}
                 </div>
                 {tache.commentaire_interne && (
                   <div className="mt-3 pt-3 border-t">
-                    <span className="font-medium text-gray-600 text-sm">Commentaire interne:</span>
-                    <p className="text-gray-700 text-sm mt-1">{tache.commentaire_interne}</p>
+                    <span className="font-medium text-gray-600 dark:text-gray-300 text-sm">Commentaire interne:</span>
+                    <p className="text-gray-700 dark:text-gray-400 text-sm mt-1">{tache.commentaire_interne}</p>
                   </div>
                 )}
               </div>
@@ -332,31 +332,31 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
 
             {/* Zone de commentaires */}
             <div className="flex-1 flex flex-col min-h-0">
-              <div className="px-4 py-2 border-b bg-gray-100">
-                <h3 className="font-medium text-gray-900">💬 Commentaires ({commentaires.length})</h3>
+              <div className="px-4 py-2 border-b bg-gray-100 dark:bg-gray-600">
+                <h3 className="font-medium text-gray-900 dark:text-dark-text">💬 Commentaires ({commentaires.length})</h3>
               </div>
               
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {commentaires.length === 0 ? (
                   <div className="text-center py-8">
                     <div className="text-4xl mb-2">💭</div>
-                    <p className="text-gray-600">Aucun commentaire pour l'instant</p>
-                    <p className="text-sm text-gray-500">Soyez le premier à commenter cette tâche</p>
+                    <p className="text-gray-600 dark:text-gray-400">Aucun commentaire pour l'instant</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Soyez le premier à commenter cette tâche</p>
                   </div>
                 ) : (
-                  commentaires.map(commentaire => (
+                  (Array.isArray(commentaires) ? commentaires : []).map(commentaire => (
                     <div key={commentaire.id} className="flex space-x-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
                         commentaire.auteur_type_real === 'agent' ? 'bg-blue-500' : 'bg-green-500'
                       }`}>
                         {commentaire.auteur_nom ? commentaire.auteur_nom.charAt(0).toUpperCase() : 'U'}
                       </div>
-                      <div className="flex-1 bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3">
                         <div className="flex items-center justify-between mb-2">
-                          <div className="font-medium text-sm text-gray-900">
+                          <div className="font-medium text-sm text-gray-900 dark:text-dark-text">
                             {commentaire.auteur_nom} {commentaire.auteur_prenom}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(commentaire.date_creation).toLocaleDateString('fr-FR', {
                               month: 'short',
                               day: 'numeric',
@@ -365,12 +365,12 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                             })}
                           </div>
                         </div>
-                        <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                        <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                           {commentaire.contenu}
                         </div>
                         {commentaire.type_commentaire !== 'commentaire' && (
                           <div className="mt-2">
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300">
                               {commentaire.type_commentaire === 'status_change' && '📊 Changement de statut'}
                               {commentaire.type_commentaire === 'file_upload' && '📎 Fichier ajouté'}
                               {commentaire.type_commentaire === 'file_delete' && '🗑️ Fichier supprimé'}
@@ -385,7 +385,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               </div>
 
               {/* Zone d'ajout de commentaire */}
-              <form onSubmit={handleAddComment} className="p-4 border-t bg-gray-50">
+              <form onSubmit={handleAddComment} className="p-4 border-t bg-gray-50 dark:bg-gray-700">
                 <div className="flex space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
                     user?.type_utilisateur === 'agent' ? 'bg-blue-500' : 'bg-green-500'
@@ -398,10 +398,10 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                       onChange={(e) => setNouveauCommentaire(e.target.value)}
                       placeholder="Ajouter un commentaire..."
                       rows={2}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
                     />
                     <div className="flex justify-between items-center mt-2">
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {nouveauCommentaire.length}/1000 caractères
                       </div>
                       <button
@@ -419,10 +419,10 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
           </div>
 
           {/* Panneau des fichiers */}
-          <div className="w-80 border-l bg-gray-50 flex flex-col">
-            <div className="p-4 border-b bg-white">
+          <div className="w-80 border-l bg-gray-50 dark:bg-gray-700 flex flex-col">
+            <div className="p-4 border-b bg-white dark:bg-gray-800">
               <div className="flex items-center justify-between">
-                <h3 className="font-medium text-gray-900">📎 Fichiers ({fichiers.length})</h3>
+                <h3 className="font-medium text-gray-900 dark:text-dark-text">📎 Fichiers ({fichiers.length})</h3>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingFile}
@@ -444,37 +444,37 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               {fichiers.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="text-4xl mb-2">📎</div>
-                  <p className="text-gray-600 text-sm">Aucun fichier</p>
-                  <p className="text-xs text-gray-500">Ajoutez des fichiers à cette tâche</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">Aucun fichier</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">Ajoutez des fichiers à cette tâche</p>
                 </div>
               ) : (
                 (Array.isArray(fichiers) ? fichiers : []).map(fichier => (
-                  <div key={fichier.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div key={fichier.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-3">
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm text-gray-900 truncate" title={fichier.nom_fichier}>
+                        <h4 className="font-medium text-sm text-gray-900 dark:text-dark-text truncate" title={fichier.nom_fichier}>
                           {fichier.nom_fichier}
                         </h4>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {formatFileSize(fichier.taille_fichier)}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(fichier.date_upload).toLocaleDateString('fr-FR')}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                           Par: {fichier.uploader_nom} {fichier.uploader_prenom}
                         </p>
                       </div>
                       <div className="flex flex-col gap-1 ml-2">
                         <button
                           onClick={() => downloadFile(fichier)}
-                          className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs hover:bg-blue-200 transition-colors"
+                          className="bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 px-2 py-1 rounded text-xs hover:bg-blue-200 dark:hover:bg-blue-900/40 transition-colors"
                         >
                           ⬇️
                         </button>
                         <button
                           onClick={() => handleDeleteFile(fichier.id, fichier.nom_fichier)}
-                          className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs hover:bg-red-200 transition-colors"
+                          className="bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 px-2 py-1 rounded text-xs hover:bg-red-200 dark:hover:bg-red-900/40 transition-colors"
                         >
                           🗑️
                         </button>
