@@ -58,13 +58,20 @@ const ProductionsPage = () => {
     fetchProductions();
   }, [statusFilter, clientFilter, searchFilter]);
 
-  const fetchProductions = async (showRefreshingIndicator = false) => {
-    if (showRefreshingIndicator) setRefreshingProductions(true);
-    else setLoading(true);
+  const fetchProductions = async (isInitialLoad = false, showRefreshingIndicator = false) => {
+    if (isInitialLoad) {
+      setLoading(true);
+    } else if (showRefreshingIndicator) {
+      setRefreshingProductions(true);
+    } else {
+      setLoadingProductions(true);
+    }
     
     // Fermer tous les menus d'expansion lors de l'actualisation
-    setExpandedProduction(null);
-    setLoadingTaches(null);
+    if (!isInitialLoad) {
+      setExpandedProduction(null);
+      setLoadingTaches(null);
+    }
     
     try {
       const params = new URLSearchParams();
