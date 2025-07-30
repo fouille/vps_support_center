@@ -107,6 +107,7 @@ const ProductionsPage = () => {
       ]);
     } finally {
       setLoading(false);
+      setLoadingProductions(false);
       setRefreshingProductions(false);
     }
   };
