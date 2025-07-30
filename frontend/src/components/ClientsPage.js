@@ -73,6 +73,16 @@ const ClientsPage = () => {
     }
   }, [searchTerm]);
 
+  const fetchSocietes = async () => {
+    try {
+      const response = await api.get('/api/demandeurs-societe?limit=100');
+      const societesData = response.data.data || response.data || [];
+      setSocietes(societesData);
+    } catch (error) {
+      console.error('Erreur lors du chargement des sociétés:', error);
+    }
+  };
+
   const fetchClients = async () => {
     try {
       // Utiliser initialLoading seulement pour le tout premier chargement
@@ -89,6 +99,11 @@ const ClientsPage = () => {
       
       if (searchTerm.trim()) {
         params.append('search', searchTerm.trim());
+      }
+
+      // Ajouter le filtre société pour les agents
+      if (user?.type_utilisateur === 'agent' && selectedSociete) {
+        params.append('societe', selectedSociete);
       }
 
       const response = await api.get(`/api/clients?${params}`);
