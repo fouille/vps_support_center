@@ -6596,8 +6596,74 @@ def test_productions_api_fixes():
     else:
         results.add_result("GET - Production details retrieval", False, "No production found to test with")
     
-    # Step 3: Test POST /api/production-tache-commentaires - Comment API Error Fix
-    print("\n📋 STEP 3: Comment API Error Fix - POST /api/production-tache-commentaires")
+    # Step 4: Test GET /api/production-taches - Get task for update test
+    print("\n📋 STEP 4: GET Production Tasks")
+    
+    task_id = None
+    try:
+        response = requests.get(f"{API_BASE}/production-taches", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            tasks = response.json()
+            results.add_result("GET - Production tasks retrieval", True)
+            
+            if len(tasks) > 0:
+                task_id = tasks[0]['id']
+                print(f"   Found {len(tasks)} tasks, using task ID: {task_id}")
+            else:
+                results.add_result("GET - Tasks available for testing", False, "No tasks found")
+                
+        else:
+            results.add_result("GET - Production tasks retrieval", False, f"Status: {response.status_code}")
+            
+    except Exception as e:
+        results.add_result("GET - Production tasks retrieval", False, str(e))
+    
+    # Step 5: Test PUT /api/production-taches/{id} - "updated_at" field error fix
+    print("\n📋 STEP 5: PUT Production Task - updated_at Field Fix")
+    
+    if task_id:
+        update_data = {
+            "status": "en_cours",
+            "commentaire": "Test update to verify updated_at field fix"
+        }
+        
+        try:
+            response = requests.put(f"{API_BASE}/production-taches/{task_id}", 
+                                  headers=headers, json=update_data, timeout=10)
+            
+            if response.status_code == 200:
+                updated_task = response.json()
+                results.add_result("PUT - Task update successful", True)
+                
+                # Verify the response doesn't contain the "updated_at" error
+                if 'error' not in updated_task:
+                    results.add_result("PUT - No updated_at field error", True)
+                else:
+                    results.add_result("PUT - No updated_at field error", False, f"Error in response: {updated_task.get('error')}")
+                
+                # Verify status was updated
+                if updated_task.get('status') == 'en_cours':
+                    results.add_result("PUT - Status update successful", True)
+                else:
+                    results.add_result("PUT - Status update successful", False, f"Status not updated correctly: {updated_task.get('status')}")
+                    
+            elif response.status_code == 500:
+                error_text = response.text
+                if "updated_at" in error_text.lower():
+                    results.add_result("PUT - Task update successful", False, "500 error with updated_at field issue - BUG NOT FIXED")
+                else:
+                    results.add_result("PUT - Task update successful", False, f"500 error: {error_text}")
+            else:
+                results.add_result("PUT - Task update successful", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("PUT - Task update successful", False, str(e))
+    else:
+        results.add_result("PUT - Task update successful", False, "No task ID available for testing")
+
+    # Step 6: Test POST /api/production-tache-commentaires - Comment API Error Fix
+    print("\n📋 STEP 6: Comment API Error Fix - POST /api/production-tache-commentaires")
     
     # First, try to get a task ID from the production
     task_id = None
