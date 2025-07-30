@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS productions (
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modification TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_livraison_prevue DATE,
-    created_by UUID REFERENCES demandeurs(id),
+    created_by UUID,  -- Peut être soit un agent soit un demandeur, pas de FK contrainte
     assigned_to UUID REFERENCES demandeurs(id)
 );
 
