@@ -251,8 +251,7 @@ const ClientsPage = () => {
       </div>
 
       {/* Zone de recherche et filtres */}
-        {/* Recherche et Filtres */}
-        <div className="mb-6 space-y-4">
+      <div className="space-y-4">
           {/* Barre de recherche */}
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
