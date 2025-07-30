@@ -99,15 +99,7 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-dark-card rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
-              Compte de test :
-            </h3>
-            <p className="text-xs text-gray-600 dark:text-dark-muted">
-              Email: admin@voipservices.fr<br />
-              Mot de passe: admin1234!
-            </p>
-          </div>
+
         </div>
       </div>
     </div>
