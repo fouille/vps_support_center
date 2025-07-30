@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Edit, Trash2, Building, AlertCircle, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit, Trash2, Building, AlertCircle, Check, Search, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 
 const ClientsPage = () => {
   const { api, user } = useAuth();
