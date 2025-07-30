@@ -407,7 +407,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
                       <button
                         type="submit"
                         disabled={!nouveauCommentaire.trim() || loading}
-                        className="bg-orange-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
+                        className="bg-primary-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors disabled:opacity-50"
                       >
                         {loading ? '⏳' : '📤'} Envoyer
                       </button>
