@@ -6486,6 +6486,273 @@ def test_productions_api():
     
     return results.summary()
 
+def test_productions_api_fixes():
+    """Test the specific Productions API fixes mentioned in the review request"""
+    results = TestResults()
+    
+    print("🚀 Starting Productions API Fixes Tests")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("="*60)
+    
+    # Step 1: Authenticate
+    print("\n📋 STEP 1: Authentication")
+    agent_token, agent_info = authenticate_user(AGENT_CREDENTIALS, "Agent")
+    
+    if not agent_token:
+        results.add_result("Agent Authentication", False, "Failed to authenticate agent")
+        return results.summary()
+    else:
+        results.add_result("Agent Authentication", True)
+    
+    headers = {
+        "Authorization": f"Bearer {agent_token}",
+        "Content-Type": "application/json"
+    }
+    
+    # Step 2: Test GET /api/productions/{id} - Productions Detail API
+    print("\n📋 STEP 2: Productions Detail API - GET /api/productions/{id}")
+    test_production_id = "ddcccbce-f876-45e5-8480-97d41d01f253"  # From review request
+    
+    try:
+        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            production = response.json()
+            results.add_result("GET - Productions detail endpoint", True)
+            
+            # Verify response structure for frontend modal
+            required_fields = ['id', 'numero_production', 'titre', 'status', 'client_display']
+            missing_fields = [field for field in required_fields if field not in production]
+            
+            if not missing_fields:
+                results.add_result("GET - Production detail structure", True)
+                
+                # Verify tasks data is included
+                if 'taches' in production and isinstance(production['taches'], list):
+                    results.add_result("GET - Tasks data included", True)
+                    print(f"   Found {len(production['taches'])} tasks in production")
+                    
+                    # Verify task structure if tasks exist
+                    if len(production['taches']) > 0:
+                        task = production['taches'][0]
+                        task_fields = ['id', 'nom_tache', 'status', 'ordre_tache']
+                        missing_task_fields = [field for field in task_fields if field not in task]
+                        
+                        if not missing_task_fields:
+                            results.add_result("GET - Task structure valid", True)
+                        else:
+                            results.add_result("GET - Task structure valid", False, f"Missing task fields: {missing_task_fields}")
+                    else:
+                        results.add_result("GET - Task structure valid", True, "No tasks to validate")
+                else:
+                    results.add_result("GET - Tasks data included", False, "Tasks data missing or not array")
+                    
+                # Verify client display formatting
+                if production.get('client_display'):
+                    results.add_result("GET - Client display formatted", True)
+                else:
+                    results.add_result("GET - Client display formatted", False, "client_display field missing")
+                    
+            else:
+                results.add_result("GET - Production detail structure", False, f"Missing fields: {missing_fields}")
+                
+        elif response.status_code == 404:
+            results.add_result("GET - Productions detail endpoint", False, "404 - Production not found or database tables missing")
+        else:
+            results.add_result("GET - Productions detail endpoint", False, f"Status: {response.status_code}, Body: {response.text}")
+            
+    except Exception as e:
+        results.add_result("GET - Productions detail endpoint", False, str(e))
+    
+    # Step 3: Test POST /api/production-tache-commentaires - Comment API Error Fix
+    print("\n📋 STEP 3: Comment API Error Fix - POST /api/production-tache-commentaires")
+    
+    # First, try to get a task ID from the production
+    task_id = None
+    try:
+        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=headers, timeout=10)
+        if response.status_code == 200:
+            production = response.json()
+            if 'taches' in production and len(production['taches']) > 0:
+                task_id = production['taches'][0]['id']
+                print(f"   Using task ID: {task_id}")
+    except:
+        pass
+    
+    if task_id:
+        # Test comment creation to verify the "column ds.nom does not exist" error is fixed
+        comment_data = {
+            "production_tache_id": task_id,
+            "contenu": f"Test comment to verify ds.nom_societe fix - {datetime.now().isoformat()}",
+            "type_commentaire": "commentaire"
+        }
+        
+        try:
+            response = requests.post(f"{API_BASE}/production-tache-commentaires", 
+                                   headers=headers, json=comment_data, timeout=10)
+            
+            if response.status_code == 201:
+                comment = response.json()
+                results.add_result("POST - Comment creation (ds.nom fix)", True)
+                
+                # Verify response structure
+                required_fields = ['id', 'production_tache_id', 'auteur_id', 'contenu', 'date_creation']
+                missing_fields = [field for field in required_fields if field not in comment]
+                
+                if not missing_fields:
+                    results.add_result("POST - Comment response structure", True)
+                    
+                    # Verify content matches
+                    if comment['contenu'] == comment_data['contenu']:
+                        results.add_result("POST - Comment content accuracy", True)
+                    else:
+                        results.add_result("POST - Comment content accuracy", False, "Content mismatch")
+                        
+                    # Verify author information is populated (this tests the JOIN query fix)
+                    if comment.get('auteur_nom') or comment.get('auteur_prenom'):
+                        results.add_result("POST - Author info populated (JOIN fix)", True)
+                    else:
+                        results.add_result("POST - Author info populated (JOIN fix)", False, "Author info missing")
+                        
+                else:
+                    results.add_result("POST - Comment response structure", False, f"Missing fields: {missing_fields}")
+                    
+            elif response.status_code == 500:
+                # This would indicate the ds.nom error is still present
+                error_text = response.text
+                if 'ds.nom' in error_text and 'does not exist' in error_text:
+                    results.add_result("POST - Comment creation (ds.nom fix)", False, "ds.nom column error still present - fix not applied")
+                else:
+                    results.add_result("POST - Comment creation (ds.nom fix)", False, f"500 error: {error_text}")
+            elif response.status_code == 404:
+                results.add_result("POST - Comment creation (ds.nom fix)", False, "404 - Database tables missing")
+            elif response.status_code == 403:
+                results.add_result("POST - Comment creation (ds.nom fix)", False, "403 - Access denied (check permissions)")
+            else:
+                results.add_result("POST - Comment creation (ds.nom fix)", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("POST - Comment creation (ds.nom fix)", False, str(e))
+    else:
+        results.add_result("POST - Comment creation (ds.nom fix)", False, "No task ID available for testing")
+    
+    # Step 4: Test GET /api/production-tache-commentaires - Verify comments retrieval
+    print("\n📋 STEP 4: Comment Retrieval - GET /api/production-tache-commentaires")
+    
+    if task_id:
+        try:
+            response = requests.get(f"{API_BASE}/production-tache-commentaires?production_tache_id={task_id}", 
+                                  headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                comments = response.json()
+                results.add_result("GET - Comments retrieval", True)
+                
+                # Verify response is array
+                if isinstance(comments, list):
+                    results.add_result("GET - Comments response is array", True)
+                    print(f"   Found {len(comments)} comments")
+                    
+                    # If comments exist, verify structure
+                    if len(comments) > 0:
+                        comment = comments[0]
+                        required_fields = ['id', 'production_tache_id', 'auteur_id', 'contenu', 'date_creation']
+                        missing_fields = [field for field in required_fields if field not in comment]
+                        
+                        if not missing_fields:
+                            results.add_result("GET - Comment structure valid", True)
+                            
+                            # Verify JOIN query works (author info populated)
+                            if comment.get('auteur_nom') or comment.get('auteur_prenom'):
+                                results.add_result("GET - Author JOIN query working", True)
+                            else:
+                                results.add_result("GET - Author JOIN query working", False, "Author info not populated")
+                        else:
+                            results.add_result("GET - Comment structure valid", False, f"Missing fields: {missing_fields}")
+                    else:
+                        results.add_result("GET - Comment structure valid", True, "No comments to validate")
+                else:
+                    results.add_result("GET - Comments response is array", False, "Response is not an array")
+                    
+            elif response.status_code == 500:
+                # Check if it's the ds.nom error
+                error_text = response.text
+                if 'ds.nom' in error_text and 'does not exist' in error_text:
+                    results.add_result("GET - Comments retrieval", False, "ds.nom column error in GET query - fix incomplete")
+                else:
+                    results.add_result("GET - Comments retrieval", False, f"500 error: {error_text}")
+            elif response.status_code == 404:
+                results.add_result("GET - Comments retrieval", False, "404 - Database tables missing")
+            else:
+                results.add_result("GET - Comments retrieval", False, f"Status: {response.status_code}, Body: {response.text}")
+                
+        except Exception as e:
+            results.add_result("GET - Comments retrieval", False, str(e))
+    else:
+        results.add_result("GET - Comments retrieval", False, "No task ID available for testing")
+    
+    # Step 5: Test parameter validation
+    print("\n📋 STEP 5: Parameter Validation Tests")
+    
+    # Test missing production_tache_id parameter
+    try:
+        response = requests.get(f"{API_BASE}/production-tache-commentaires", headers=headers, timeout=10)
+        
+        if response.status_code == 400:
+            results.add_result("GET - Missing parameter validation", True)
+        else:
+            results.add_result("GET - Missing parameter validation", False, f"Expected 400, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Missing parameter validation", False, str(e))
+    
+    # Test empty comment content
+    if task_id:
+        try:
+            empty_comment_data = {
+                "production_tache_id": task_id,
+                "contenu": "",
+                "type_commentaire": "commentaire"
+            }
+            
+            response = requests.post(f"{API_BASE}/production-tache-commentaires", 
+                                   headers=headers, json=empty_comment_data, timeout=10)
+            
+            if response.status_code == 400:
+                results.add_result("POST - Empty content validation", True)
+            else:
+                results.add_result("POST - Empty content validation", False, f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            results.add_result("POST - Empty content validation", False, str(e))
+    
+    # Step 6: Test authentication validation
+    print("\n📋 STEP 6: Authentication Validation")
+    
+    # Test without token
+    try:
+        response = requests.get(f"{API_BASE}/productions/{test_production_id}", timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - No token authentication", True)
+        else:
+            results.add_result("GET - No token authentication", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - No token authentication", False, str(e))
+    
+    # Test with invalid token
+    try:
+        invalid_headers = {"Authorization": "Bearer invalid_token"}
+        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=invalid_headers, timeout=10)
+        
+        if response.status_code == 401:
+            results.add_result("GET - Invalid token authentication", True)
+        else:
+            results.add_result("GET - Invalid token authentication", False, f"Expected 401, got {response.status_code}")
+    except Exception as e:
+        results.add_result("GET - Invalid token authentication", False, str(e))
+    
+    return results.summary()
+
 if __name__ == "__main__":
     print("🚀 Starting Backend API Tests - Productions API")
     print("="*60)
