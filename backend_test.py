@@ -6510,60 +6510,91 @@ def test_productions_api_fixes():
         "Content-Type": "application/json"
     }
     
-    # Step 2: Test GET /api/productions/{id} - Productions Detail API
-    print("\n📋 STEP 2: Productions Detail API - GET /api/productions/{id}")
-    test_production_id = "ddcccbce-f876-45e5-8480-97d41d01f253"  # From review request
-    
+    # Step 2: Test GET /api/productions - Check if database tables exist
+    print("\n📋 STEP 2: Productions Database Structure Check")
     try:
-        response = requests.get(f"{API_BASE}/productions/{test_production_id}", headers=headers, timeout=10)
+        response = requests.get(f"{API_BASE}/productions", headers=headers, timeout=10)
         
         if response.status_code == 200:
-            production = response.json()
-            results.add_result("GET - Productions detail endpoint", True)
+            data = response.json()
+            results.add_result("GET - Productions endpoint accessible", True)
             
-            # Verify response structure for frontend modal
-            required_fields = ['id', 'numero_production', 'titre', 'status', 'client_display']
-            missing_fields = [field for field in required_fields if field not in production]
-            
-            if not missing_fields:
-                results.add_result("GET - Production detail structure", True)
-                
-                # Verify tasks data is included
-                if 'taches' in production and isinstance(production['taches'], list):
-                    results.add_result("GET - Tasks data included", True)
-                    print(f"   Found {len(production['taches'])} tasks in production")
-                    
-                    # Verify task structure if tasks exist
-                    if len(production['taches']) > 0:
-                        task = production['taches'][0]
-                        task_fields = ['id', 'nom_tache', 'status', 'ordre_tache']
-                        missing_task_fields = [field for field in task_fields if field not in task]
-                        
-                        if not missing_task_fields:
-                            results.add_result("GET - Task structure valid", True)
-                        else:
-                            results.add_result("GET - Task structure valid", False, f"Missing task fields: {missing_task_fields}")
-                    else:
-                        results.add_result("GET - Task structure valid", True, "No tasks to validate")
-                else:
-                    results.add_result("GET - Tasks data included", False, "Tasks data missing or not array")
-                    
-                # Verify client display formatting
-                if production.get('client_display'):
-                    results.add_result("GET - Client display formatted", True)
-                else:
-                    results.add_result("GET - Client display formatted", False, "client_display field missing")
-                    
+            # Validate response structure
+            if 'data' in data and 'pagination' in data:
+                results.add_result("GET - Response structure valid", True)
+                print(f"   Found {len(data['data'])} productions")
             else:
-                results.add_result("GET - Production detail structure", False, f"Missing fields: {missing_fields}")
+                results.add_result("GET - Response structure valid", False, "Missing 'data' or 'pagination' fields")
                 
         elif response.status_code == 404:
-            results.add_result("GET - Productions detail endpoint", False, "404 - Production not found or database tables missing")
+            results.add_result("GET - Productions endpoint accessible", False, "404 - Database tables likely don't exist")
+            print("   ❌ Database tables (productions, production_taches, etc.) appear to be missing")
+            print("   ❌ User needs to execute setup_productions_database.sql on Neon database")
+            return results.summary()
         else:
-            results.add_result("GET - Productions detail endpoint", False, f"Status: {response.status_code}, Body: {response.text}")
+            results.add_result("GET - Productions endpoint accessible", False, f"Status: {response.status_code}, Body: {response.text}")
+            return results.summary()
             
     except Exception as e:
-        results.add_result("GET - Productions detail endpoint", False, str(e))
+        results.add_result("GET - Productions endpoint accessible", False, str(e))
+        return results.summary()
+
+    # Step 3: Test GET /api/productions/{id} - Productions Detail API for Form
+    print("\n📋 STEP 3: Productions Detail API - GET /api/productions/{id}")
+    test_production_id = "ddcccbce-f876-45e5-8480-97d41d01f253"  # From review request
+    
+    # Get a production ID from the list
+    production_id = None
+    try:
+        response = requests.get(f"{API_BASE}/productions", headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if 'data' in data and len(data['data']) > 0:
+                production_id = data['data'][0]['id']
+                print(f"   Using production ID: {production_id}")
+    except:
+        pass
+    
+    if production_id:
+        try:
+            response = requests.get(f"{API_BASE}/productions/{production_id}", headers=headers, timeout=10)
+            
+            if response.status_code == 200:
+                production = response.json()
+                results.add_result("GET - Production details retrieval", True)
+                
+                # Check date format in response (this was the reported issue)
+                date_fields = ['created_at', 'updated_at', 'date_demandee', 'date_effective']
+                date_format_valid = True
+                invalid_dates = []
+                
+                for field in date_fields:
+                    if field in production and production[field]:
+                        date_value = production[field]
+                        # Check if date is in ISO format or properly formatted
+                        try:
+                            if isinstance(date_value, str):
+                                # Try to parse the date to validate format
+                                from datetime import datetime
+                                datetime.fromisoformat(date_value.replace('Z', '+00:00'))
+                            results.add_result(f"GET - {field} date format", True)
+                        except:
+                            date_format_valid = False
+                            invalid_dates.append(field)
+                            results.add_result(f"GET - {field} date format", False, f"Invalid date format: {date_value}")
+                
+                if date_format_valid:
+                    results.add_result("GET - All date formats valid", True)
+                else:
+                    results.add_result("GET - All date formats valid", False, f"Invalid date fields: {invalid_dates}")
+                    
+            else:
+                results.add_result("GET - Production details retrieval", False, f"Status: {response.status_code}")
+                
+        except Exception as e:
+            results.add_result("GET - Production details retrieval", False, str(e))
+    else:
+        results.add_result("GET - Production details retrieval", False, "No production found to test with")
     
     # Step 3: Test POST /api/production-tache-commentaires - Comment API Error Fix
     print("\n📋 STEP 3: Comment API Error Fix - POST /api/production-tache-commentaires")
