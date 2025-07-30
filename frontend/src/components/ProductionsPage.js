@@ -520,18 +520,18 @@ const ProductionsPage = () => {
                   )}
 
                   {/* Barre de progression */}
-                  {production.taches && production.taches.length > 0 && (
+                  {production.avancement_pourcentage !== undefined && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Avancement</span>
                         <span className="text-sm font-medium text-gray-900 dark:text-dark-text">
-                          {calculateProgress(production.taches)}%
+                          {production.avancement_pourcentage}%
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                         <div
                           className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${calculateProgress(production.taches)}%` }}
+                          style={{ width: `${production.avancement_pourcentage}%` }}
                         ></div>
                       </div>
                     </div>
