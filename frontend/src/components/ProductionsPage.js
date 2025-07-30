@@ -177,8 +177,10 @@ const ProductionsPage = () => {
   const openProductionDetails = async (production) => {
     try {
       const response = await api.get(`/api/productions/${production.id}`);
-      // La réponse contient directement les données
-      setSelectedProduction(response);
+      // La réponse contient directement les données avec les tâches
+      console.log('API Response for production details:', response);
+      const productionDetails = response.data || response;
+      setSelectedProduction(productionDetails);
       setShowProductionModal(true);
     } catch (error) {
       console.error('Erreur lors du chargement des détails:', error);
@@ -186,8 +188,8 @@ const ProductionsPage = () => {
       setSelectedProduction({
         ...production,
         taches: [
-          { id: '1', nom_tache: 'Portabilité', status: 'a_faire', ordre_tache: 1 },
-          { id: '2', nom_tache: 'Fichier de collecte', status: 'en_cours', ordre_tache: 2 }
+          { id: '1', nom_tache: 'Portabilité', status: 'a_faire', ordre_tache: 1, descriptif: 'Tâche de test 1' },
+          { id: '2', nom_tache: 'Fichier de collecte', status: 'en_cours', ordre_tache: 2, descriptif: 'Tâche de test 2' }
         ]
       });
       setShowProductionModal(true);
