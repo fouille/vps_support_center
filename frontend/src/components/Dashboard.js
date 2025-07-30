@@ -330,6 +330,36 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Répartition des Productions */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-4">
+            Répartition des Productions
+          </h3>
+          {stats.productions && stats.productions.total > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={productionsChartData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {productionsChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-dark-text-secondary">
+              Aucune production
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Graphiques détaillés */}
