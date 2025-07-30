@@ -26,7 +26,8 @@ const ProductionsPage = () => {
   const [productions, setProductions] = useState([]);
   const [clients, setClients] = useState([]);
   const [demandeurs, setDemandeurs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Loading initial de la page
+  const [loadingProductions, setLoadingProductions] = useState(false); // Loading du tableau seulement
   const [error, setError] = useState('');
   const [selectedProduction, setSelectedProduction] = useState(null);
   const [selectedTache, setSelectedTache] = useState(null);
