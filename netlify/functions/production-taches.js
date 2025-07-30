@@ -199,14 +199,58 @@ exports.handler = async (event, context) => {
           const commentQuery = `
             INSERT INTO production_tache_commentaires (production_tache_id, auteur_id, contenu, type_commentaire)
             VALUES ($1, $2, $3, $4)
+            RETURNING *
           `;
 
-          await sql(commentQuery, [
+          const commentResult = await sql(commentQuery, [
             tacheId,
             decoded.id,
             `📝 Statut changé: ${oldStatus} → ${status}`,
             'status_change'
           ]);
+
+          // Envoyer un email pour le changement de statut
+          if (commentResult.length > 0) {
+            try {
+              // Récupération des informations pour l'email
+              const emailInfoQuery = `
+                SELECT 
+                  p.*,
+                  c.nom_societe,
+                  c.nom as client_nom,
+                  c.prenom as client_prenom,
+                  d.nom as demandeur_nom,
+                  d.prenom as demandeur_prenom,
+                  d.email as demandeur_email,
+                  ds.nom_societe as societe_nom,
+                  pt.nom_tache
+                FROM productions p
+                LEFT JOIN clients c ON p.client_id = c.id
+                LEFT JOIN demandeurs d ON p.demandeur_id = d.id
+                LEFT JOIN demandeurs_societe ds ON p.societe_id = ds.id
+                LEFT JOIN production_taches pt ON p.id = pt.production_id
+                WHERE p.id = (SELECT production_id FROM production_taches WHERE id = $1)
+                AND pt.id = $1
+              `;
+
+              const productionInfo = await sql(emailInfoQuery, [tacheId]);
+
+              if (productionInfo.length > 0) {
+                const emailService = loadEmailService();
+                if (emailService) {
+                  await emailService.sendProductionCommentEmail(
+                    productionInfo[0],
+                    updatedTache,
+                    commentResult[0],
+                    decoded
+                  );
+                }
+              }
+            } catch (emailError) {
+              console.error('Erreur envoi email changement statut:', emailError);
+              // Ne pas faire échouer la mise à jour de la tâche
+            }
+          }
         } catch (commentError) {
           console.error('Erreur ajout commentaire status:', commentError);
         }
