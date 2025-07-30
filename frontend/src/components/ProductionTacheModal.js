@@ -121,7 +121,7 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
 
     // Vérification de la taille (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert('Le fichier est trop volumineux (max 10MB)');
+      setMessage({ type: 'error', content: 'Le fichier est trop volumineux (max 10MB)' });
       return;
     }
 
