@@ -270,6 +270,33 @@ exports.handler = async (event, context) => {
         }
       });
 
+      // Traitement des statistiques productions
+      const productionsData = {
+        non_termine: 0,
+        termine: 0,
+        bloque: 0,
+        total: 0,
+        byStatus: {}
+      };
+
+      const productionsNonTermine = ['en_attente', 'en_cours'];
+      const productionsTermine = ['termine'];
+      const productionsBloque = ['bloque'];
+
+      productionsStats.forEach(stat => {
+        const count = parseInt(stat.count);
+        productionsData.byStatus[stat.status] = count;
+        productionsData.total += count;
+
+        if (productionsNonTermine.includes(stat.status)) {
+          productionsData.non_termine += count;
+        } else if (productionsTermine.includes(stat.status)) {
+          productionsData.termine += count;
+        } else if (productionsBloque.includes(stat.status)) {
+          productionsData.bloque += count;
+        }
+      });
+
       // Statistiques additionnelles intéressantes
       const additionalStats = {};
 
