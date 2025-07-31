@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
   minor: 27,      // Version mineure - nouvelles fonctionnalités
-  patch: 0,      // Version patch - corrections de bugs
+  patch: 1,      // Version patch - corrections de bugs
   buildDate: "2025-07-31", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.27.1",
+    date: "2025-07-31",
+    type: "PATCH",
+    description: "Fix password reset - correction trigger PostgreSQL + amélioration affichage reCAPTCHA"
+  },
+{
     version: "1.27.0",
     date: "2025-07-31",
     type: "MINOR",
