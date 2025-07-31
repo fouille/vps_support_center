@@ -487,6 +487,41 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
             </div>
           )}
 
+          {/* Message spécifique à la génération PDF */}
+          {pdfGenerationMessage && (
+            <div className={`mb-6 p-4 border rounded-md ${
+              pdfGenerationMessage.includes('Erreur') 
+                ? 'bg-red-100 border-red-400 text-red-700' 
+                : 'bg-blue-100 border-blue-400 text-blue-700'
+            }`}>
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                {pdfGenerationMessage}
+              </div>
+            </div>
+          )}
+
+          {/* Loader overlay pendant la génération PDF */}
+          {generatingPDF && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+              <div className="bg-white dark:bg-dark-surface rounded-lg p-6 shadow-xl max-w-sm mx-4">
+                <div className="flex items-center space-x-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
+                      Génération en cours...
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-dark-muted">
+                      Création du mandat de portabilité PDF
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Indicateur de progression */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
