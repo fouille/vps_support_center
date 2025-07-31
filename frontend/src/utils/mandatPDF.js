@@ -310,42 +310,37 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
     
     currentY += 10;
     
-    // === SIGNATURE ===
-    addLine(currentY);
-    currentY += 10;
-    
+    // === SIGNATURE === (sans ligne de séparation)
     const today = new Date().toLocaleDateString('fr-FR');
-    addText(`Fait à : _____________________, le : ${today}`, leftMargin, currentY, {
+    const signatureY = currentY;
+    
+    // Colonne gauche : "Fait à" et "le" en vertical
+    addText('Fait à : _____________________', leftMargin, signatureY, {
       fontSize: 11
     });
-    currentY += 15;
     
-    // Zone de signature
-    addText('Signature du représentant légal :', leftMargin, currentY, {
+    addText(`Le : ${today}`, leftMargin, signatureY + 8, {
+      fontSize: 11
+    });
+    
+    // Colonne droite : Signature (à côté de "Fait à")
+    const signatureX = leftMargin + 100; // 100mm de décalage depuis la gauche
+    
+    addText('Signature du représentant légal :', signatureX, signatureY, {
       fontSize: 11,
       fontStyle: 'bold'
     });
     
-    addText('(Précédée de la mention "Lu et approuvé")', leftMargin, currentY + 6, {
+    addText('(Précédée de la mention "Lu et approuvé")', signatureX, signatureY + 6, {
       fontSize: 9,
       color: lightGray
     });
     
-    // Cadre pour la signature
+    // Cadre pour la signature (à droite)
     pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
-    pdf.rect(leftMargin, currentY + 12, 80, 30);
+    pdf.rect(signatureX, signatureY + 12, 80, 30);
     
-    // === PIED DE PAGE ===
-    const footerY = 280;
-    addLine(footerY - 5);
-    
-    const datePdf = new Date().toLocaleDateString('fr-FR');
-    const heurePdf = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    addText(`Document généré automatiquement le ${datePdf} à ${heurePdf}`, 0, footerY, {
-      fontSize: 8,
-      color: lightGray,
-      align: 'center'
-    });
+    // Pas de pied de page automatique
     
     // Nom du fichier avec timestamp
     const clientName = (formData.nom_client || 'client').toLowerCase().replace(/[^a-z0-9]/g, '_');
