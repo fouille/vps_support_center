@@ -23,7 +23,7 @@ const Login = () => {
 
   const fetchLogoForDomain = async (domaine) => {
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
       const response = await fetch(`${backendUrl}/api/get-logo-by-domain?domaine=${encodeURIComponent(domaine)}`);
       
       if (response.ok) {
