@@ -9,18 +9,20 @@ Cette fonctionnalité permet aux utilisateurs (agents et demandeurs) de réiniti
 1. **Lien "Mot de passe oublié ?"** sur la page de connexion
 2. **Modal de saisie** avec :
    - Champ email obligatoire
-   - reCAPTCHA optionnel (si configuré)
+   - reCAPTCHA v3 invisible (si configuré)
    - Boutons Annuler/Réinitialiser
 3. **Gestion des états** : loading, succès, erreur
 4. **UX améliorée** : fermeture automatique après succès
+5. **reCAPTCHA v3** : Protection invisible avec score de confiance
 
 ### Backend (password-reset.js)
-1. **Validation** : email format, reCAPTCHA (optionnel)
+1. **Validation** : email format, reCAPTCHA v3 (optionnel)
 2. **Recherche utilisateur** dans `agents` et `demandeurs`
 3. **Génération mot de passe sécurisé** : 12 caractères avec majuscules, minuscules, chiffres, symboles
 4. **Hachage bcrypt** et mise à jour base de données
 5. **Envoi email** via Mailjet avec template HTML professionnel
 6. **Sécurité** : même message de succès que l'email existe ou non
+7. **reCAPTCHA v3** : Vérification du score et de l'action
 
 ## Configuration requise
 
