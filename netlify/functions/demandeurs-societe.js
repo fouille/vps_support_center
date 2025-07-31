@@ -62,13 +62,14 @@ exports.handler = async (event, context) => {
         if (search) {
           societeQuery = sql`
             SELECT id, nom_societe, siret, adresse, adresse_complement, 
-                   code_postal, ville, numero_tel, email, logo_base64,
+                   code_postal, ville, numero_tel, email, logo_base64, domaine,
                    created_at, updated_at
             FROM demandeurs_societe 
             WHERE nom_societe ILIKE ${'%' + search + '%'} 
                OR siret ILIKE ${'%' + search + '%'}
                OR email ILIKE ${'%' + search + '%'}
                OR ville ILIKE ${'%' + search + '%'}
+               OR domaine ILIKE ${'%' + search + '%'}
             ORDER BY nom_societe
             LIMIT ${limit} OFFSET ${offset}
           `;
