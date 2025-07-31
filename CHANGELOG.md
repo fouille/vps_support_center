@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.21.1] - 2025-07-31
+### Fixed
+- 🔧 Fix: Correction de l'erreur React Hooks rules-of-hooks dans AuditPage
+
 ## [1.21.0] - 2025-07-31
 ### Added
 - ✨ Ajout de la fonctionnalité d'audit des connexions pour les agents
