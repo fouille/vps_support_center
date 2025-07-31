@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.24.3] - 2025-07-31
+### Fixed
+- 🔧 Fix: Suppression cadre signature PDF mandat portabilité
+
 ## [1.24.2] - 2025-07-31
 ### Fixed
 - 🔧 Fix: Réorganisation partie basse PDF - Fait à/le vertical + signature côte à côte, suppression pied de page
