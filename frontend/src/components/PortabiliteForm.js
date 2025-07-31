@@ -23,6 +23,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     nom_client: '',
     prenom_client: '',
     email_client: '',
+    telephone_client: '', // Nouveau champ pour le PDF (pas envoyé à l'API)
     siret_client: '',
     adresse: '',
     code_postal: '',
