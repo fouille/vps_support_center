@@ -81,6 +81,7 @@ exports.handler = async (event, context) => {
                OR siret ILIKE ${'%' + search + '%'}
                OR email ILIKE ${'%' + search + '%'}
                OR ville ILIKE ${'%' + search + '%'}
+               OR domaine ILIKE ${'%' + search + '%'}
           `;
         } else {
           societeQuery = sql`
