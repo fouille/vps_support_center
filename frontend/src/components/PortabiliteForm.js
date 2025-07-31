@@ -115,6 +115,8 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       setGeneratingPDF(false);
     }
   };
+
+  // Fonction pour calculer +11 jours ouvrés (sans samedi/dimanche)
   const getMinPortabilityDate = () => {
     const today = new Date();
     let workingDays = 0;
