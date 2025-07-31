@@ -675,6 +675,21 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Téléphone client
+                      <span className="text-xs text-gray-500 ml-1">(pour le mandat PDF)</span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="telephone_client"
+                      value={formData.telephone_client}
+                      onChange={handleInputChange}
+                      placeholder="Ex: 01 23 45 67 89"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
+                    />
+                  </div>
                 </div>
 
                 {/* Adresse - avec indication de pré-remplissage */}
