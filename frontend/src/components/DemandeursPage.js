@@ -41,7 +41,8 @@ const DemandeursPage = () => {
     ville: '',
     numero_tel: '',
     email: '',
-    logo_base64: ''
+    logo_base64: '',
+    domaine: ''
   });
 
   const isAgent = user?.type_utilisateur === 'agent';
