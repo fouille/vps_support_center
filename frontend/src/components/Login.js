@@ -81,7 +81,12 @@ const Login = () => {
       // Récupérer le token reCAPTCHA si disponible
       let recaptchaToken = null;
       if (recaptchaRef.current) {
-        recaptchaToken = recaptchaRef.current.getValue();
+        try {
+          recaptchaToken = recaptchaRef.current.getValue();
+        } catch (error) {
+          console.warn('Erreur récupération token reCAPTCHA:', error);
+          // Continuer sans token reCAPTCHA
+        }
       }
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
