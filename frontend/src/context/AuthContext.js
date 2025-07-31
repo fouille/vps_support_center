@@ -165,6 +165,24 @@ export const AuthProvider = ({ children }) => {
     return () => clearInterval(tokenCheckInterval);
   }, []);
 
+  // Fonction pour enregistrer un log de connexion
+  const logConnectionAction = async (userData, actionType) => {
+    try {
+      await api.post('/api/connexions-logs', {
+        user_id: userData.id,
+        user_type: userData.type_utilisateur,
+        user_email: userData.email,
+        user_nom: userData.nom,
+        user_prenom: userData.prenom,
+        action_type: actionType
+      });
+      console.log(`${actionType} logged for user:`, userData.email);
+    } catch (error) {
+      console.error(`Error logging ${actionType}:`, error);
+      // Ne pas bloquer le processus de connexion/déconnexion si le log échoue
+    }
+  };
+
   const login = async (email, password) => {
     try {
       const response = await api.post('/api/auth', { email, password });
@@ -174,6 +192,9 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       
       setUser(userData);
+      
+      // Enregistrer le log de connexion (en arrière-plan)
+      logConnectionAction(userData, 'login');
       
       return { success: true };
     } catch (error) {
