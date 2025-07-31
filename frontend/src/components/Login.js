@@ -351,24 +351,15 @@ const Login = () => {
                     </div>
                   </div>
 
-                  {/* reCAPTCHA - seulement si la clé publique est configurée */}
-                  {process.env.REACT_APP_RECAPTCHA_SITE_KEY && process.env.REACT_APP_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
-                    <div className="flex justify-center">
-                      <ReCAPTCHA
-                        ref={recaptchaRef}
-                        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
-                        theme="light"
-                        onErrored={(error) => {
-                          console.error('reCAPTCHA error:', error);
-                          setResetError('Erreur reCAPTCHA - Vous pouvez continuer sans validation captcha');
-                        }}
-                        onExpired={() => {
-                          console.log('reCAPTCHA expired');
-                          if (recaptchaRef.current) {
-                            recaptchaRef.current.reset();
-                          }
-                        }}
-                      />
+                  {/* Information reCAPTCHA v3 */}
+                  {process.env.REACT_APP_RECAPTCHA_SITE_KEY && 
+                   process.env.REACT_APP_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                      {recaptchaLoaded ? (
+                        <span>🛡️ reCAPTCHA v3 activé - Protection automatique</span>
+                      ) : (
+                        <span>⏳ Chargement de la protection reCAPTCHA...</span>
+                      )}
                     </div>
                   ) : (
                     <div className="text-xs text-gray-500 dark:text-gray-400 text-center p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
