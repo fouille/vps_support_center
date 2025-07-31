@@ -29,8 +29,8 @@ Cette fonctionnalité permet aux utilisateurs (agents et demandeurs) de réiniti
 # Obligatoire
 REACT_APP_BACKEND_URL=your_backend_url
 
-# Optionnel - pour activer reCAPTCHA
-REACT_APP_RECAPTCHA_SITE_KEY=your_google_recaptcha_site_key
+# Optionnel - pour activer reCAPTCHA v3
+REACT_APP_RECAPTCHA_SITE_KEY=your_google_recaptcha_v3_site_key
 ```
 
 ### Variables d'environnement Backend (Netlify)
