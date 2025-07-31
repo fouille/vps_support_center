@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.23.0] - 2025-07-31
+### Added
+- ✨ Fix: Correction erreur demandeur-info telephone + ajout champ telephone_client formulaire portabilité
+
 ## [1.22.1] - 2025-07-31
 ### Fixed
 - 🔧 Fix: Correction erreur 500 date_modification dans API demandeurs-societe PUT

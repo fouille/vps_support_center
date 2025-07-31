@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 22,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  minor: 23,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-31", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.23.0",
+    date: "2025-07-31",
+    type: "MINOR",
+    description: "Fix: Correction erreur demandeur-info telephone + ajout champ telephone_client formulaire portabilité"
+  },
+{
     version: "1.22.1",
     date: "2025-07-31",
     type: "PATCH",
