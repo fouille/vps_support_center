@@ -100,7 +100,11 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       
     } catch (error) {
       console.error('Erreur lors de la génération du mandat:', error);
-      setError('Erreur lors de la génération du mandat PDF');
+      setPdfGenerationMessage('Erreur lors de la génération du mandat PDF');
+      
+      setTimeout(() => {
+        setPdfGenerationMessage(null);
+      }, 4000);
     } finally {
       setGeneratingPDF(false);
     }
