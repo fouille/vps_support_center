@@ -291,6 +291,7 @@ const DemandeursPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingDemandeur(null);
+    setDemandeurFormLoading(false);
     
     // Si l'utilisateur est demandeur, pré-remplir sa société
     const initialFormData = {
