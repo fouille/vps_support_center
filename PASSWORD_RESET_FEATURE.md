@@ -39,8 +39,8 @@ REACT_APP_RECAPTCHA_SITE_KEY=your_google_recaptcha_v3_site_key
 MJ_APIKEY_PUBLIC=your_mailjet_public_key
 MJ_APIKEY_PRIVATE=your_mailjet_private_key
 
-# Optionnel - pour activer reCAPTCHA
-RECAPTCHA_SECRET_KEY=your_google_recaptcha_secret_key
+# Optionnel - pour activer reCAPTCHA v3
+RECAPTCHA_SECRET_KEY=your_google_recaptcha_v3_secret_key
 
 # Déjà configurées
 JWT_SECRET=your_jwt_secret
