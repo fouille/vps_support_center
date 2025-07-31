@@ -168,16 +168,16 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
     
     // === INFORMATIONS DU DEMANDEUR ===
     addText('INFORMATIONS DU DEMANDEUR', leftMargin, currentY, {
-      fontSize: 13,
+      fontSize: 12, // Taille réduite
       fontStyle: 'bold',
       color: primaryColor
     });
-    currentY += 10;
+    currentY += 8; // Espace réduit
     
-    // Cadre pour les informations
+    // Cadre pour les informations - hauteur réduite
     pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
     pdf.setLineWidth(0.5);
-    pdf.rect(leftMargin, currentY - 2, contentWidth, 35);
+    pdf.rect(leftMargin, currentY - 2, contentWidth, 30); // Hauteur réduite de 35 à 30
     
     // Informations dans le cadre
     const infoY = currentY + 5;
