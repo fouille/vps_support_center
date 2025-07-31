@@ -55,6 +55,8 @@ const AppContent = () => {
         return <ProductionsPage />;
       case 'tickets':
         return <TicketsPage />;
+      case 'audit':
+        return <AuditPage />;
       default:
         return <Dashboard />;
     }
