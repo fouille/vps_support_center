@@ -921,16 +921,26 @@ const DemandeursPage = () => {
                   type="button"
                   onClick={handleCloseSocieteModal}
                   className="btn-secondary"
+                  disabled={societeFormLoading}
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex items-center"
-                  disabled={siretLoading}
+                  className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={siretLoading || societeFormLoading}
                 >
-                  <Check className="h-4 w-4 mr-2" />
-                  {editingSociete ? 'Modifier' : 'Créer'}
+                  {societeFormLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      {editingSociete ? 'Modification...' : 'Création...'}
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      {editingSociete ? 'Modifier' : 'Créer'}
+                    </>
+                  )}
                 </button>
               </div>
             </form>
