@@ -312,13 +312,20 @@ const Login = () => {
                   </div>
 
                   {/* reCAPTCHA - seulement si la clé publique est configurée */}
-                  {process.env.REACT_APP_RECAPTCHA_SITE_KEY && (
+                  {process.env.REACT_APP_RECAPTCHA_SITE_KEY && process.env.REACT_APP_RECAPTCHA_SITE_KEY !== 'your_site_key_here' ? (
                     <div className="flex justify-center">
                       <ReCAPTCHA
                         ref={recaptchaRef}
                         sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
                         theme="light"
+                        onErrored={(error) => {
+                          console.error('reCAPTCHA error:', error);
+                        }}
                       />
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                      ℹ️ reCAPTCHA non configuré - protection basique active
                     </div>
                   )}
 
