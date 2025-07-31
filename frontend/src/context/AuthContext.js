@@ -168,7 +168,7 @@ export const AuthProvider = ({ children }) => {
   // Fonction pour enregistrer un log de connexion
   const logConnectionAction = async (userData, actionType) => {
     try {
-      await api.post('/api/connexions-logs', {
+      const response = await api.post('/api/connexions-logs', {
         user_id: userData.id,
         user_type: userData.type_utilisateur,
         user_email: userData.email,
@@ -177,9 +177,11 @@ export const AuthProvider = ({ children }) => {
         action_type: actionType
       });
       console.log(`${actionType} logged for user:`, userData.email);
+      return response;
     } catch (error) {
       console.error(`Error logging ${actionType}:`, error);
       // Ne pas bloquer le processus de connexion/déconnexion si le log échoue
+      throw error; // Re-lancer l'erreur pour que logout puisse la gérer
     }
   };
 
