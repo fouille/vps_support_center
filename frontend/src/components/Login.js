@@ -175,9 +175,6 @@ const Login = () => {
     setResetEmail('');
     setResetError('');
     setResetMessage('');
-    if (recaptchaRef.current) {
-      recaptchaRef.current.reset();
-    }
   };
 
   // Afficher le loader pendant l'initialisation
