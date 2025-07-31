@@ -41,7 +41,80 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
 
   const [validationErrors, setValidationErrors] = useState({});
 
-  // Fonction pour calculer +11 jours ouvrés (sans samedi/dimanche)
+  // Fonction pour récupérer les informations détaillées du demandeur avec sa société
+  const fetchDemandeurWithSociete = async (demandeurId) => {
+    if (!demandeurId) return null;
+    
+    try {
+      // Récupérer les informations du demandeur
+      const demandeurResponse = await api.get(`/api/demandeurs`);
+      const demandeur = demandeurResponse.data.find(d => d.id === demandeurId);
+      
+      if (!demandeur || !demandeur.societe_id) return demandeur;
+      
+      // Récupérer les informations de la société
+      const societeResponse = await api.get(`/api/demandeurs-societe`);
+      const societes = societeResponse.data?.data || societeResponse.data || [];
+      const societe = Array.isArray(societes) ? societes.find(s => s.id === demandeur.societe_id) : null;
+      
+      return {
+        ...demandeur,
+        societe: societe
+      };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des informations du demandeur:', error);
+      return null;
+    }
+  };
+
+  // Fonction pour générer le PDF du mandat
+  const handleGenerateMandat = async () => {
+    try {
+      setGeneratingPDF(true);
+      
+      // Déterminer le demandeur à utiliser
+      let demandeurId = formData.demandeur_id;
+      if (user.type_utilisateur === 'demandeur') {
+        demandeurId = user.id;
+      }
+      
+      if (!demandeurId) {
+        setError('Aucun demandeur sélectionné pour générer le mandat');
+        return;
+      }
+      
+      // Récupérer les informations complètes du demandeur
+      const demandeurInfo = await fetchDemandeurWithSociete(demandeurId);
+      
+      if (!demandeurInfo) {
+        setError('Impossible de récupérer les informations du demandeur');
+        return;
+      }
+      
+      // Générer le PDF
+      const result = await generateMandatPDF(formData, demandeurInfo);
+      
+      if (result.success) {
+        // Afficher un message de succès temporaire
+        const originalError = error;
+        setError(null);
+        setSuccess(`Mandat PDF généré avec succès : ${result.fileName}`);
+        
+        setTimeout(() => {
+          setSuccess(false);
+          setError(originalError);
+        }, 3000);
+      } else {
+        setError(`Erreur lors de la génération du PDF : ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.error('Erreur lors de la génération du mandat:', error);
+      setError('Erreur lors de la génération du mandat PDF');
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
   const getMinPortabilityDate = () => {
     const today = new Date();
     let workingDays = 0;
