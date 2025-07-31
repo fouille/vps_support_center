@@ -237,7 +237,119 @@ const Login = () => {
                 </>
               )}
             </button>
+
+            {/* Lien mot de passe oublié */}
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={openResetModal}
+                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 transition-colors"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
           </form>
+
+          {/* Modal de récupération de mot de passe */}
+          {showResetModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-md mx-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-dark-text">
+                    Réinitialiser le mot de passe
+                  </h2>
+                  <button
+                    onClick={closeResetModal}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+
+                {resetMessage && (
+                  <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-green-700 dark:text-green-300">{resetMessage}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {resetError && (
+                  <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <div className="flex items-center">
+                      <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mr-3" />
+                      <span className="text-red-700 dark:text-red-300 text-sm">{resetError}</span>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handlePasswordReset} className="space-y-4">
+                  <div>
+                    <label htmlFor="reset-email" className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+                      Adresse email
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-dark-muted" />
+                      <input
+                        id="reset-email"
+                        type="email"
+                        required
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        className="input pl-10"
+                        placeholder="votre@email.fr"
+                        disabled={resetLoading}
+                      />
+                    </div>
+                  </div>
+
+                  {/* reCAPTCHA - seulement si la clé publique est configurée */}
+                  {process.env.REACT_APP_RECAPTCHA_SITE_KEY && (
+                    <div className="flex justify-center">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                        theme="light"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={closeResetModal}
+                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      disabled={resetLoading}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={resetLoading}
+                    >
+                      {resetLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        'Réinitialiser'
+                      )}
+                    </button>
+                  </div>
+                </form>
+
+                <div className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+                  Un nouveau mot de passe sera généré et envoyé par email si l'adresse est valide.
+                </div>
+              </div>
+            </div>
+          )}
 
 
         </div>
