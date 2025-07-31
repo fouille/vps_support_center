@@ -103,8 +103,8 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 3. (Si erreur trigger) Exécuter `/app/fix_password_reset_triggers.sql`
 4. La fonctionnalité est automatiquement disponible
 
-## Dépendances ajoutées
-- **Frontend** : `react-google-recaptcha@3.1.0`
+## Dépendances
+- **Frontend** : Implémentation native reCAPTCHA v3 (pas de dépendance externe)
 - **Backend** : `crypto@1.0.1` (pour génération mot de passe)
 
 ## API Endpoint
