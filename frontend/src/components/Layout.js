@@ -132,7 +132,14 @@ const Layout = ({ children, currentPage, onNavigate }) => {
               </div>
             </div>
             <button
-              onClick={logout}
+              onClick={async () => {
+                try {
+                  await logout();
+                } catch (error) {
+                  console.error('Erreur lors de la déconnexion:', error);
+                  // La déconnexion s'est quand même effectuée côté interface
+                }
+              }}
               className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
             >
               <LogOut className="h-5 w-5" />
