@@ -107,18 +107,41 @@ exports.handler = async (event, context) => {
       const ip_address = getClientIP(event);
       const user_agent = event.headers['user-agent'] || 'unknown';
 
-      // Insérer le log
-      const result = await sql`
-        INSERT INTO connexions_logs (
-          user_id, user_type, user_email, user_nom, user_prenom, 
-          action_type, ip_address, user_agent, created_at
-        )
-        VALUES (
-          ${user_id}, ${user_type}, ${user_email}, ${user_nom}, ${user_prenom},
-          ${action_type}, ${ip_address}, ${user_agent}, NOW()
-        )
-        RETURNING id, created_at
-      `;
+      console.log('Attempting to log connection:', { user_id, user_type, action_type, ip_address });
+
+      // Insérer le log avec gestion d'erreur spécifique pour l'IP
+      let result;
+      try {
+        result = await sql`
+          INSERT INTO connexions_logs (
+            user_id, user_type, user_email, user_nom, user_prenom, 
+            action_type, ip_address, user_agent, created_at
+          )
+          VALUES (
+            ${user_id}, ${user_type}, ${user_email}, ${user_nom}, ${user_prenom},
+            ${action_type}, ${ip_address}, ${user_agent}, NOW()
+          )
+          RETURNING id, created_at
+        `;
+      } catch (ipError) {
+        // Si l'erreur est liée à l'IP, retenter sans l'IP
+        if (ipError.message.includes('inet') || ipError.message.includes('22P02')) {
+          console.warn('IP address error, retrying without IP:', ipError.message);
+          result = await sql`
+            INSERT INTO connexions_logs (
+              user_id, user_type, user_email, user_nom, user_prenom, 
+              action_type, user_agent, created_at
+            )
+            VALUES (
+              ${user_id}, ${user_type}, ${user_email}, ${user_nom}, ${user_prenom},
+              ${action_type}, ${user_agent}, NOW()
+            )
+            RETURNING id, created_at
+          `;
+        } else {
+          throw ipError; // Re-lancer l'erreur si ce n'est pas lié à l'IP
+        }
+      }
 
       return {
         statusCode: 201,
