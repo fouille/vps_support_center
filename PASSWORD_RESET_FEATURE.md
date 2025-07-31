@@ -36,8 +36,8 @@ REACT_APP_RECAPTCHA_SITE_KEY=your_google_recaptcha_site_key
 ### Variables d'environnement Backend (Netlify)
 ```bash
 # Obligatoire pour l'envoi d'emails
-MAILJET_API_KEY=your_mailjet_api_key
-MAILJET_SECRET_KEY=your_mailjet_secret_key
+MJ_API_KEY=your_mailjet_api_key
+MJ_SECRET_KEY=your_mailjet_secret_key
 
 # Optionnel - pour activer reCAPTCHA
 RECAPTCHA_SECRET_KEY=your_google_recaptcha_secret_key
