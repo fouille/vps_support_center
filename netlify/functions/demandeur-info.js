@@ -107,14 +107,13 @@ exports.handler = async (event, context) => {
         d.nom,
         d.prenom,
         d.email,
-        d.telephone,
         d.societe_id,
         ds.nom_societe,
         ds.siret,
         ds.adresse as societe_adresse,
         ds.code_postal as societe_code_postal,
         ds.ville as societe_ville,
-        ds.telephone as societe_telephone,
+        ds.numero_tel as societe_telephone,
         ds.email as societe_email,
         ds.site_web as societe_site_web
       FROM demandeurs d
