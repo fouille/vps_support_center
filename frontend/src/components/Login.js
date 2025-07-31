@@ -124,15 +124,10 @@ const Login = () => {
     setResetMessage('');
 
     try {
-      // Récupérer le token reCAPTCHA si disponible
+      // Exécuter reCAPTCHA v3 si disponible
       let recaptchaToken = null;
-      if (recaptchaRef.current) {
-        try {
-          recaptchaToken = recaptchaRef.current.getValue();
-        } catch (error) {
-          console.warn('Erreur récupération token reCAPTCHA:', error);
-          // Continuer sans token reCAPTCHA
-        }
+      if (recaptchaLoaded) {
+        recaptchaToken = await executeRecaptcha('password_reset');
       }
 
       const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
@@ -152,9 +147,6 @@ const Login = () => {
       if (response.ok) {
         setResetMessage(data.message);
         setResetEmail('');
-        if (recaptchaRef.current) {
-          recaptchaRef.current.reset();
-        }
         // Fermer le modal après 3 secondes
         setTimeout(() => {
           setShowResetModal(false);
