@@ -91,7 +91,7 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 ### Pour l'utilisateur
 1. Cliquer sur "Mot de passe oublié ?" sur la page de connexion
 2. Saisir son adresse email
-3. Compléter le reCAPTCHA (si activé)
+3. La protection reCAPTCHA v3 fonctionne automatiquement en arrière-plan (si activée)
 4. Cliquer "Réinitialiser"
 5. Vérifier sa boîte email pour le nouveau mot de passe
 6. Se connecter avec le nouveau mot de passe
