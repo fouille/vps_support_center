@@ -13,6 +13,7 @@ import PortabilitesPage from './components/PortabilitesPage';
 import PortabiliteForm from './components/PortabiliteForm';
 import PortabiliteDetail from './components/PortabiliteDetail';
 import ProductionsPage from './components/ProductionsPage';
+import AuditPage from './components/AuditPage';
 import './App.css';
 
 const AppContent = () => {
