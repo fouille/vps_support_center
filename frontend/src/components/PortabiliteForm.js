@@ -10,9 +10,11 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState([]);
   const [demandeurs, setDemandeurs] = useState([]);
+  const [selectedDemandeurInfo, setSelectedDemandeurInfo] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
   
   const [formData, setFormData] = useState({
     client_id: '',
