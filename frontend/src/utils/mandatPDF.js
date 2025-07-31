@@ -77,31 +77,33 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
           const imageType = demandeurInfo.societe.logo_base64.includes('data:image/jpeg') || 
                            demandeurInfo.societe.logo_base64.includes('data:image/jpg') ? 'JPEG' : 'PNG';
           
-          // Ajouter le logo (aligné à droite)
-          const logoWidth = 40;
-          const logoHeight = 25;
+          // Dimensions du logo avec hauteur limitée à 15mm
+          const maxLogoHeight = 15; // 15mm maximum
+          let logoWidth = 30; // Largeur par défaut
+          let logoHeight = maxLogoHeight;
+          
+          // Essayer de récupérer les dimensions réelles de l'image pour calculer le ratio
+          // (jsPDF calculera automatiquement les bonnes proportions)
           const logoX = pageWidth - rightMargin - logoWidth;
           
+          // Ajouter le logo avec hauteur limitée (jsPDF ajustera la largeur automatiquement)
           pdf.addImage(base64Data, imageType, logoX, currentY, logoWidth, logoHeight);
           
-          // Réserver l'espace du logo
-          const logoBottomY = currentY + logoHeight + 5;
-          if (logoBottomY > currentY + 35) { // Si le logo est plus grand que le texte
-            currentY = logoBottomY;
-          } else {
-            currentY += 35; // Espace standard pour le texte de la société
-          }
+          // Réserver l'espace du logo (plus compact maintenant)
+          const logoBottomY = currentY + logoHeight + 3;
+          currentY = Math.max(currentY + 20, logoBottomY); // Au minimum 20mm pour le texte
+          
         } catch (logoError) {
           console.warn('Erreur lors de l\'ajout du logo:', logoError);
           // Continuer sans logo en cas d'erreur
-          currentY += 35;
+          currentY += 20; // Espace réduit sans logo
         }
       } else {
-        currentY += 35; // Espace standard sans logo
+        currentY += 20; // Espace réduit standard sans logo
       }
       
       // Retourner au début pour le texte de la société (à gauche du logo)
-      let textY = currentY - 35;
+      let textY = currentY - 20;
       
       // Nom de la société (remplace Weaccess Group)
       addText(demandeurInfo.societe.nom_societe || 'Société', leftMargin, textY, {
@@ -109,9 +111,9 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
         fontStyle: 'bold',
         color: primaryColor
       });
-      textY += 8;
+      textY += 6;
       
-      // Adresse de la société (remplace l'adresse Weaccess)
+      // Adresse de la société (remplace l'adresse Weaccess) - plus compacte
       if (demandeurInfo.societe.adresse) {
         let adresseComplete = demandeurInfo.societe.adresse;
         if (demandeurInfo.societe.code_postal && demandeurInfo.societe.ville) {
@@ -125,12 +127,12 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
         }
         
         const addressHeight = addText(adresseComplete, leftMargin, textY, {
-          fontSize: 9,
+          fontSize: 8, // Taille réduite pour économiser l'espace
           maxWidth: contentWidth / 2 - 10 // Laisser de la place pour le logo
         });
         
         // S'assurer que currentY est après le texte si celui-ci est plus bas
-        const textBottomY = textY + addressHeight + 5;
+        const textBottomY = textY + addressHeight + 3;
         if (textBottomY > currentY) {
           currentY = textBottomY;
         }
