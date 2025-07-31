@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
   minor: 26,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  patch: 2,      // Version patch - corrections de bugs
   buildDate: "2025-07-31", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.26.2",
+    date: "2025-07-31",
+    type: "PATCH",
+    description: "Amélioration UX login - loader global pendant chargement logo + API"
+  },
+{
     version: "1.26.1",
     date: "2025-07-31",
     type: "PATCH",
