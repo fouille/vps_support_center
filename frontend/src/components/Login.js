@@ -61,6 +61,22 @@ const Login = () => {
     setLoading(false);
   };
 
+  // Afficher le loader pendant l'initialisation
+  if (pageLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-dark-bg dark:to-dark-surface flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center mb-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+          </div>
+          <p className="text-primary-600 dark:text-primary-400 font-medium">
+            Chargement...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-dark-bg dark:to-dark-surface flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
