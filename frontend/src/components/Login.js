@@ -7,18 +7,26 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const [logo, setLogo] = useState(null);
   const [companyName, setCompanyName] = useState('');
 
   useEffect(() => {
-    // Détecter le domaine depuis l'URL
-    const currentDomain = window.location.hostname;
-    console.log('Domaine détecté:', currentDomain);
-    
-    if (currentDomain && currentDomain !== 'localhost') {
-      fetchLogoForDomain(currentDomain);
-    }
+    const initializePage = async () => {
+      // Détecter le domaine depuis l'URL
+      const currentDomain = window.location.hostname;
+      console.log('Domaine détecté:', currentDomain);
+      
+      if (currentDomain && currentDomain !== 'localhost') {
+        await fetchLogoForDomain(currentDomain);
+      }
+      
+      // Page entièrement chargée (avec ou sans logo)
+      setPageLoading(false);
+    };
+
+    initializePage();
   }, []);
 
   const fetchLogoForDomain = async (domaine) => {
