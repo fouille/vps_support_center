@@ -233,7 +233,7 @@ exports.handler = async (event, context) => {
           SET nom_societe = ${upd_nom}, siret = ${upd_siret}, adresse = ${upd_adresse}, 
               adresse_complement = ${upd_complement}, code_postal = ${upd_cp}, 
               ville = ${upd_ville}, numero_tel = ${upd_tel}, email = ${upd_email},
-              logo_base64 = ${upd_logo}
+              logo_base64 = ${upd_logo}, updated_at = NOW()
           WHERE id = ${societeId}
           RETURNING id, nom_societe, siret, adresse, adresse_complement, 
                     code_postal, ville, numero_tel, email, logo_base64,
