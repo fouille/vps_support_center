@@ -168,8 +168,9 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Vérification reCAPTCHA (optionnel si configuré)
+    // Vérification reCAPTCHA v3 (optionnel si configuré)
     if (process.env.RECAPTCHA_SECRET_KEY && recaptchaToken) {
+      console.log('Vérification reCAPTCHA v3...');
       const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -177,12 +178,30 @@ exports.handler = async (event, context) => {
       });
       
       const recaptchaData = await recaptchaResponse.json();
+      console.log('reCAPTCHA response:', recaptchaData);
+      
       if (!recaptchaData.success) {
+        console.error('reCAPTCHA verification failed:', recaptchaData['error-codes']);
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ error: 'Verification reCAPTCHA échouée' })
+          body: JSON.stringify({ error: 'Vérification reCAPTCHA échouée' })
         };
+      }
+      
+      // Vérification du score pour reCAPTCHA v3 (optionnel)
+      if (recaptchaData.score !== undefined) {
+        console.log('reCAPTCHA score:', recaptchaData.score);
+        if (recaptchaData.score < 0.5) {
+          console.warn('Low reCAPTCHA score:', recaptchaData.score);
+          // Pour l'instant, on continue même avec un score bas
+          // Vous pouvez ajuster ce seuil selon vos besoins
+        }
+      }
+      
+      // Vérification de l'action pour reCAPTCHA v3 (optionnel)
+      if (recaptchaData.action && recaptchaData.action !== 'password_reset') {
+        console.warn('Unexpected reCAPTCHA action:', recaptchaData.action);
       }
     }
 
