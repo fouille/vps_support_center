@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://92fdfad9-8f95-4277-820b-721138efcac9.preview.emergentagent.com"
+BACKEND_URL = "https://c6ad5d6e-f0fe-4b7f-8dd8-c8cfe53099e5.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
