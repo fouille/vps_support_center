@@ -320,6 +320,7 @@ const DemandeursPage = () => {
   const handleCloseSocieteModal = () => {
     setShowSocieteModal(false);
     setEditingSociete(null);
+    setSocieteFormLoading(false);
     setSocieteFormData({
       nom_societe: '',
       siret: '',
