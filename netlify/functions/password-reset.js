@@ -119,6 +119,12 @@ const sendPasswordResetEmail = async (email, newPassword, userName) => {
 exports.handler = async (event, context) => {
   console.log('Password reset function called:', event.httpMethod);
   
+  // Debug des variables d'environnement
+  console.log('Environment variables check:');
+  console.log('MAILJET_API_KEY present:', !!process.env.MAILJET_API_KEY);
+  console.log('MAILJET_SECRET_KEY present:', !!process.env.MAILJET_SECRET_KEY);
+  console.log('RECAPTCHA_SECRET_KEY present:', !!process.env.RECAPTCHA_SECRET_KEY);
+  
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers };
   }
