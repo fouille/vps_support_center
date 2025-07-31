@@ -228,6 +228,7 @@ exports.handler = async (event, context) => {
           };
         }
         
+        // Mise à jour de la société avec updated_at explicite pour éviter le trigger
         const updatedSociete = await sql`
           UPDATE demandeurs_societe 
           SET nom_societe = ${upd_nom}, siret = ${upd_siret}, adresse = ${upd_adresse}, 
