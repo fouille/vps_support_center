@@ -204,14 +204,14 @@ exports.handler = async (event, context) => {
         const createdSociete = await sql`
           INSERT INTO demandeurs_societe (
             id, nom_societe, siret, adresse, adresse_complement, 
-            code_postal, ville, numero_tel, email, logo_base64
+            code_postal, ville, numero_tel, email, logo_base64, domaine
           )
           VALUES (
             ${uuidv4()}, ${nom_societe}, ${siret}, ${adresse}, ${adresse_complement}, 
-            ${code_postal}, ${ville}, ${numero_tel}, ${email}, ${logo_base64}
+            ${code_postal}, ${ville}, ${numero_tel}, ${email}, ${logo_base64}, ${domaine}
           )
           RETURNING id, nom_societe, siret, adresse, adresse_complement, 
-                    code_postal, ville, numero_tel, email, logo_base64,
+                    code_postal, ville, numero_tel, email, logo_base64, domaine,
                     created_at, updated_at
         `;
         
