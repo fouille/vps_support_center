@@ -131,8 +131,8 @@ exports.handler = async (event, context) => {
   
   // Debug des variables d'environnement
   console.log('Environment variables check:');
-  console.log('MAILJET_API_KEY present:', !!process.env.MAILJET_API_KEY);
-  console.log('MAILJET_SECRET_KEY present:', !!process.env.MAILJET_SECRET_KEY);
+  console.log('MJ_API_KEY present:', !!process.env.MJ_API_KEY);
+  console.log('MJ_SECRET_KEY present:', !!process.env.MJ_SECRET_KEY);
   console.log('RECAPTCHA_SECRET_KEY present:', !!process.env.RECAPTCHA_SECRET_KEY);
   
   if (event.httpMethod === 'OPTIONS') {
