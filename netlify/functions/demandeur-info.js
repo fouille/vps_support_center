@@ -137,7 +137,6 @@ exports.handler = async (event, context) => {
       nom: demandeur.nom,
       prenom: demandeur.prenom,
       email: demandeur.email,
-      telephone: demandeur.telephone,
       societe_id: demandeur.societe_id,
       societe: demandeur.societe_id ? {
         id: demandeur.societe_id,
