@@ -207,6 +207,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Enregistrer le log de déconnexion avant de supprimer les données
+    if (user) {
+      logConnectionAction(user, 'logout');
+    }
+    
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
