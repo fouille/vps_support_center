@@ -139,19 +139,19 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
       }
     }
     
-    currentY += 15;
+    currentY += 10; // Espace réduit
     
     // === TITRE PRINCIPAL ===
     addText('MANDAT DE PORTABILITÉ', 0, currentY, {
-      fontSize: 18,
+      fontSize: 16, // Taille réduite
       fontStyle: 'bold',
       color: primaryColor,
       align: 'center'
     });
-    currentY += 12;
+    currentY += 10; // Espace réduit
     
     addLine(currentY);
-    currentY += 10;
+    currentY += 8; // Espace réduit
     
     // === INTRODUCTION ===
     const societeNom = demandeurInfo?.societe?.nom_societe || 'notre société';
