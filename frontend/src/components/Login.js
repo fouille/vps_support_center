@@ -26,6 +26,7 @@ const Login = () => {
       // Détecter le domaine depuis l'URL
       const currentDomain = window.location.hostname;
       console.log('Domaine détecté:', currentDomain);
+      console.log('reCAPTCHA Site Key:', process.env.REACT_APP_RECAPTCHA_SITE_KEY);
       
       if (currentDomain && currentDomain !== 'localhost') {
         await fetchLogoForDomain(currentDomain);
