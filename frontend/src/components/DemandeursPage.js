@@ -21,6 +21,8 @@ const DemandeursPage = () => {
   const [siretLoading, setSiretLoading] = useState(false);
   const [siretError, setSiretError] = useState('');
   const [transferLoading, setTransferLoading] = useState(false);
+  const [demandeurFormLoading, setDemandeurFormLoading] = useState(false);
+  const [societeFormLoading, setSocieteFormLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     nom: '',
