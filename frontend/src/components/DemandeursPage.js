@@ -700,15 +700,26 @@ const DemandeursPage = () => {
                   type="button"
                   onClick={handleCloseModal}
                   className="btn-secondary"
+                  disabled={demandeurFormLoading}
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary flex items-center"
+                  className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={demandeurFormLoading}
                 >
-                  <Check className="h-4 w-4 mr-2" />
-                  {editingDemandeur ? 'Modifier' : 'Créer'}
+                  {demandeurFormLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      {editingDemandeur ? 'Modification...' : 'Création...'}
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      {editingDemandeur ? 'Modifier' : 'Créer'}
+                    </>
+                  )}
                 </button>
               </div>
             </form>
