@@ -220,17 +220,29 @@ exports.handler = async (event, context) => {
     const newPassword = generateSecurePassword();
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Mettre à jour le mot de passe dans la base de données
+    // Mettre à jour le mot de passe dans la base de données (sans déclencher les triggers)
     if (userType === 'agent') {
       await sql`
         UPDATE agents 
-        SET password = ${hashedPassword}, updated_at = NOW() 
+        SET password = ${hashedPassword}
+        WHERE id = ${user.id}
+      `;
+      // Mise à jour séparée de updated_at pour éviter les triggers
+      await sql`
+        UPDATE agents 
+        SET updated_at = NOW() 
         WHERE id = ${user.id}
       `;
     } else {
       await sql`
         UPDATE demandeurs 
-        SET password = ${hashedPassword}, updated_at = NOW() 
+        SET password = ${hashedPassword}
+        WHERE id = ${user.id}
+      `;
+      // Mise à jour séparée de updated_at pour éviter les triggers
+      await sql`
+        UPDATE demandeurs 
+        SET updated_at = NOW() 
         WHERE id = ${user.id}
       `;
     }
