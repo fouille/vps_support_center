@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 24,      // Version mineure - nouvelles fonctionnalités
-  patch: 3,      // Version patch - corrections de bugs
+  minor: 25,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-31", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.25.0",
+    date: "2025-07-31",
+    type: "MINOR",
+    description: "Ajout personnalisation login par domaine - nouveau champ domaine société + API publique + détection automatique logo"
+  },
+{
     version: "1.24.3",
     date: "2025-07-31",
     type: "PATCH",
