@@ -47,6 +47,25 @@ JWT_SECRET=your_jwt_secret
 NETLIFY_DATABASE_URL=your_neon_database_url
 ```
 
+## Troubleshooting
+
+### reCAPTCHA ne s'affiche pas
+1. **Vérifier la variable d'environnement** : `REACT_APP_RECAPTCHA_SITE_KEY` dans `/frontend/.env`
+2. **Décommenter la ligne** si elle est commentée
+3. **Redémarrer le serveur frontend** après modification
+4. **Vérifier les logs console** pour voir si la clé est bien lue
+5. **Alternative** : Si non configuré, un message informatif s'affiche
+
+### Erreur "record new has no field date_modification"
+1. **Exécuter le script de correction** : `/app/fix_password_reset_triggers.sql` sur Neon
+2. **Cause** : Triggers PostgreSQL utilisant l'ancien nom de colonne
+3. **Solution** : Le script corrige les triggers pour utiliser `updated_at`
+
+### Email non reçu
+1. **Vérifier les variables Mailjet** dans Netlify
+2. **Consulter les logs Netlify** pour les erreurs d'envoi
+3. **Vérifier les dossiers spam/indésirables**
+
 ## Sécurité
 
 ### Mesures de protection
@@ -77,7 +96,8 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 ### Pour l'administrateur
 1. Configurer les variables d'environnement Mailjet
 2. (Optionnel) Configurer reCAPTCHA
-3. La fonctionnalité est automatiquement disponible
+3. (Si erreur) Exécuter `/app/fix_password_reset_triggers.sql`
+4. La fonctionnalité est automatiquement disponible
 
 ## Dépendances ajoutées
 - **Frontend** : `react-google-recaptcha@3.1.0`
