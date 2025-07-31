@@ -200,25 +200,25 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
       addText(`Email : ${formData.email_client}`, leftMargin + 3, infoCurrentY, {
         fontSize: 10
       });
-      infoCurrentY += 6;
+      infoCurrentY += 5; // Espacement réduit
     }
     
     if (formData.siret_client) {
       addText(`SIRET : ${formData.siret_client}`, leftMargin + 3, infoCurrentY, {
-        fontSize: 10
+        fontSize: 9 // Taille réduite
       });
-      infoCurrentY += 6;
+      infoCurrentY += 5; // Espacement réduit
     }
     
     if (formData.adresse) {
       const adresseComplete = `${formData.adresse}${formData.code_postal ? ', ' + formData.code_postal : ''}${formData.ville ? ' ' + formData.ville : ''}`;
       addText(`Adresse : ${adresseComplete}`, leftMargin + 3, infoCurrentY, {
-        fontSize: 10,
+        fontSize: 9, // Taille réduite
         maxWidth: contentWidth - 6
       });
     }
     
-    currentY += 40;
+    currentY += 35; // Espace réduit
     
     // === NUMÉROS À PORTER ===
     addText('NUMÉROS À PORTER (NDI)', leftMargin, currentY, {
