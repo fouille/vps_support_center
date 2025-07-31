@@ -12,6 +12,14 @@ const Login = () => {
   const [error, setError] = useState('');
   const [logo, setLogo] = useState(null);
   const [companyName, setCompanyName] = useState('');
+  
+  // États pour le modal de récupération de mot de passe
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState('');
+  const [resetError, setResetError] = useState('');
+  const recaptchaRef = useRef(null);
 
   useEffect(() => {
     const initializePage = async () => {
