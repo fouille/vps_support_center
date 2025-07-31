@@ -303,8 +303,10 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     }
     
     try {
-      // Préparer les données à envoyer (ne pas envoyer la date effective si elle n'est pas saisie en mode création)
-      const dataToSend = { ...formData };
+      // Préparer les données à envoyer (exclure telephone_client qui est seulement pour le PDF)
+      const { telephone_client, ...dataToSend } = formData;
+      
+      // Ne pas envoyer la date effective si elle n'est pas saisie en mode création
       if (!isEdit && !dataToSend.date_portabilite_effective) {
         delete dataToSend.date_portabilite_effective;
       }
