@@ -166,6 +166,9 @@ const DemandeursPage = () => {
 
   const handleSocieteSubmit = async (e) => {
     e.preventDefault();
+    setSocieteFormLoading(true);
+    setError('');
+    
     try {
       if (editingSociete) {
         await api.put(`/api/demandeurs-societe/${editingSociete.id}`, societeFormData);
@@ -176,6 +179,8 @@ const DemandeursPage = () => {
       handleCloseSocieteModal();
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } finally {
+      setSocieteFormLoading(false);
     }
   };
 
