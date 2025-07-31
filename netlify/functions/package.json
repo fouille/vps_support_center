@@ -8,6 +8,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-mailjet": "^6.0.6",
     "uuid": "^10.0.0",
-    "uri-js": "^4.4.1"
+    "uri-js": "^4.4.1",
+    "crypto": "^1.0.1"
   }
 }
