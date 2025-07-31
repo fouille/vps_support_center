@@ -46,21 +46,8 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     if (!demandeurId) return null;
     
     try {
-      // Récupérer les informations du demandeur
-      const demandeurResponse = await api.get(`/api/demandeurs`);
-      const demandeur = demandeurResponse.data.find(d => d.id === demandeurId);
-      
-      if (!demandeur || !demandeur.societe_id) return demandeur;
-      
-      // Récupérer les informations de la société
-      const societeResponse = await api.get(`/api/demandeurs-societe`);
-      const societes = societeResponse.data?.data || societeResponse.data || [];
-      const societe = Array.isArray(societes) ? societes.find(s => s.id === demandeur.societe_id) : null;
-      
-      return {
-        ...demandeur,
-        societe: societe
-      };
+      const response = await api.get(`/api/demandeur-info/${demandeurId}`);
+      return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des informations du demandeur:', error);
       return null;
