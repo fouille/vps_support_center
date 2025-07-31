@@ -877,6 +877,22 @@ const DemandeursPage = () => {
                 </p>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Domaine
+                </label>
+                <input
+                  type="text"
+                  value={societeFormData.domaine}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, domaine: e.target.value })}
+                  className="input"
+                  placeholder="exemple.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Domaine pour personnaliser la page de connexion (format: exemple.com, sans http/https)
+                </p>
+              </div>
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
