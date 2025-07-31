@@ -5,9 +5,9 @@
 // PATCH: Corrections de bugs compatibles
 
 export const VERSION_CONFIG = {
-  major: 1,      // Version majeure - changements breaking
-  minor: 27,      // Version mineure - nouvelles fonctionnalités
-  patch: 3,      // Version patch - corrections de bugs
+  major: 2,      // Version majeure - changements breaking
+  minor: 0,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-07-31", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.0.0",
+    date: "2025-07-31",
+    type: "MAJOR",
+    description: "Migration reCAPTCHA v2 → v3 - implémentation native invisible avec score de confiance"
+  },
+{
     version: "1.27.3",
     date: "2025-07-31",
     type: "PATCH",
