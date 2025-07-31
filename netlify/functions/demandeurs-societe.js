@@ -229,7 +229,8 @@ exports.handler = async (event, context) => {
           ville: upd_ville, 
           numero_tel: upd_tel, 
           email: upd_email,
-          logo_base64: upd_logo
+          logo_base64: upd_logo,
+          domaine: upd_domaine
         } = updateData;
         
         // Check if SIRET already exists for another company (if provided)
