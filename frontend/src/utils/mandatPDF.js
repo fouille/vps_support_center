@@ -65,13 +65,51 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
     
     // === EN-TÊTE SOCIÉTÉ ===
     if (demandeurInfo?.societe) {
+      // Logo de la société (si disponible)
+      if (demandeurInfo.societe.logo_base64) {
+        try {
+          // Nettoyer l'URL base64 (supprimer le préfixe data:image/...)
+          const base64Data = demandeurInfo.societe.logo_base64.includes(',') 
+            ? demandeurInfo.societe.logo_base64.split(',')[1] 
+            : demandeurInfo.societe.logo_base64;
+          
+          // Détecter le type d'image
+          const imageType = demandeurInfo.societe.logo_base64.includes('data:image/jpeg') || 
+                           demandeurInfo.societe.logo_base64.includes('data:image/jpg') ? 'JPEG' : 'PNG';
+          
+          // Ajouter le logo (aligné à droite)
+          const logoWidth = 40;
+          const logoHeight = 25;
+          const logoX = pageWidth - rightMargin - logoWidth;
+          
+          pdf.addImage(base64Data, imageType, logoX, currentY, logoWidth, logoHeight);
+          
+          // Réserver l'espace du logo
+          const logoBottomY = currentY + logoHeight + 5;
+          if (logoBottomY > currentY + 35) { // Si le logo est plus grand que le texte
+            currentY = logoBottomY;
+          } else {
+            currentY += 35; // Espace standard pour le texte de la société
+          }
+        } catch (logoError) {
+          console.warn('Erreur lors de l\'ajout du logo:', logoError);
+          // Continuer sans logo en cas d'erreur
+          currentY += 35;
+        }
+      } else {
+        currentY += 35; // Espace standard sans logo
+      }
+      
+      // Retourner au début pour le texte de la société (à gauche du logo)
+      let textY = currentY - 35;
+      
       // Nom de la société (remplace Weaccess Group)
-      addText(demandeurInfo.societe.nom_societe || 'Société', leftMargin, currentY, {
+      addText(demandeurInfo.societe.nom_societe || 'Société', leftMargin, textY, {
         fontSize: 14,
         fontStyle: 'bold',
         color: primaryColor
       });
-      currentY += 8;
+      textY += 8;
       
       // Adresse de la société (remplace l'adresse Weaccess)
       if (demandeurInfo.societe.adresse) {
@@ -86,15 +124,17 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
           adresseComplete += `\nEmail : ${demandeurInfo.societe.email}`;
         }
         
-        const addressHeight = addText(adresseComplete, leftMargin, currentY, {
+        const addressHeight = addText(adresseComplete, leftMargin, textY, {
           fontSize: 9,
-          maxWidth: contentWidth / 2
+          maxWidth: contentWidth / 2 - 10 // Laisser de la place pour le logo
         });
-        currentY += addressHeight + 5;
+        
+        // S'assurer que currentY est après le texte si celui-ci est plus bas
+        const textBottomY = textY + addressHeight + 5;
+        if (textBottomY > currentY) {
+          currentY = textBottomY;
+        }
       }
-      
-      // Note: L'espace pour le logo pourrait être ajouté ici plus tard
-      // currentY += 15; // Espace réservé pour le logo
     }
     
     currentY += 15;
