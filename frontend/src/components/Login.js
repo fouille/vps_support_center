@@ -57,14 +57,25 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-dark-bg dark:to-dark-surface flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center">
-            <LogIn className="h-8 w-8 text-white" />
-          </div>
+          {logo ? (
+            <div className="mx-auto h-16 w-auto flex items-center justify-center mb-2">
+              <img 
+                src={`data:image/jpeg;base64,${logo}`}
+                alt={`Logo ${companyName}`}
+                className="max-h-16 w-auto object-contain"
+                style={{ maxWidth: '200px' }}
+              />
+            </div>
+          ) : (
+            <div className="mx-auto h-16 w-16 bg-primary-600 rounded-full flex items-center justify-center">
+              <LogIn className="h-8 w-8 text-white" />
+            </div>
+          )}
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-dark-text">
             Connexion
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-dark-muted">
-            Système de gestion de tickets de support
+            {companyName ? `${companyName} - ` : ''}Système de gestion de tickets de support
           </p>
         </div>
 
