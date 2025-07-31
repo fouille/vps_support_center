@@ -27,6 +27,12 @@ const Login = () => {
       console.log('Domaine détecté:', currentDomain);
       console.log('reCAPTCHA Site Key:', process.env.REACT_APP_RECAPTCHA_SITE_KEY);
       
+      // Charger reCAPTCHA v3 si configuré
+      if (process.env.REACT_APP_RECAPTCHA_SITE_KEY && 
+          process.env.REACT_APP_RECAPTCHA_SITE_KEY !== 'your_site_key_here') {
+        loadRecaptchaScript();
+      }
+      
       if (currentDomain && currentDomain !== 'localhost') {
         await fetchLogoForDomain(currentDomain);
       }
@@ -37,6 +43,47 @@ const Login = () => {
 
     initializePage();
   }, []);
+
+  // Fonction pour charger le script reCAPTCHA v3
+  const loadRecaptchaScript = () => {
+    if (window.grecaptcha || document.querySelector('#recaptcha-script')) {
+      setRecaptchaLoaded(true);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.id = 'recaptcha-script';
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`;
+    script.onload = () => {
+      console.log('reCAPTCHA v3 script loaded');
+      setRecaptchaLoaded(true);
+    };
+    script.onerror = () => {
+      console.error('Failed to load reCAPTCHA v3 script');
+      setRecaptchaLoaded(false);
+    };
+    document.head.appendChild(script);
+  };
+
+  // Fonction pour exécuter reCAPTCHA v3
+  const executeRecaptcha = async (action) => {
+    if (!window.grecaptcha || !recaptchaLoaded) {
+      console.warn('reCAPTCHA not loaded');
+      return null;
+    }
+
+    try {
+      await window.grecaptcha.ready();
+      const token = await window.grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {
+        action: action
+      });
+      console.log('reCAPTCHA token generated for action:', action);
+      return token;
+    } catch (error) {
+      console.error('reCAPTCHA execution failed:', error);
+      return null;
+    }
+  };
 
   const fetchLogoForDomain = async (domaine) => {
     try {
