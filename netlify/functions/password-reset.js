@@ -38,8 +38,14 @@ const sendPasswordResetEmail = async (email, newPassword, userName) => {
     const mailjetApiKey = process.env.MAILJET_API_KEY;
     const mailjetSecretKey = process.env.MAILJET_SECRET_KEY;
     
+    console.log('Mailjet config check:');
+    console.log('API Key length:', mailjetApiKey ? mailjetApiKey.length : 0);
+    console.log('Secret Key length:', mailjetSecretKey ? mailjetSecretKey.length : 0);
+    
     if (!mailjetApiKey || !mailjetSecretKey) {
-      console.log('Mailjet non configuré, mot de passe généré mais email non envoyé');
+      console.log('Mailjet non configuré - Variables manquantes');
+      console.log('MAILJET_API_KEY:', mailjetApiKey ? 'définie' : 'manquante');
+      console.log('MAILJET_SECRET_KEY:', mailjetSecretKey ? 'définie' : 'manquante');
       return false;
     }
 
