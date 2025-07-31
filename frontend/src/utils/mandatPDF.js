@@ -147,6 +147,13 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
     });
     infoCurrentY += 6;
     
+    if (formData.telephone_client) {
+      addText(`Téléphone : ${formData.telephone_client}`, leftMargin + 3, infoCurrentY, {
+        fontSize: 10
+      });
+      infoCurrentY += 6;
+    }
+    
     if (formData.email_client) {
       addText(`Email : ${formData.email_client}`, leftMargin + 3, infoCurrentY, {
         fontSize: 10
