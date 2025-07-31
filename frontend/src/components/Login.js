@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, AlertCircle, X } from 'lucide-react';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 const Login = () => {
   const { login } = useAuth();
