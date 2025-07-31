@@ -130,7 +130,8 @@ exports.handler = async (event, context) => {
           ville, 
           numero_tel, 
           email,
-          logo_base64
+          logo_base64,
+          domaine
         } = newSociete;
         
         if (!nom_societe || !adresse || !code_postal || !ville || !email) {
