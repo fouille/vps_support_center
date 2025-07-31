@@ -35,8 +35,8 @@ const generateSecurePassword = () => {
 // Fonction pour envoyer l'email avec Mailjet
 const sendPasswordResetEmail = async (email, newPassword, userName) => {
   try {
-    const mailjetApiKey = process.env.MJ_API_KEY;
-    const mailjetSecretKey = process.env.MJ_SECRET_KEY;
+    const mailjetApiKey = process.env.MJ_APIKEY_PUBLIC;
+    const mailjetSecretKey = process.env.MJ_APIKEY_PRIVATE;
     
     console.log('Mailjet config check:');
     console.log('API Key length:', mailjetApiKey ? mailjetApiKey.length : 0);
@@ -44,8 +44,8 @@ const sendPasswordResetEmail = async (email, newPassword, userName) => {
     
     if (!mailjetApiKey || !mailjetSecretKey) {
       console.log('Mailjet non configuré - Variables manquantes');
-      console.log('MJ_API_KEY:', mailjetApiKey ? 'définie' : 'manquante');
-      console.log('MJ_SECRET_KEY:', mailjetSecretKey ? 'définie' : 'manquante');
+      console.log('MJ_APIKEY_PUBLIC:', mailjetApiKey ? 'définie' : 'manquante');
+      console.log('MJ_APIKEY_PRIVATE:', mailjetSecretKey ? 'définie' : 'manquante');
       return false;
     }
 
