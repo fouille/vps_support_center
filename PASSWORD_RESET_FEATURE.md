@@ -62,9 +62,10 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 3. **Solution** : Le script corrige les triggers pour utiliser `updated_at`
 
 ### Email non reçu
-1. **Vérifier les variables Mailjet** dans Netlify
+1. **Vérifier les variables Mailjet** dans Netlify : `MJ_API_KEY` et `MJ_SECRET_KEY`
 2. **Consulter les logs Netlify** pour les erreurs d'envoi
 3. **Vérifier les dossiers spam/indésirables**
+4. **Tester les clés** avec l'API Mailjet directement
 
 ## Sécurité
 
