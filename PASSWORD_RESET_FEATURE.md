@@ -49,12 +49,13 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 
 ## Troubleshooting
 
-### reCAPTCHA ne s'affiche pas
-1. **Vérifier la variable d'environnement** : `REACT_APP_RECAPTCHA_SITE_KEY` dans `/frontend/.env`
-2. **Décommenter la ligne** si elle est commentée
-3. **Redémarrer le serveur frontend** après modification
-4. **Vérifier les logs console** pour voir si la clé est bien lue
-5. **Alternative** : Si non configuré, un message informatif s'affiche
+### reCAPTCHA ne fonctionne pas
+1. **Vérifier le type de clé** : Doit être une clé **reCAPTCHA v3** (pas v2)
+2. **Vérifier la variable d'environnement** : `REACT_APP_RECAPTCHA_SITE_KEY` dans `/frontend/.env`
+3. **Vérifier le domaine** : La clé doit être configurée pour votre domaine sur Google reCAPTCHA
+4. **Redémarrer le serveur frontend** après modification des variables
+5. **Vérifier les logs console** pour voir le chargement du script et la génération du token
+6. **Alternative** : L'application fonctionne sans reCAPTCHA si non configuré
 
 ### Erreur "record new has no field date_modification"
 1. **Exécuter le script de correction** : `/app/fix_password_reset_triggers.sql` sur Neon
