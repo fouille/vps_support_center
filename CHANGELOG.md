@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.27.0] - 2025-07-31
+### Added
+- ✨ Ajout fonctionnalité récupération mot de passe - modal + API + email + reCAPTCHA optionnel
+
 ## [1.26.2] - 2025-07-31
 ### Fixed
 - 🔧 Amélioration UX login - loader global pendant chargement logo + API
