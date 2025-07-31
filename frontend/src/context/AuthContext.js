@@ -206,10 +206,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Enregistrer le log de déconnexion avant de supprimer les données
+  const logout = async () => {
+    // Enregistrer le log de déconnexion AVANT de supprimer les données
     if (user) {
-      logConnectionAction(user, 'logout');
+      try {
+        await logConnectionAction(user, 'logout');
+      } catch (error) {
+        console.warn('Erreur lors de l\'enregistrement du log de déconnexion:', error);
+        // Ne pas bloquer la déconnexion si le log échoue
+      }
     }
     
     localStorage.removeItem('token');
