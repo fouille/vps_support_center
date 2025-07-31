@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
@@ -8,6 +8,36 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [logo, setLogo] = useState(null);
+  const [companyName, setCompanyName] = useState('');
+
+  useEffect(() => {
+    // Détecter le domaine depuis l'URL
+    const currentDomain = window.location.hostname;
+    console.log('Domaine détecté:', currentDomain);
+    
+    if (currentDomain && currentDomain !== 'localhost') {
+      fetchLogoForDomain(currentDomain);
+    }
+  }, []);
+
+  const fetchLogoForDomain = async (domaine) => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || import.meta.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/get-logo-by-domain?domaine=${encodeURIComponent(domaine)}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setLogo(data.logo_base64);
+        setCompanyName(data.nom_societe);
+        console.log('Logo trouvé pour le domaine:', domaine, 'société:', data.nom_societe);
+      } else {
+        console.log('Aucun logo trouvé pour le domaine:', domaine);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération du logo:', error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
