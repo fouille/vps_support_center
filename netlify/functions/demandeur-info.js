@@ -145,8 +145,7 @@ exports.handler = async (event, context) => {
         code_postal: demandeur.societe_code_postal,
         ville: demandeur.societe_ville,
         telephone: demandeur.societe_telephone,
-        email: demandeur.societe_email,
-        site_web: demandeur.societe_site_web
+        email: demandeur.societe_email
       } : null
     };
 
