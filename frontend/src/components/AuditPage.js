@@ -10,25 +10,6 @@ const AuditPage = () => {
   const [total, setTotal] = useState(0);
   const [hasMore, setHasMore] = useState(false);
 
-  // Redirection si l'utilisateur n'est pas un agent
-  if (!isAgent) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 text-red-500">
-            <Eye className="w-full h-full" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-dark-text mb-2">
-            Accès restreint
-          </h2>
-          <p className="text-gray-600 dark:text-dark-muted">
-            Cette page est réservée aux agents.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   const fetchLogs = async () => {
     try {
       setLoading(true);
@@ -47,9 +28,33 @@ const AuditPage = () => {
     }
   };
 
+  // useEffect doit être appelé avant toute logique conditionnelle
   useEffect(() => {
-    fetchLogs();
-  }, []);
+    if (isAgent) {
+      fetchLogs();
+    } else {
+      setLoading(false);
+    }
+  }, [isAgent]);
+
+  // Redirection si l'utilisateur n'est pas un agent
+  if (!isAgent) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 text-red-500">
+            <Eye className="w-full h-full" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-dark-text mb-2">
+            Accès restreint
+          </h2>
+          <p className="text-gray-600 dark:text-dark-muted">
+            Cette page est réservée aux agents.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
