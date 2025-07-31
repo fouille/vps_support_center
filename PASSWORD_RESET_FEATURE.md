@@ -98,9 +98,9 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 7. (Recommandé) Changer le mot de passe après première connexion
 
 ### Pour l'administrateur
-1. Configurer les variables d'environnement Mailjet
-2. (Optionnel) Configurer reCAPTCHA
-3. (Si erreur) Exécuter `/app/fix_password_reset_triggers.sql`
+1. Configurer les variables d'environnement Mailjet : `MJ_APIKEY_PUBLIC` et `MJ_APIKEY_PRIVATE`
+2. (Optionnel) Configurer reCAPTCHA v3 : créer une clé v3 sur https://www.google.com/recaptcha/admin
+3. (Si erreur trigger) Exécuter `/app/fix_password_reset_triggers.sql`
 4. La fonctionnalité est automatiquement disponible
 
 ## Dépendances ajoutées
