@@ -107,12 +107,16 @@ const sendPasswordResetEmail = async (email, newPassword, userName) => {
       body: JSON.stringify(emailData)
     });
 
+    console.log('Mailjet response status:', response.status);
+    console.log('Mailjet response headers:', Object.fromEntries(response.headers.entries()));
+
     if (response.ok) {
-      console.log('Email de réinitialisation envoyé avec succès');
+      const responseData = await response.json();
+      console.log('Email de réinitialisation envoyé avec succès:', responseData);
       return true;
     } else {
       const errorData = await response.text();
-      console.error('Erreur envoi email Mailjet:', errorData);
+      console.error('Erreur envoi email Mailjet:', response.status, errorData);
       return false;
     }
 
