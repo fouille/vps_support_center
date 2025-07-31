@@ -70,6 +70,72 @@ const Login = () => {
     setLoading(false);
   };
 
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetError('');
+    setResetMessage('');
+
+    try {
+      // Récupérer le token reCAPTCHA si disponible
+      let recaptchaToken = null;
+      if (recaptchaRef.current) {
+        recaptchaToken = recaptchaRef.current.getValue();
+      }
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+      const response = await fetch(`${backendUrl}/api/password-reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: resetEmail,
+          recaptchaToken
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResetMessage(data.message);
+        setResetEmail('');
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
+        // Fermer le modal après 3 secondes
+        setTimeout(() => {
+          setShowResetModal(false);
+          setResetMessage('');
+        }, 3000);
+      } else {
+        setResetError(data.error || 'Erreur lors de la réinitialisation');
+      }
+    } catch (error) {
+      setResetError('Erreur de connexion');
+      console.error('Erreur reset password:', error);
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const openResetModal = () => {
+    setShowResetModal(true);
+    setResetEmail('');
+    setResetError('');
+    setResetMessage('');
+  };
+
+  const closeResetModal = () => {
+    setShowResetModal(false);
+    setResetEmail('');
+    setResetError('');
+    setResetMessage('');
+    if (recaptchaRef.current) {
+      recaptchaRef.current.reset();
+    }
+  };
+
   // Afficher le loader pendant l'initialisation
   if (pageLoading) {
     return (
