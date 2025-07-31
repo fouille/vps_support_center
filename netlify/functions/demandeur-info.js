@@ -114,8 +114,7 @@ exports.handler = async (event, context) => {
         ds.code_postal as societe_code_postal,
         ds.ville as societe_ville,
         ds.numero_tel as societe_telephone,
-        ds.email as societe_email,
-        ds.site_web as societe_site_web
+        ds.email as societe_email
       FROM demandeurs d
       LEFT JOIN demandeurs_societe ds ON d.societe_id = ds.id
       WHERE d.id = ${demandeurId}
