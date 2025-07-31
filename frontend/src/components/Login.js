@@ -320,6 +320,13 @@ const Login = () => {
                         theme="light"
                         onErrored={(error) => {
                           console.error('reCAPTCHA error:', error);
+                          setResetError('Erreur reCAPTCHA - Vous pouvez continuer sans validation captcha');
+                        }}
+                        onExpired={() => {
+                          console.log('reCAPTCHA expired');
+                          if (recaptchaRef.current) {
+                            recaptchaRef.current.reset();
+                          }
                         }}
                       />
                     </div>
