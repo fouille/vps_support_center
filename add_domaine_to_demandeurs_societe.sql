@@ -15,9 +15,11 @@ ALTER TABLE demandeurs_societe
 ADD CONSTRAINT chk_domaine_format 
 CHECK (
     domaine IS NULL OR 
-    (domaine ~ '^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$' 
+    (domaine ~ '^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$' 
      AND domaine NOT LIKE 'http%' 
-     AND domaine NOT LIKE 'https%')
+     AND domaine NOT LIKE 'https%'
+     AND length(domaine) >= 4
+     AND domaine LIKE '%.%')
 );
 
 -- Ajouter un commentaire pour documenter le champ
