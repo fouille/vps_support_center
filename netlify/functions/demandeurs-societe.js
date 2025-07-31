@@ -233,6 +233,35 @@ exports.handler = async (event, context) => {
           domaine: upd_domaine
         } = updateData;
         
+        // Validation du format de domaine si fourni
+        if (upd_domaine) {
+          const domaineRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/;
+          if (!domaineRegex.test(upd_domaine) || upd_domaine.includes('http')) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ 
+                detail: 'Format de domaine invalide. Utilisez le format: exemple.com (sans http/https)' 
+              })
+            };
+          }
+        }
+
+        // Check if domain already exists for another company (if provided)
+        if (upd_domaine) {
+          const existingDomaine = await sql`
+            SELECT domaine FROM demandeurs_societe WHERE domaine = ${upd_domaine} AND id != ${societeId}
+          `;
+          
+          if (existingDomaine.length > 0) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ detail: 'Ce domaine est déjà utilisé par une autre société' })
+            };
+          }
+        }
+
         // Check if SIRET already exists for another company (if provided)
         if (upd_siret) {
           const existingSiret = await sql`
