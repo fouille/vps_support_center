@@ -161,10 +161,10 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
       `en vue de la portabilité des numéros de téléphone ci-dessous mentionnés.`;
     
     const introHeight = addText(introText, leftMargin, currentY, {
-      fontSize: 11,
+      fontSize: 10, // Taille réduite
       maxWidth: contentWidth
     });
-    currentY += introHeight + 15;
+    currentY += introHeight + 10; // Espace réduit
     
     // === INFORMATIONS DU DEMANDEUR ===
     addText('INFORMATIONS DU DEMANDEUR', leftMargin, currentY, {
