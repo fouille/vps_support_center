@@ -84,17 +84,18 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       const result = await generateMandatPDF(formData, demandeurInfo);
       
       if (result.success) {
-        // Afficher un message de succès temporaire
-        const originalError = error;
-        setError(null);
-        setSuccess(`Mandat PDF généré avec succès : ${result.fileName}`);
+        // Afficher un message de succès spécifique au PDF
+        setPdfGenerationMessage(`Génération du mandat de portabilité terminée : ${result.fileName}`);
         
         setTimeout(() => {
-          setSuccess(false);
-          setError(originalError);
-        }, 3000);
+          setPdfGenerationMessage(null);
+        }, 4000);
       } else {
-        setError(`Erreur lors de la génération du PDF : ${result.error}`);
+        setPdfGenerationMessage(`Erreur lors de la génération du PDF : ${result.error}`);
+        
+        setTimeout(() => {
+          setPdfGenerationMessage(null);
+        }, 4000);
       }
       
     } catch (error) {
