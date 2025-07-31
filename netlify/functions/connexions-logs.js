@@ -33,19 +33,16 @@ const getClientIP = (event) => {
     ip = ip.split(',')[0].trim();
   }
   
-  // Validation basique de l'IP pour éviter les erreurs de type INET
-  if (ip && ip !== 'unknown') {
-    // Vérifier si c'est une IPv4 ou IPv6 valide (regex simple)
-    const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,7}:$|^([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}$|^([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}$|^([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}$|^([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}$|^([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}$|^[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})$|^:((:[0-9a-fA-F]{1,4}){1,7}|:)$/;
-    
-    if (!ipv4Regex.test(ip) && !ipv6Regex.test(ip)) {
-      console.warn('Invalid IP format detected:', ip);
+  // Nettoyer l'IP et vérifier qu'elle n'est pas vide
+  if (ip) {
+    ip = ip.trim();
+    // Si l'IP contient des caractères suspects ou est trop longue, retourner 'unknown'
+    if (ip.length > 45 || ip === '' || ip.includes(' ')) {
       return 'unknown';
     }
   }
   
-  return ip;
+  return ip || 'unknown';
 };
 
 exports.handler = async (event, context) => {
