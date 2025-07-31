@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [1.27.3] - 2025-07-31
+### Fixed
+- 🔧 Fix final variables Mailjet - correction MJ_APIKEY_PUBLIC/MJ_APIKEY_PRIVATE
+
 ## [1.27.2] - 2025-07-31
 ### Fixed
 - 🔧 Fix variables Mailjet - correction MJ_API_KEY/MJ_SECRET_KEY + amélioration gestion erreurs reCAPTCHA
