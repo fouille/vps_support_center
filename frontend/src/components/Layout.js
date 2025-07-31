@@ -13,7 +13,8 @@ import {
   Moon,
   Phone,
   BarChart3,
-  Factory
+  Factory,
+  Activity
 } from 'lucide-react';
 
 const Layout = ({ children, currentPage, onNavigate }) => {
