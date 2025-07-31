@@ -336,9 +336,7 @@ export const generateMandatPDF = async (formData, demandeurInfo) => {
       color: lightGray
     });
     
-    // Cadre pour la signature (à droite)
-    pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
-    pdf.rect(signatureX, signatureY + 12, 80, 30);
+    // Pas de cadre pour la signature - juste l'espace libre
     
     // Pas de pied de page automatique
     
