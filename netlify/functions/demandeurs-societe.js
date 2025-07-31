@@ -86,7 +86,7 @@ exports.handler = async (event, context) => {
         } else {
           societeQuery = sql`
             SELECT id, nom_societe, siret, adresse, adresse_complement, 
-                   code_postal, ville, numero_tel, email, logo_base64,
+                   code_postal, ville, numero_tel, email, logo_base64, domaine,
                    created_at, updated_at
             FROM demandeurs_societe 
             ORDER BY nom_societe
