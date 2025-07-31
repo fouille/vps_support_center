@@ -6,9 +6,9 @@
 
 export const VERSION_CONFIG = {
   major: 1,      // Version majeure - changements breaking
-  minor: 20,      // Version mineure - nouvelles fonctionnalités
+  minor: 21,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
-  buildDate: "2025-07-30", // Date de build automatique
+  buildDate: "2025-07-31", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "1.21.0",
+    date: "2025-07-31",
+    type: "MINOR",
+    description: "Ajout de la fonctionnalité d'audit des connexions pour les agents"
+  },
+{
     version: "1.20.0",
     date: "2025-07-30",
     type: "MINOR",
