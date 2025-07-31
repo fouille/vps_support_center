@@ -3,11 +3,55 @@
 ## Original User Problem Statement
 L'utilisateur a demandé une interface de gestion de tickets de support avec interface bleu pastel thème sombre (style React Admin). Les fonctionnalités principales incluent les opérations CRUD pour clients, demandeurs et agents, une page de supervision des tickets, et un système de commentaires/échanges. Recent additions include agents creating tickets (requiring client and requestor selection), a ticket refresh button, ticket status/client filtering for agents, and a comment system within tickets.
 
-## Current Issue Being Addressed - 🔧 BUGS CORRECTIONS: Productions Feature
-**Date**: 2025-07-30 12:50:00
-**Status**: 🔧 Bug Fixes Applied - Requires Database Setup for Testing
+## Current Issue Being Addressed - 🆕 NOUVELLE FONCTIONNALITÉ: Personnalisation Login par Domaine
+**Date**: 2025-06-XX XX:XX:XX
+**Status**: 🚧 En Développement - Personnalisation de la page de login basée sur le domaine
 
-### Corrections de bugs appliquées le 30/07/2025 - MISE À JOUR:
+### Nouvelle fonctionnalité en cours de développement:
+
+**Objectif**: Personnaliser la page de connexion selon le domaine d'accès
+- Si connexion depuis un domaine déclaré dans la fiche entreprise → affichage du logo de l'entreprise
+- Si domaine non déclaré → affichage standard actuel (icône bleue)
+
+**Modifications apportées**:
+
+**1. Structure base de données - ✅ PRÉPARÉ**
+- **Fichier**: `/app/add_domaine_to_demandeurs_societe.sql`
+- **Ajout**: Champ `domaine` VARCHAR(255) optionnel avec contrainte unique
+- **Validation**: Regex pour format domaine (exemple.com, sans http/https)
+- **Index**: Index unique sur domaine (excluant NULL)
+
+**2. API Backend modifiée - ✅ COMPLÉTÉ**
+- **Fichier**: `/app/netlify/functions/demandeurs-societe.js`
+- **Ajouts**: Support du champ `domaine` dans CRUD complet
+- **Validation**: Format de domaine côté serveur avec regex
+- **Recherche**: Domaine inclus dans la recherche textuelle
+
+**3. Nouvelle API publique créée - ✅ COMPLÉTÉ**
+- **Fichier**: `/app/netlify/functions/get-logo-by-domain.js`
+- **Usage**: GET `/api/get-logo-by-domain?domaine=exemple.com`
+- **Sécurité**: API publique (pas d'auth requise pour page login)
+- **Retour**: `{logo_base64, nom_societe}` ou 404 si non trouvé
+
+**4. Frontend - Formulaire société - ✅ COMPLÉTÉ**
+- **Fichier**: `/app/frontend/src/components/DemandeursPage.js`
+- **Ajout**: Champ "Domaine" dans le formulaire de création/édition société
+- **Validation**: Format d'exemple et texte d'aide
+- **Integration**: Lié à `societeFormData.domaine`
+
+**5. Frontend - Page de login - ✅ COMPLÉTÉ**
+- **Fichier**: `/app/frontend/src/components/Login.js`
+- **Logic**: Détection automatique du domaine depuis `window.location.hostname`
+- **API Call**: Appel automatique à `get-logo-by-domain` au chargement
+- **Affichage**: Logo personnalisé ou icône par défaut
+- **UX**: Nom de société ajouté dans le sous-titre
+
+**Prochaines étapes**:
+1. ⚠️ **REQUIS**: Exécuter le script SQL sur la base Neon
+2. 🧪 Tester l'API get-logo-by-domain 
+3. 🧪 Tester CRUD société avec nouveau champ domaine
+4. 🧪 Tester personnalisation login (nécessite domaine test)
+
 
 **1. Erreur API 500 "column ds.nom does not exist" - ✅ CORRIGÉ**
 - **Fichier**: `/app/netlify/functions/production-tache-commentaires.js`
