@@ -139,6 +139,9 @@ const DemandeursPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDemandeurFormLoading(true);
+    setError('');
+    
     try {
       let submitData = { ...formData };
       
@@ -156,6 +159,8 @@ const DemandeursPage = () => {
       handleCloseModal();
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } finally {
+      setDemandeurFormLoading(false);
     }
   };
 
