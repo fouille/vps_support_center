@@ -15,6 +15,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
   const [success, setSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [pdfGenerationMessage, setPdfGenerationMessage] = useState(null);
   
   const [formData, setFormData] = useState({
     client_id: '',
