@@ -146,13 +146,13 @@ exports.handler = async (event, context) => {
 
         // Validation du format de domaine si fourni
         if (domaine) {
-          const domaineRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/;
-          if (!domaineRegex.test(domaine) || domaine.includes('http')) {
+          const domaineRegex = /^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$/;
+          if (!domaineRegex.test(domaine) || domaine.includes('http') || domaine.length < 4 || !domaine.includes('.')) {
             return {
               statusCode: 400,
               headers,
               body: JSON.stringify({ 
-                detail: 'Format de domaine invalide. Utilisez le format: exemple.com (sans http/https)' 
+                detail: 'Format de domaine invalide. Utilisez le format: exemple.com (sans http/https, minimum 4 caractères avec un point)' 
               })
             };
           }
