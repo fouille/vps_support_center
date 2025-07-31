@@ -144,6 +144,35 @@ exports.handler = async (event, context) => {
           };
         }
 
+        // Validation du format de domaine si fourni
+        if (domaine) {
+          const domaineRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.[a-zA-Z]{2,}(\.[a-zA-Z]{2,})*$/;
+          if (!domaineRegex.test(domaine) || domaine.includes('http')) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ 
+                detail: 'Format de domaine invalide. Utilisez le format: exemple.com (sans http/https)' 
+              })
+            };
+          }
+        }
+
+        // Check if domain already exists (if provided)
+        if (domaine) {
+          const existingDomaine = await sql`
+            SELECT domaine FROM demandeurs_societe WHERE domaine = ${domaine}
+          `;
+          
+          if (existingDomaine.length > 0) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ detail: 'Ce domaine est déjà utilisé' })
+            };
+          }
+        }
+
         // Check if SIRET already exists (if provided)
         if (siret) {
           const existingSiret = await sql`
