@@ -75,7 +75,7 @@ NETLIFY_DATABASE_URL=your_neon_database_url
 ### Mesures de protection
 - **Anti-énumération** : même message de succès que l'email existe ou non
 - **Délai simulé** : 1-2 secondes pour masquer la différence de traitement
-- **reCAPTCHA optionnel** : protection contre les bots
+- **reCAPTCHA v3** : Protection invisible contre les bots avec score de confiance
 - **Mot de passe sécurisé** : génération aléatoire avec critères stricts
 - **Hachage bcrypt** : stockage sécurisé des mots de passe
 
