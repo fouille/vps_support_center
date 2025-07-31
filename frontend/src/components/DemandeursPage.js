@@ -270,7 +270,8 @@ const DemandeursPage = () => {
       ville: societe.ville,
       numero_tel: societe.numero_tel || '',
       email: societe.email,
-      logo_base64: societe.logo_base64 || ''
+      logo_base64: societe.logo_base64 || '',
+      domaine: societe.domaine || ''
     });
     setShowSocieteModal(true);
   };
