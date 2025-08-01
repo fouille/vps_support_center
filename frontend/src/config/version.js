@@ -7,8 +7,8 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 0,      // Version mineure - nouvelles fonctionnalités
-  patch: 0,      // Version patch - corrections de bugs
-  buildDate: "2025-07-31", // Date de build automatique
+  patch: 1,      // Version patch - corrections de bugs
+  buildDate: "2025-08-01", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.0.1",
+    date: "2025-08-01",
+    type: "PATCH",
+    description: "Amélioration UX - renforcement reCAPTCHA + scroll listes + footer fixe + recherche clients"
+  },
+{
     version: "2.0.0",
     date: "2025-07-31",
     type: "MAJOR",
