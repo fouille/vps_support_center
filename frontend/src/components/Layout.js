@@ -56,7 +56,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="flex h-full bg-gray-50 dark:bg-dark-bg">
       {/* Sidebar mobile backdrop */}
       {sidebarOpen && (
         <div 
