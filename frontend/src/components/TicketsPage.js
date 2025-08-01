@@ -678,6 +678,8 @@ const TicketsPage = () => {
             </p>
           </div>
         )}
+        </div>
+      </div>
       </div>
 
       {/* Modal de création/édition */}
