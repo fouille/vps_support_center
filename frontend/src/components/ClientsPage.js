@@ -252,45 +252,45 @@ const ClientsPage = () => {
 
       {/* Zone de recherche et filtres */}
       <div className="space-y-4">
-          {/* Barre de recherche */}
-          <div className="relative max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+          {/* Recherche et filtre côte à côte */}
+          <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+            {/* Barre de recherche */}
+            <div className="relative max-w-md flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Rechercher un client (min. 3 caractères)..."
+                value={searchInput}
+                onChange={handleSearchChange}
+                className="input pl-10 pr-10 w-full"
+              />
+              {isSearching && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                </div>
+              )}
             </div>
-            <input
-              type="text"
-              placeholder="Rechercher un client (min. 3 caractères)..."
-              value={searchInput}
-              onChange={handleSearchChange}
-              className="input pl-10 pr-10 w-full"
-            />
-            {isSearching && (
-              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+
+            {/* Filtre société pour les agents */}
+            {user?.type_utilisateur === 'agent' && (
+              <div className="max-w-md flex-1">
+                <select
+                  value={selectedSociete}
+                  onChange={(e) => handleSocieteFilterChange(e.target.value)}
+                  className="input w-full"
+                >
+                  <option value="">Toutes les sociétés</option>
+                  {societes.map((societe) => (
+                    <option key={societe.id} value={societe.id}>
+                      {societe.nom_societe}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </div>
-
-          {/* Filtre société pour les agents */}
-          {user?.type_utilisateur === 'agent' && (
-            <div className="max-w-md">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Filtrer par société
-              </label>
-              <select
-                value={selectedSociete}
-                onChange={(e) => handleSocieteFilterChange(e.target.value)}
-                className="input w-full"
-              >
-                <option value="">Toutes les sociétés</option>
-                {societes.map((societe) => (
-                  <option key={societe.id} value={societe.id}>
-                    {societe.nom_societe}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {/* Messages informatifs */}
           {searchInput && searchInput.length > 0 && searchInput.length < 3 && (
