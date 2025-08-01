@@ -149,7 +149,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <div className="h-16 bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-dark-border flex items-center justify-between px-6">
           <button
