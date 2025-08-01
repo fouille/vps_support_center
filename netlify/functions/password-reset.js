@@ -189,13 +189,18 @@ exports.handler = async (event, context) => {
         };
       }
       
-      // Vérification du score pour reCAPTCHA v3 (optionnel)
+      // Vérification du score pour reCAPTCHA v3 (seuil de sécurité)
       if (recaptchaData.score !== undefined) {
         console.log('reCAPTCHA score:', recaptchaData.score);
-        if (recaptchaData.score < 0.5) {
-          console.warn('Low reCAPTCHA score:', recaptchaData.score);
-          // Pour l'instant, on continue même avec un score bas
-          // Vous pouvez ajuster ce seuil selon vos besoins
+        if (recaptchaData.score <= 0.5) {
+          console.warn('reCAPTCHA score trop bas:', recaptchaData.score);
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({ 
+              error: 'Demande refusée pour des raisons de sécurité. Veuillez réessayer plus tard.' 
+            })
+          };
         }
       }
       
