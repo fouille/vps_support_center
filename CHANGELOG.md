@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.0.3] - 2025-08-01
+### Fixed
+- 🔧 Fix double footer - suppression du footer Layout + restructuration pour footer global visible
+
 ## [2.0.2] - 2025-08-01
 ### Fixed
 - 🔧 Fix erreur build footer - utilisation du composant Footer.js existant

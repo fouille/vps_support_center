@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 0,      // Version mineure - nouvelles fonctionnalités
-  patch: 2,      // Version patch - corrections de bugs
+  patch: 3,      // Version patch - corrections de bugs
   buildDate: "2025-08-01", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.0.3",
+    date: "2025-08-01",
+    type: "PATCH",
+    description: "Fix double footer - suppression du footer Layout + restructuration pour footer global visible"
+  },
+{
     version: "2.0.2",
     date: "2025-08-01",
     type: "PATCH",
