@@ -449,8 +449,9 @@ const ProductionsPage = () => {
           </div>
         )}
         
-        <div className="grid gap-4">
-          {productions.length === 0 && !loadingProductions ? (
+        <div className="overflow-y-auto max-h-[70vh] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <div className="grid gap-4 pr-2">
+            {productions.length === 0 && !loadingProductions ? (
             <div className="text-center py-12">
               <Factory className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text mb-2">Aucune production trouvée</h3>
