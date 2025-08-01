@@ -680,7 +680,6 @@ const TicketsPage = () => {
         )}
         </div>
       </div>
-      </div>
 
       {/* Modal de création/édition */}
       {showModal && (
