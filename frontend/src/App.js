@@ -75,8 +75,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="app-container bg-gray-100 dark:bg-dark-bg">
-          <div className="main-content">
+        <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-dark-bg">
+          <div className="flex-1">
             <AppContent />
           </div>
           <Footer />
