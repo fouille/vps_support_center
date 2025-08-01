@@ -611,6 +611,7 @@ const ProductionsPage = () => {
             </div>
           ))
         )}
+          </div>
         </div>
       </div>
 
