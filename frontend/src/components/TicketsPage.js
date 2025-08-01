@@ -584,8 +584,9 @@ const TicketsPage = () => {
         </div>
       )}
 
-      <div className="grid gap-4">
-        {tickets.map((ticket) => (
+      <div className="overflow-y-auto max-h-[70vh] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+        <div className="grid gap-4 pr-2">
+          {tickets.map((ticket) => (
           <div key={ticket.id} className="card p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
