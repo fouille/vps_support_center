@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Footer from './Footer';
 import { 
   Users, 
   UserCheck, 
