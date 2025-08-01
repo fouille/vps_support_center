@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.0.2] - 2025-08-01
+### Fixed
+- 🔧 Fix erreur build footer - utilisation du composant Footer.js existant
+
 ## [2.0.1] - 2025-08-01
 ### Fixed
 - 🔧 Amélioration UX - renforcement reCAPTCHA + scroll listes + footer fixe + recherche clients
