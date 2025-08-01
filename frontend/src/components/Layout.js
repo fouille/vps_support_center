@@ -150,7 +150,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Top bar */}
         <div className="h-16 bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-dark-border flex items-center justify-between px-6">
           <button
@@ -168,26 +168,12 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         </div>
 
         {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto pb-20">
+        <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>
 
-        {/* Footer fixe */}
-        <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-surface border-t border-gray-200 dark:border-dark-border shadow-lg z-10">
-          <div className="flex items-center justify-between px-6 py-3">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-dark-muted">
-                © 2025 Support System - v{require('../../config/version').version}
-              </span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                Connecté en tant que {user?.prenom} {user?.nom}
-              </span>
-              <div className="w-2 h-2 bg-green-500 rounded-full" title="En ligne"></div>
-            </div>
-          </div>
-        </footer>
+        {/* Footer utilisant le composant existant */}
+        <Footer />
       </div>
     </div>
   );
