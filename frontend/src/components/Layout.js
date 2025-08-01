@@ -171,9 +171,6 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>
-
-        {/* Footer utilisant le composant existant */}
-        <Footer />
       </div>
     </div>
   );
