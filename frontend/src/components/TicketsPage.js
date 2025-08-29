@@ -199,7 +199,7 @@ const TicketsPage = () => {
         params.append('search', searchTerm);
         params.append('limit', '100'); // Plus de résultats avec recherche
       } else {
-        params.append('limit', '10'); // 10 premiers clients par défaut
+        params.append('limit', '100'); // Charger plus de clients par défaut pour les filtres
       }
       
       // Pour les demandeurs, limiter aux clients de leur société
