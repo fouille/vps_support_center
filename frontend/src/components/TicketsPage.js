@@ -240,7 +240,7 @@ const TicketsPage = () => {
 
       loadInitialFormClients();
     }
-  }, [showModal, isAgent, user?.societe_id, api]); // Dépendances stables
+  }, [showModal, isAgent, user?.societe_id]); // Supprimer api des dépendances
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
