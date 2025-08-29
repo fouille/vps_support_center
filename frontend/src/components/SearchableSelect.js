@@ -23,17 +23,29 @@ const SearchableSelect = ({
 
   // Filter options based on search term
   useEffect(() => {
-    if (!searchTerm) {
+    if (onSearch) {
+      // Si une fonction de recherche côté serveur est fournie, l'utiliser
+      if (searchTerm.length >= 3) {
+        onSearch(searchTerm);
+      } else if (searchTerm.length === 0) {
+        onSearch(''); // Recherche vide pour récupérer les résultats par défaut
+      }
+      // Les options filtrées seront mises à jour par le parent
       setFilteredOptions(options);
     } else {
-      const filtered = options.filter(option => 
-        searchKeys.some(key => 
-          option[key]?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-      setFilteredOptions(filtered);
+      // Filtrage côté client (comportement original)
+      if (!searchTerm) {
+        setFilteredOptions(options);
+      } else {
+        const filtered = options.filter(option => 
+          searchKeys.some(key => 
+            option[key]?.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        );
+        setFilteredOptions(filtered);
+      }
     }
-  }, [searchTerm, options, searchKeys]);
+  }, [searchTerm, options, onSearch, searchKeys]);
 
   // Handle clicks outside component
   useEffect(() => {
