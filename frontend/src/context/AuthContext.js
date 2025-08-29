@@ -176,10 +176,8 @@ export const AuthProvider = ({ children }) => {
         user_prenom: userData.prenom,
         action_type: actionType
       });
-      console.log(`${actionType} logged for user:`, userData.email);
       return response;
     } catch (error) {
-      console.error(`Error logging ${actionType}:`, error);
       // Ne pas bloquer le processus de connexion/déconnexion si le log échoue
       throw error; // Re-lancer l'erreur pour que logout puisse la gérer
     }
