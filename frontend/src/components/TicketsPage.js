@@ -132,6 +132,8 @@ const TicketsPage = () => {
 
   const fetchClients = async (searchTerm = '') => {
     try {
+      setLoadingClients(true);
+      
       // Construire les paramètres pour la requête
       const params = new URLSearchParams();
       
@@ -145,7 +147,7 @@ const TicketsPage = () => {
       }
       
       // Récupérer plus de résultats pour avoir une liste complète
-      params.append('limit', '100'); // Limite augmentée
+      params.append('limit', '500'); // Limite augmentée pour avoir tous les clients
       
       const response = await api.get(`/api/clients?${params}`);
       
@@ -158,8 +160,19 @@ const TicketsPage = () => {
       }
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
+    } finally {
+      setLoadingClients(false);
     }
   };
+
+  // Fonction debounced pour la recherche de clients
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchClients(clientSearchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [clientSearchTerm, isAgent, user?.societe_id]);
 
   const fetchDemandeurs = async () => {
     try {
