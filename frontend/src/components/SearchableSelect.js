@@ -28,9 +28,8 @@ const SearchableSelect = ({
       const timer = setTimeout(() => {
         if (searchTerm.length >= 3) {
           onSearch(searchTerm);
-        } else if (searchTerm.length === 0) {
-          onSearch(''); // Recherche vide pour récupérer les résultats par défaut
         }
+        // SUPPRIMER l'appel onSearch('') pour éviter les boucles infinies
       }, 300); // Debounce de 300ms
       
       // Les options filtrées seront mises à jour par le parent
