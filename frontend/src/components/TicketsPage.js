@@ -164,14 +164,7 @@ const TicketsPage = () => {
     }
   };
 
-  // Fonction debounced pour la recherche de clients
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchClients(clientSearchTerm);
-    }, 300);
 
-    return () => clearTimeout(timer);
-  }, [clientSearchTerm, isAgent, user?.societe_id]);
 
   const fetchDemandeurs = async () => {
     try {
