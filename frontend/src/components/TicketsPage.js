@@ -473,6 +473,7 @@ const TicketsPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingTicket(null);
+    setClientSearchTerm(''); // Réinitialiser la recherche de clients
     setFormData({
       titre: '',
       client_id: '',
