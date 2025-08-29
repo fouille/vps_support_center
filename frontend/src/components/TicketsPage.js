@@ -12,7 +12,8 @@ import {
   User,
   Building,
   Clock,
-  RefreshCw
+  RefreshCw,
+  Search
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
