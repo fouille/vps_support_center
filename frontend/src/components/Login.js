@@ -147,7 +147,6 @@ const Login = () => {
       }
     } catch (error) {
       setResetError('Erreur de connexion');
-      console.error('Erreur reset password:', error);
     } finally {
       setResetLoading(false);
     }
