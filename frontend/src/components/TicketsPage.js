@@ -135,22 +135,20 @@ const TicketsPage = () => {
 
   const fetchClients = async (searchTerm = '') => {
     try {
-      setLoadingClients(true);
-      
       // Construire les paramètres pour la requête
       const params = new URLSearchParams();
       
-      if (searchTerm) {
+      if (searchTerm && searchTerm.length >= 3) {
         params.append('search', searchTerm);
+        params.append('limit', '100'); // Plus de résultats avec recherche
+      } else {
+        params.append('limit', '10'); // 10 premiers clients par défaut
       }
       
       // Pour les demandeurs, limiter aux clients de leur société
       if (!isAgent && user?.societe_id) {
         params.append('societe', user.societe_id);
       }
-      
-      // Récupérer plus de résultats pour avoir une liste complète
-      params.append('limit', '500'); // Limite augmentée pour avoir tous les clients
       
       const response = await api.get(`/api/clients?${params}`);
       
@@ -163,8 +161,6 @@ const TicketsPage = () => {
       }
     } catch (error) {
       console.error('Erreur lors du chargement des clients:', error);
-    } finally {
-      setLoadingClients(false);
     }
   };
 
