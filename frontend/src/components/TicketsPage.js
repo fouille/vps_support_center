@@ -632,6 +632,8 @@ const TicketsPage = () => {
             options={clientOptions}
             value={clientFilter}
             onChange={setClientFilter}
+            onSearch={handleFilterClientSearch}
+            loading={loadingFilterClients}
             placeholder="Tous les clients"
             className="w-full"
             displayKey="label"
