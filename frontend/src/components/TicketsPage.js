@@ -21,7 +21,8 @@ import { fr } from 'date-fns/locale';
 const TicketsPage = () => {
   const { isAgent, api, user } = useAuth();
   const [tickets, setTickets] = useState([]);
-  const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([]); // Clients pour les filtres
+  const [formClients, setFormClients] = useState([]); // Clients pour le formulaire de création
   const [demandeurs, setDemandeurs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -39,7 +40,7 @@ const TicketsPage = () => {
   const [sendingComment, setSendingComment] = useState(false);
   const [refreshingTickets, setRefreshingTickets] = useState(false);
   
-  const [loadingClients, setLoadingClients] = useState(false);
+  const [loadingFormClients, setLoadingFormClients] = useState(false);
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
