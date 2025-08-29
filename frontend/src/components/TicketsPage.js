@@ -531,7 +531,7 @@ const TicketsPage = () => {
     <div className="fade-in">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
-          {isAgent ? 'Supervision des Tickets' : 'Mes Tickets'}
+          {isAgent ? 'Support' : 'Mes Tickets'}
         </h1>
         <div className="flex space-x-3">
           <button
