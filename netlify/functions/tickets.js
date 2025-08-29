@@ -66,8 +66,7 @@ exports.handler = async (event, context) => {
         
         if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           // Base query for agents (can see all tickets)
-          let whereConditions = [];
-          let params = [];
+          console.log('AGENT branch executed');
           
           // Filter by status if specified
           if (statusFilter) {
