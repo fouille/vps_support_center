@@ -39,10 +39,54 @@ const TicketsPage = () => {
   const [sendingComment, setSendingComment] = useState(false);
   const [refreshingTickets, setRefreshingTickets] = useState(false);
   
+  const [loadingClients, setLoadingClients] = useState(false);
+  
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
+
+  // Fonction de recherche de clients avec debouncing
+  const handleClientSearch = React.useCallback((searchTerm) => {
+    setLoadingClients(true);
+    
+    const searchClients = async () => {
+      try {
+        // Construire les paramètres pour la requête
+        const params = new URLSearchParams();
+        
+        if (searchTerm && searchTerm.length >= 3) {
+          params.append('search', searchTerm);
+          params.append('limit', '100'); // Plus de résultats avec recherche
+        } else {
+          params.append('limit', '10'); // 10 premiers clients par défaut
+        }
+        
+        // Pour les demandeurs, limiter aux clients de leur société
+        if (!isAgent && user?.societe_id) {
+          params.append('societe', user.societe_id);
+        }
+        
+        const response = await api.get(`/api/clients?${params}`);
+        
+        // Check if response has pagination structure (new API) or is just array (old API)
+        if (response.data.data && response.data.pagination) {
+          setClients(response.data.data);
+        } else {
+          // Fallback for old API format
+          setClients(response.data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des clients:', error);
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+
+    // Debounce de 300ms
+    const timer = setTimeout(searchClients, 300);
+    return () => clearTimeout(timer);
+  }, [isAgent, user?.societe_id, api]);
   
   const [formData, setFormData] = useState({
     titre: '',
