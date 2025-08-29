@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.0.7] - 2025-08-29
+### Fixed
+- 🔧 Fix recherche clients - séparation états filtres/formulaire + correction appels API continus
+
 ## [2.0.6] - 2025-08-29
 ### Fixed
 - 🔧 Sécurité: suppression logs sensibles authentification - domaine, clés reCAPTCHA, emails utilisateurs
