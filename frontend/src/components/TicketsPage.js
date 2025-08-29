@@ -171,8 +171,8 @@ const TicketsPage = () => {
 
   // Charger les clients pour les filtres au montage initial (une seule fois)
   useEffect(() => {
-    if (filterClientsLoaded || loadingFilterClients) {
-      return; // Éviter les re-appels si déjà chargé ou en cours de chargement
+    if (filterClientsLoaded) {
+      return; // Éviter les re-appels si déjà chargé
     }
 
     const loadInitialFilterClients = async () => {
@@ -205,7 +205,7 @@ const TicketsPage = () => {
     };
 
     loadInitialFilterClients();
-  }, [isAgent, user?.societe_id, api, filterClientsLoaded, loadingFilterClients]); // Inclure les nouveaux états
+  }, [isAgent, user?.societe_id, filterClientsLoaded]); // Supprimer api des dépendances
 
   // Charger les clients pour le formulaire lors de l'ouverture du modal (une seule fois par ouverture)
   useEffect(() => {
