@@ -98,7 +98,6 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         // Vérifier si le token est expiré côté client
         if (isTokenExpired(token)) {
-          console.log('Token expired on client side, logging out');
           handleTokenExpiration();
           return Promise.reject(new Error('Token expired'));
         }
