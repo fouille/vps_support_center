@@ -201,12 +201,40 @@ const TicketsPage = () => {
     loadInitialFilterClients();
   }, [isAgent, user?.societe_id, api]); // Seulement ces dépendances stables
 
-  // Charger les clients pour le formulaire lors de l'ouverture du modal
+  // Charger les clients pour le formulaire lors de l'ouverture du modal (une seule fois par ouverture)
   useEffect(() => {
     if (showModal) {
-      handleFormClientSearch(''); // Charger les 10 premiers clients par défaut
+      const loadInitialFormClients = async () => {
+        setLoadingFormClients(true);
+        
+        try {
+          const params = new URLSearchParams();
+          params.append('limit', '10'); // 10 premiers clients par défaut
+          
+          // Pour les demandeurs, limiter aux clients de leur société
+          if (!isAgent && user?.societe_id) {
+            params.append('societe', user.societe_id);
+          }
+          
+          const response = await api.get(`/api/clients?${params}`);
+          
+          // Check if response has pagination structure (new API) or is just array (old API)
+          if (response.data.data && response.data.pagination) {
+            setFormClients(response.data.data);
+          } else {
+            // Fallback for old API format
+            setFormClients(response.data);
+          }
+        } catch (error) {
+          console.error('Erreur lors du chargement initial des clients pour formulaire:', error);
+        } finally {
+          setLoadingFormClients(false);
+        }
+      };
+
+      loadInitialFormClients();
     }
-  }, [showModal, handleFormClientSearch]);
+  }, [showModal, isAgent, user?.societe_id, api]); // Dépendances stables
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
