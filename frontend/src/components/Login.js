@@ -53,11 +53,9 @@ const Login = () => {
     script.id = 'recaptcha-script';
     script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.REACT_APP_RECAPTCHA_SITE_KEY}`;
     script.onload = () => {
-      console.log('reCAPTCHA v3 script loaded');
       setRecaptchaLoaded(true);
     };
     script.onerror = () => {
-      console.error('Failed to load reCAPTCHA v3 script');
       setRecaptchaLoaded(false);
     };
     document.head.appendChild(script);
