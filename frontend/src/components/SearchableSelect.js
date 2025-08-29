@@ -24,14 +24,19 @@ const SearchableSelect = ({
   // Filter options based on search term
   useEffect(() => {
     if (onSearch) {
-      // Si une fonction de recherche côté serveur est fournie, l'utiliser
-      if (searchTerm.length >= 3) {
-        onSearch(searchTerm);
-      } else if (searchTerm.length === 0) {
-        onSearch(''); // Recherche vide pour récupérer les résultats par défaut
-      }
+      // Si une fonction de recherche côté serveur est fournie, l'utiliser avec debouncing
+      const timer = setTimeout(() => {
+        if (searchTerm.length >= 3) {
+          onSearch(searchTerm);
+        } else if (searchTerm.length === 0) {
+          onSearch(''); // Recherche vide pour récupérer les résultats par défaut
+        }
+      }, 300); // Debounce de 300ms
+      
       // Les options filtrées seront mises à jour par le parent
       setFilteredOptions(options);
+      
+      return () => clearTimeout(timer);
     } else {
       // Filtrage côté client (comportement original)
       if (!searchTerm) {
