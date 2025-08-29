@@ -744,31 +744,6 @@ const TicketsPage = () => {
                   Client *
                 </label>
                 
-                {/* Barre de recherche des clients */}
-                <div className="mb-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Rechercher un client..."
-                      value={clientSearchTerm}
-                      onChange={(e) => setClientSearchTerm(e.target.value)}
-                      className="input pl-10 text-sm"
-                    />
-                    {loadingClients && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-600 border-t-transparent"></div>
-                      </div>
-                    )}
-                  </div>
-                  {clientSearchTerm && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {clients.length} client{clients.length > 1 ? 's' : ''} trouvé{clients.length > 1 ? 's' : ''}
-                      {!isAgent && ' dans votre société'}
-                    </p>
-                  )}
-                </div>
-                
                 <SearchableSelect
                   options={Array.isArray(clients) ? clients.map(client => ({
                     value: client.id,
