@@ -34,10 +34,10 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
-    version: "2.0.11",
+    version: "2.1.0",
     date: "2025-08-29",
-    type: "PATCH",
-    description: "minor"
+    type: "MINOR",
+    description: "Optimisation filtres tickets - suppression requêtes doubles + recherche par numéro avec debouncing et loader"
   },
 {
     version: "2.0.10",
