@@ -210,7 +210,9 @@ const TicketsPage = () => {
 
   // Charger les clients pour le formulaire lors de l'ouverture du modal (une seule fois par ouverture)
   useEffect(() => {
-    if (showModal) {
+    if (showModal && currentModalRef.current !== showModal) {
+      currentModalRef.current = showModal; // Marquer cette ouverture de modal
+
       const loadInitialFormClients = async () => {
         setLoadingFormClients(true);
         
@@ -240,8 +242,10 @@ const TicketsPage = () => {
       };
 
       loadInitialFormClients();
+    } else if (!showModal) {
+      currentModalRef.current = null; // Reset when modal is closed
     }
-  }, [showModal, isAgent, user?.societe_id]); // Supprimer api des dépendances
+  }, [showModal]); // Seulement showModal comme dépendance
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
