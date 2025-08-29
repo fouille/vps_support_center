@@ -128,9 +128,24 @@ const TicketsPage = () => {
     }
   };
 
-  const fetchClients = async () => {
+  const fetchClients = async (searchTerm = '') => {
     try {
-      const response = await api.get('/api/clients');
+      // Construire les paramètres pour la requête
+      const params = new URLSearchParams();
+      
+      if (searchTerm) {
+        params.append('search', searchTerm);
+      }
+      
+      // Pour les demandeurs, limiter aux clients de leur société
+      if (!isAgent && user?.societe_id) {
+        params.append('societe', user.societe_id);
+      }
+      
+      // Récupérer plus de résultats pour avoir une liste complète
+      params.append('limit', '100'); // Limite augmentée
+      
+      const response = await api.get(`/api/clients?${params}`);
       
       // Check if response has pagination structure (new API) or is just array (old API)
       if (response.data.data && response.data.pagination) {
