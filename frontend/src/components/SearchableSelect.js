@@ -49,7 +49,18 @@ const SearchableSelect = ({
         setFilteredOptions(filtered);
       }
     }
-  }, [searchTerm, options, onSearch, searchKeys]);
+  }, [searchTerm, onSearch, searchKeys]); // SUPPRIMER 'options' des dépendances
+
+  // useEffect séparé pour mettre à jour filteredOptions quand options changent
+  useEffect(() => {
+    if (onSearch) {
+      // Pour la recherche serveur, utiliser directement les options reçues
+      setFilteredOptions(options);
+    } else if (!searchTerm) {
+      // Pour le filtrage client, mettre à jour seulement si pas de recherche
+      setFilteredOptions(options);
+    }
+  }, [options, onSearch, searchTerm]);
 
   // Handle clicks outside component
   useEffect(() => {
