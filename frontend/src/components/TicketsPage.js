@@ -165,13 +165,6 @@ const TicketsPage = () => {
     }
   }, [isAgent, statusFilter, clientFilter, searchFilter]); // Refetch when filters change
 
-  useEffect(() => {
-    fetchTickets();
-    if (isAgent) {
-      fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
-    }
-  }, [isAgent, statusFilter, clientFilter, searchFilter]); // Refetch when filters change
-
   // Charger les clients pour les filtres au montage initial (une seule fois)
   useEffect(() => {
     if (filterClientsLoadedRef.current) {
