@@ -163,8 +163,8 @@ const TicketsPage = () => {
 
   // Charger les clients pour les filtres au montage initial
   useEffect(() => {
-    fetchClients(); // Chargement des clients pour les filtres (100 clients)
-  }, [isAgent, user?.societe_id]); // Recharger si le type d'utilisateur ou la société change
+    handleFilterClientSearch(''); // Chargement des 10 premiers clients pour les filtres
+  }, [handleFilterClientSearch]); // Recharger si la fonction change
 
   // Charger les clients pour le formulaire lors de l'ouverture du modal
   useEffect(() => {
