@@ -768,7 +768,10 @@ const TicketsPage = () => {
           </div>
           {searchFilter && (
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Recherche par numéro de ticket
+              {searchFilter.length < 3 
+                ? `Saisissez au moins 3 chiffres (${searchFilter.length}/3)`
+                : 'Recherche par numéro de ticket'
+              }
             </p>
           )}
         </div>
