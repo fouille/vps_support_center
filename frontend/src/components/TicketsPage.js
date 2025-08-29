@@ -185,6 +185,11 @@ const TicketsPage = () => {
   ];
 
   useEffect(() => {
+    // Debouncing pour la recherche par numéro
+    if (searchFilter && searchFilter.length > 0 && searchFilter.length < 3) {
+      return; // Ne pas effectuer de recherche si moins de 3 caractères
+    }
+    
     fetchTickets();
     if (isAgent) {
       fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
