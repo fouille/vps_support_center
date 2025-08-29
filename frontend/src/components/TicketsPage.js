@@ -224,36 +224,7 @@ const TicketsPage = () => {
     }
   };
 
-  const fetchClients = async (searchTerm = '') => {
-    try {
-      // Construire les paramètres pour la requête
-      const params = new URLSearchParams();
-      
-      if (searchTerm && searchTerm.length >= 3) {
-        params.append('search', searchTerm);
-        params.append('limit', '100'); // Plus de résultats avec recherche
-      } else {
-        params.append('limit', '100'); // Charger plus de clients par défaut pour les filtres
-      }
-      
-      // Pour les demandeurs, limiter aux clients de leur société
-      if (!isAgent && user?.societe_id) {
-        params.append('societe', user.societe_id);
-      }
-      
-      const response = await api.get(`/api/clients?${params}`);
-      
-      // Check if response has pagination structure (new API) or is just array (old API)
-      if (response.data.data && response.data.pagination) {
-        setClients(response.data.data);
-      } else {
-        // Fallback for old API format
-        setClients(response.data);
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des clients:', error);
-    }
-  };
+
 
 
 
