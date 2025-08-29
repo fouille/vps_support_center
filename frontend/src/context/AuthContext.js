@@ -136,7 +136,6 @@ export const AuthProvider = ({ children }) => {
     if (token && userData) {
       // Vérifier immédiatement si le token est expiré
       if (isTokenExpired(token)) {
-        console.log('Token expired on app load, clearing storage');
         handleTokenExpiration(false); // Pas de notification au chargement
       } else {
         try {
