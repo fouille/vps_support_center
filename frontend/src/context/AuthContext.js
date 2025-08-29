@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }) => {
 
   // Fonction pour gérer la déconnexion pour expiration de token
   const handleTokenExpiration = (showNotification = true) => {
-    console.log('Token expired, logging out user');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
