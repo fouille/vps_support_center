@@ -87,12 +87,9 @@ const Login = () => {
         const data = await response.json();
         setLogo(data.logo_base64);
         setCompanyName(data.nom_societe);
-        console.log('Logo trouvé pour le domaine:', domaine, 'société:', data.nom_societe);
-      } else {
-        console.log('Aucun logo trouvé pour le domaine:', domaine);
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération du logo:', error);
+      // Silencieux - pas de log d'erreur
     }
   };
 
