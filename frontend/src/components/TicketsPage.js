@@ -781,6 +781,9 @@ const TicketsPage = () => {
                     subtitle: client.prenom || client.nom ? `${client.prenom || ''} ${client.nom || ''}`.trim() : ''
                   })) : []}
                   value={formData.client_id}
+                  onSearch={handleClientSearch}
+                  loading={loadingClients}
+                  placeholder="Sélectionner un client"
                   onChange={(value) => setFormData({ ...formData, client_id: value })}
                   placeholder="Sélectionner un client"
                   displayKey="label"
