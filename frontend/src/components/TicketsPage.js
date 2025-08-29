@@ -171,6 +171,10 @@ const TicketsPage = () => {
 
   // Charger les clients pour les filtres au montage initial (une seule fois)
   useEffect(() => {
+    if (filterClientsLoaded || loadingFilterClients) {
+      return; // Éviter les re-appels si déjà chargé ou en cours de chargement
+    }
+
     const loadInitialFilterClients = async () => {
       setLoadingFilterClients(true);
       
@@ -192,6 +196,7 @@ const TicketsPage = () => {
           // Fallback for old API format
           setClients(response.data);
         }
+        setFilterClientsLoaded(true); // Marquer comme chargé
       } catch (error) {
         console.error('Erreur lors du chargement initial des clients pour filtres:', error);
       } finally {
@@ -200,7 +205,7 @@ const TicketsPage = () => {
     };
 
     loadInitialFilterClients();
-  }, [isAgent, user?.societe_id, api]); // Seulement ces dépendances stables
+  }, [isAgent, user?.societe_id, api, filterClientsLoaded, loadingFilterClients]); // Inclure les nouveaux états
 
   // Charger les clients pour le formulaire lors de l'ouverture du modal (une seule fois par ouverture)
   useEffect(() => {
