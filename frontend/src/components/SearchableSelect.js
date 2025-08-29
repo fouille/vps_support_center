@@ -90,6 +90,10 @@ const SearchableSelect = ({
   const handleClear = () => {
     onChange('');
     setSearchTerm('');
+    // Déclencher une recherche vide pour recharger les 10 premiers éléments
+    if (onSearch) {
+      onSearch('');
+    }
   };
 
   const selectedOption = options.find(option => option[valueKey] === value);
