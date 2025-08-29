@@ -171,6 +171,7 @@ exports.handler = async (event, context) => {
           }
         } else {
           // Demandeurs can only see tickets from their company (using societe_id)
+          console.log('DEMANDEUR branch executed');
           const demandeur = await sql`
             SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}
           `;
