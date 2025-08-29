@@ -49,7 +49,7 @@ const SearchableSelect = ({
         setFilteredOptions(filtered);
       }
     }
-  }, [searchTerm, onSearch, searchKeys]); // SUPPRIMER 'options' des dépendances
+  }, [searchTerm, onSearch]); // Retirer 'searchKeys' qui cause la boucle infinie
 
   // useEffect séparé pour mettre à jour filteredOptions quand options changent
   useEffect(() => {
