@@ -24,8 +24,6 @@ const Login = () => {
     const initializePage = async () => {
       // Détecter le domaine depuis l'URL
       const currentDomain = window.location.hostname;
-      console.log('Domaine détecté:', currentDomain);
-      console.log('reCAPTCHA Site Key:', process.env.REACT_APP_RECAPTCHA_SITE_KEY);
       
       // Charger reCAPTCHA v3 si configuré
       if (process.env.REACT_APP_RECAPTCHA_SITE_KEY && 
