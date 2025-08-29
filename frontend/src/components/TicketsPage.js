@@ -73,11 +73,15 @@ const TicketsPage = () => {
 
   useEffect(() => {
     fetchTickets();
-    fetchClients(); // Les clients sont nécessaires pour tous les utilisateurs qui créent des tickets
     if (isAgent) {
       fetchDemandeurs(); // Les agents ont besoin de voir la liste des demandeurs
     }
   }, [isAgent, statusFilter, clientFilter, searchFilter]); // Refetch when filters change
+
+  // Charger les clients au montage initial seulement
+  useEffect(() => {
+    fetchClients(); // Chargement initial sans recherche
+  }, [isAgent, user?.societe_id]); // Recharger si le type d'utilisateur ou la société change
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
