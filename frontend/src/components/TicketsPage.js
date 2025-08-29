@@ -48,6 +48,11 @@ const TicketsPage = () => {
 
   // Fonction de recherche de clients avec debouncing
   const handleClientSearch = React.useCallback((searchTerm) => {
+    // Éviter les appels multiples pour les recherches vides
+    if (!searchTerm && clients.length === 10) {
+      return; // On a déjà les 10 premiers clients
+    }
+    
     setLoadingClients(true);
     
     const searchClients = async () => {
@@ -58,8 +63,12 @@ const TicketsPage = () => {
         if (searchTerm && searchTerm.length >= 3) {
           params.append('search', searchTerm);
           params.append('limit', '100'); // Plus de résultats avec recherche
-        } else {
+        } else if (!searchTerm) {
           params.append('limit', '10'); // 10 premiers clients par défaut
+        } else {
+          // Moins de 3 caractères : ne pas faire d'appel
+          setLoadingClients(false);
+          return;
         }
         
         // Pour les demandeurs, limiter aux clients de leur société
@@ -83,10 +92,14 @@ const TicketsPage = () => {
       }
     };
 
-    // Debounce de 300ms
-    const timer = setTimeout(searchClients, 300);
-    return () => clearTimeout(timer);
-  }, [isAgent, user?.societe_id, api]);
+    // Appel immédiat pour recherche vide, debounce pour recherche avec texte
+    if (!searchTerm) {
+      searchClients();
+    } else {
+      const timer = setTimeout(searchClients, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isAgent, user?.societe_id, api, clients.length]);
   
   const [formData, setFormData] = useState({
     titre: '',
