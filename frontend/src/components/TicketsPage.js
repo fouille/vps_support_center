@@ -42,6 +42,7 @@ const TicketsPage = () => {
   
   const [loadingFormClients, setLoadingFormClients] = useState(false);
   const [loadingFilterClients, setLoadingFilterClients] = useState(false);
+  const [filterClientsLoaded, setFilterClientsLoaded] = useState(false); // État pour éviter les re-chargements
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
