@@ -68,107 +68,8 @@ exports.handler = async (event, context) => {
           // Base query for agents (can see all tickets)
           console.log('AGENT branch executed');
           
-          // Filter by status if specified
-          if (statusFilter) {
-            const statuses = statusFilter.split(',');
-            whereConditions.push(`t.status = ANY($${params.length + 1})`);
-            params.push(statuses);
-          }
-          
-          // Filter by client if specified
-          if (clientIdFilter) {
-            whereConditions.push(`t.client_id = $${params.length + 1}`);
-            params.push(clientIdFilter);
-          }
-          
-          // Filter by ticket number search if specified
-          if (searchFilter) {
-            whereConditions.push(`t.numero_ticket ILIKE $${params.length + 1}`);
-            params.push(`%${searchFilter}%`);
-          }
-          
-          // Build the WHERE clause
-          const whereClause = whereConditions.length > 0 ? 'WHERE ' + whereConditions.join(' AND ') : '';
-          
-          console.log('SQL WHERE clause:', whereClause, 'Params:', params);
-          
-          // Execute the unified query
-          const baseQuery = `
-            SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                   d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                   a.nom as agent_nom, a.prenom as agent_prenom
-            FROM tickets t 
-            JOIN clients c ON t.client_id = c.id 
-            JOIN demandeurs d ON t.demandeur_id = d.id 
-            LEFT JOIN agents a ON t.agent_id = a.id 
-            ${whereClause}
-            ORDER BY t.date_creation DESC
-          `;
-          
-          if (params.length === 0) {
-            ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                     a.nom as agent_nom, a.prenom as agent_prenom
-              FROM tickets t 
-              JOIN clients c ON t.client_id = c.id 
-              JOIN demandeurs d ON t.demandeur_id = d.id 
-              LEFT JOIN agents a ON t.agent_id = a.id 
-              ORDER BY t.date_creation DESC
-            `;
-          } else if (params.length === 1) {
-            ticketsQuery = await sql`
-              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                     a.nom as agent_nom, a.prenom as agent_prenom
-              FROM tickets t 
-              JOIN clients c ON t.client_id = c.id 
-              JOIN demandeurs d ON t.demandeur_id = d.id 
-              LEFT JOIN agents a ON t.agent_id = a.id 
-            `.append(sql.unsafe(whereClause)).append(sql`
-              ORDER BY t.date_creation DESC
-            `);
-          } else if (params.length === 2) {
-            if (statusFilter && clientIdFilter) {
-              const statuses = statusFilter.split(',');
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.status = ANY(${statuses}) AND t.client_id = ${clientIdFilter}
-                ORDER BY t.date_creation DESC
-              `;
-            } else if (statusFilter && searchFilter) {
-              const statuses = statusFilter.split(',');
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.status = ANY(${statuses}) AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
-                ORDER BY t.date_creation DESC
-              `;
-            } else if (clientIdFilter && searchFilter) {
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.client_id = ${clientIdFilter} AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
-                ORDER BY t.date_creation DESC
-              `;
-            }
-          } else if (params.length === 3) {
+          // Execute the appropriate query based on filters
+          if (statusFilter && clientIdFilter && searchFilter) {
             const statuses = statusFilter.split(',');
             ticketsQuery = await sql`
               SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
@@ -181,57 +82,92 @@ exports.handler = async (event, context) => {
               WHERE t.status = ANY(${statuses}) AND t.client_id = ${clientIdFilter} AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
               ORDER BY t.date_creation DESC
             `;
+          } else if (statusFilter && clientIdFilter) {
+            const statuses = statusFilter.split(',');
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.status = ANY(${statuses}) AND t.client_id = ${clientIdFilter}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (statusFilter && searchFilter) {
+            const statuses = statusFilter.split(',');
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.status = ANY(${statuses}) AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (clientIdFilter && searchFilter) {
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.client_id = ${clientIdFilter} AND t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (statusFilter) {
+            const statuses = statusFilter.split(',');
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.status = ANY(${statuses})
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (clientIdFilter) {
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.client_id = ${clientIdFilter}
+              ORDER BY t.date_creation DESC
+            `;
+          } else if (searchFilter) {
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              WHERE t.numero_ticket ILIKE ${`%${searchFilter}%`}
+              ORDER BY t.date_creation DESC
+            `;
           } else {
-            // Fallback: status filter only if it exists  
-            if (statusFilter) {
-              const statuses = statusFilter.split(',');
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.status = ANY(${statuses})
-                ORDER BY t.date_creation DESC
-              `;
-            } else if (clientIdFilter) {
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.client_id = ${clientIdFilter}
-                ORDER BY t.date_creation DESC
-              `;
-            } else if (searchFilter) {
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                WHERE t.numero_ticket ILIKE ${`%${searchFilter}%`}
-                ORDER BY t.date_creation DESC
-              `;
-            } else {
-              ticketsQuery = await sql`
-                SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
-                       d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
-                       a.nom as agent_nom, a.prenom as agent_prenom
-                FROM tickets t 
-                JOIN clients c ON t.client_id = c.id 
-                JOIN demandeurs d ON t.demandeur_id = d.id 
-                LEFT JOIN agents a ON t.agent_id = a.id 
-                ORDER BY t.date_creation DESC
-              `;
-            }
+            ticketsQuery = await sql`
+              SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                     d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                     a.nom as agent_nom, a.prenom as agent_prenom
+              FROM tickets t 
+              JOIN clients c ON t.client_id = c.id 
+              JOIN demandeurs d ON t.demandeur_id = d.id 
+              LEFT JOIN agents a ON t.agent_id = a.id 
+              ORDER BY t.date_creation DESC
+            `;
           }
         } else {
           // Demandeurs can only see tickets from their company (using societe_id)
