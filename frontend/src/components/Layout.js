@@ -30,7 +30,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   const navigation = [
     { name: 'Dashboard', icon: BarChart3, key: 'dashboard' },
     ...(isAgent ? [
-      { name: 'Supervision Tickets', icon: Ticket, key: 'tickets' },
+      { name: 'Support', icon: Ticket, key: 'tickets' },
       { name: 'Portabilités', icon: Phone, key: 'portabilites' },
       { name: 'Productions', icon: Factory, key: 'productions' },
       { name: 'Clients', icon: Users, key: 'clients' },
