@@ -87,6 +87,9 @@ const TicketsPage = () => {
       setLoadingFilterClients(false);
     }
   }, [isAgent, user?.societe_id, api]);
+
+  // Fonction de recherche de clients pour le formulaire (sans debouncing, géré par SearchableSelect)
+  const handleFormClientSearch = React.useCallback(async (searchTerm) => {
     setLoadingFormClients(true);
     
     try {
