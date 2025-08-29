@@ -38,8 +38,6 @@ const TicketsPage = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
   const [refreshingTickets, setRefreshingTickets] = useState(false);
-  const [clientSearchTerm, setClientSearchTerm] = useState('');
-  const [loadingClients, setLoadingClients] = useState(false);
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
