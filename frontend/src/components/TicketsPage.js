@@ -42,8 +42,10 @@ const TicketsPage = () => {
   
   const [loadingFormClients, setLoadingFormClients] = useState(false);
   const [loadingFilterClients, setLoadingFilterClients] = useState(false);
+  const [loadingSearch, setLoadingSearch] = useState(false); // Nouveau loader pour la recherche par numéro
   const filterClientsLoadedRef = useRef(false); // Utiliser useRef au lieu de useState
   const currentModalRef = useRef(null); // Pour éviter les re-chargements du formulaire
+  const searchTimeoutRef = useRef(null); // Pour le debouncing de la recherche par numéro
   
   // Filtres pour la supervision (agents seulement)
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
