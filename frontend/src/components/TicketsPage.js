@@ -47,60 +47,45 @@ const TicketsPage = () => {
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
 
-  // Fonction de recherche de clients pour le formulaire avec debouncing
-  const handleFormClientSearch = React.useCallback((searchTerm) => {
-    // Éviter les appels multiples pour les recherches vides
-    if (!searchTerm && formClients.length === 10) {
-      return; // On a déjà les 10 premiers clients
-    }
-    
+  // Fonction de recherche de clients pour le formulaire (sans debouncing, géré par SearchableSelect)
+  const handleFormClientSearch = React.useCallback(async (searchTerm) => {
     setLoadingFormClients(true);
     
-    const searchClients = async () => {
-      try {
-        // Construire les paramètres pour la requête
-        const params = new URLSearchParams();
-        
-        if (searchTerm && searchTerm.length >= 3) {
-          params.append('search', searchTerm);
-          params.append('limit', '100'); // Plus de résultats avec recherche
-        } else if (!searchTerm) {
-          params.append('limit', '10'); // 10 premiers clients par défaut
-        } else {
-          // Moins de 3 caractères : ne pas faire d'appel
-          setLoadingFormClients(false);
-          return;
-        }
-        
-        // Pour les demandeurs, limiter aux clients de leur société
-        if (!isAgent && user?.societe_id) {
-          params.append('societe', user.societe_id);
-        }
-        
-        const response = await api.get(`/api/clients?${params}`);
-        
-        // Check if response has pagination structure (new API) or is just array (old API)
-        if (response.data.data && response.data.pagination) {
-          setFormClients(response.data.data);
-        } else {
-          // Fallback for old API format
-          setFormClients(response.data);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des clients pour formulaire:', error);
-      } finally {
+    try {
+      // Construire les paramètres pour la requête
+      const params = new URLSearchParams();
+      
+      if (searchTerm && searchTerm.length >= 3) {
+        params.append('search', searchTerm);
+        params.append('limit', '100'); // Plus de résultats avec recherche
+      } else if (!searchTerm) {
+        params.append('limit', '10'); // 10 premiers clients par défaut
+      } else {
+        // Moins de 3 caractères : ne pas faire d'appel
         setLoadingFormClients(false);
+        return;
       }
-    };
-
-    // Appel immédiat pour recherche vide, debounce pour recherche avec texte
-    if (!searchTerm) {
-      searchClients();
-    } else {
-      const timer = setTimeout(searchClients, 300);
-      return () => clearTimeout(timer);
+      
+      // Pour les demandeurs, limiter aux clients de leur société
+      if (!isAgent && user?.societe_id) {
+        params.append('societe', user.societe_id);
+      }
+      
+      const response = await api.get(`/api/clients?${params}`);
+      
+      // Check if response has pagination structure (new API) or is just array (old API)
+      if (response.data.data && response.data.pagination) {
+        setFormClients(response.data.data);
+      } else {
+        // Fallback for old API format
+        setFormClients(response.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des clients pour formulaire:', error);
+    } finally {
+      setLoadingFormClients(false);
     }
-  }, [isAgent, user?.societe_id, api, formClients.length]);
+  }, [isAgent, user?.societe_id, api]);
   
   const [formData, setFormData] = useState({
     titre: '',
