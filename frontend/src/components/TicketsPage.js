@@ -52,6 +52,32 @@ const TicketsPage = () => {
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
 
+  // Fonction de recherche avec debouncing pour le numéro de ticket
+  const handleSearchFilterChange = React.useCallback((value) => {
+    // Nettoyer le timeout précédent
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
+    // Mettre à jour immédiatement la valeur d'affichage
+    setSearchFilter(value);
+    
+    // Si moins de 3 caractères, pas de recherche
+    if (value.length < 3) {
+      setLoadingSearch(false);
+      return;
+    }
+    
+    // Montrer le loader
+    setLoadingSearch(true);
+    
+    // Debouncer l'appel de recherche
+    searchTimeoutRef.current = setTimeout(() => {
+      // La recherche se fera automatiquement via le useEffect qui écoute searchFilter
+      setLoadingSearch(false);
+    }, 500); // 500ms de délai
+  }, []);
+
   // Fonction de recherche de clients pour les filtres (identique au formulaire)
   const handleFilterClientSearch = React.useCallback(async (searchTerm) => {
     setLoadingFilterClients(true);
