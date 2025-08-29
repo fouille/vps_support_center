@@ -154,7 +154,6 @@ export const AuthProvider = ({ children }) => {
     const tokenCheckInterval = setInterval(() => {
       const currentToken = localStorage.getItem('token');
       if (currentToken && isTokenExpired(currentToken)) {
-        console.log('Token expired during session, logging out');
         handleTokenExpiration();
       }
     }, 5 * 60 * 1000); // 5 minutes
