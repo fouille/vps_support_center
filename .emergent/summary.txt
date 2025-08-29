@@ -1,117 +1,121 @@
 <analysis>
-The AI engineer, initially tasked with expanding the Production feature, systematically addressed a broad range of development and bug-fixing challenges. The trajectory demonstrates a strong focus on enhancing user experience, ensuring data consistency, and correcting critical API/database errors. Key decisions included refining UI elements (e.g., modals, dashboards, client pages), optimizing frontend performance by offloading calculations to the backend, and meticulously debugging persistent database trigger issues. The engineer successfully integrated new features like client-society relationships and strict date validations, demonstrating adaptability in handling complex interdependencies and user-reported bugs. The iterative approach, combined with explicit versioning, ensures a traceable and stable development cycle.
+The AI engineer systematically evolved the application through multiple feature additions and critical bug fixes. Initially, a login page customization feature was implemented, allowing dynamic company logo display based on the domain, which involved new SQL for the  field, a new unauthenticated Netlify Function, and frontend modifications to  and . This was followed by a comprehensive password reset functionality, integrating  (later migrated to native v3) and Mailjet for email, necessitating a new backend function and extensive configuration for environment variables. A series of UX enhancements were also delivered: scrollable lists for tickets and productions, a fixed footer, and refined client search layout. The later stages were dominated by debugging persistent infinite API call loops and reCAPTCHA integration issues, leading to iterative refinements in , , , and , often involving , , , and careful management of component dependencies to stabilize network requests and UI behavior.
 </analysis>
 
 <product_requirements>
-The application is a support ticket management system for clients, requestors, and agents, including CRUD, file uploads, and text exchanges. The Portabilités section handles telecom portability. The new Production feature provides a dedicated section for agents (full CRUD, client/demandeur selection) and demandeurs (create, track, client choice) to manage production requests. Requirements include: a new menu item, a page similar to support tickets, 12 predefined tasks with statuses/comments/files, auto-generated 8-digit production numbers, and email notifications. All API calls must use JWT AuthContext. Key updates involved visual date indicators for Portabilités, removal of test account info from login, consistent styling for production modals, agent-only production status editing, dashboard production statistics, server-side advancement calculation for productions, and a revamped Clients page with client-to-societe relation, improved filtering/pagination, full-width display, and menu visibility for demandeurs.
+The application is a full-stack support ticket management system for clients, requestors, and agents, featuring CRUD operations, file uploads, text exchanges, and modules for Portabilités and Production. JWT authentication is mandatory for all API calls. Recent pre-trajectory enhancements included visual date indicators for portabilities, refined production dashboards, and a modernized Clients page with client-to-society relationships.
+
+During this trajectory, new features and improvements were requested:
+1.  **Login Page Customization**: Display a company logo on the login page dynamically based on the connection domain. This requires adding a Domaine field (non-mandatory) to the society creation form and database, and creating an unauthenticated API endpoint to fetch the logo.
+2.  **Password Reset Functionality**: Implement a Forgot password? feature on the login page. This involves a modal for email input and reCAPTCHA, a Netlify Function to verify the user (agent or demandeur), generate a secure random password, update the database, and send the new password via email.
+3.  **UX Enhancements**:
+    *   Improve client search in ticket creation: Initially show 10 clients, then trigger server search on 3+ characters while preserving agent/demandeur roles.
+    *   Implement scrollable lists () for Tickets and Productions pages to avoid full-page scrolling.
+    *   Make the application's footer always visible at the bottom of the navigation window, without requiring scroll.
+    *   Arrange client search fields side-by-side on the Clients page.
+4.  **Security Enhancement**: Remove sensitive log information (API keys, domains, emails) from the frontend console during authentication.
+5.  **Refactor reCAPTCHA**: Migrate from  (v2) to a native reCAPTCHA v3 implementation, enforcing a score threshold > 0.5.
 </product_requirements>
 
 <key_technical_concepts>
-- **React JS**: Frontend development.
-- **Netlify Functions**: Serverless backend for API endpoints.
-- **Neon Database (PostgreSQL)**: Primary data storage.
-- **JWT Authentication**: User authentication and authorization.
-- **Tailwind CSS**: Utility-first CSS for styling.
-- **SQL Constraints**: Database schema, including foreign keys and triggers.
-- **Environment Variables**: Secure configuration.
+-   **React JS**: Frontend development, including hooks (, , , ) for state and lifecycle management.
+-   **Netlify Functions (Node.js)**: Serverless backend for API endpoints.
+-   **Neon Database (PostgreSQL)**: Primary data storage, with a focus on SQL queries and trigger management ().
+-   **JWT Authentication**: Secure user authentication.
+-   **Tailwind CSS**: Utility-first CSS for styling.
+-   **jsPDF & html2canvas**: Client-side PDF generation (mandatePDF.js).
+-   **reCAPTCHA v3 (Google)**: Bot protection, moved from v2 library to native v3 implementation.
+-   **Mailjet API**: Email sending for password resets.
 </key_technical_concepts>
 
 <code_architecture>
+The application uses a full-stack architecture with React.js frontend, Node.js (Netlify Functions) backend, and a Neon (PostgreSQL) database.
 
 
--   ****: Main page for viewing/filtering production requests.
-    -   **Summary:** Implemented full-page layout, filters, and production table. Corrected API response parsing and applied consistent styling.
-    -   **Changes:** Enhanced API response handling (), implemented loading states (, ), added logic to reset expanded menus, refined search functionality (, ), added Terminées filter option, removed client-side progress calculation, and integrated server-side  for immediate progress display.
--   ****: Modal form for creating/editing production requests.
-    -   **Summary:** Designed for production details input.
-    -   **Changes:** Modified to correctly format  from ISO string to YYYY-MM-DD.
--   ****: Displays detailed information for a single production request.
-    -   **Summary:** Shows production attributes and progress.
-    -   **Changes:** Removed blue gradient from the header, excluded hors scope tasks from advancement calculation, and added agent-only status editing via a select dropdown.
--   ****: Modal for viewing and editing individual production tasks.
-    -   **Summary:** Displays task details, comments, and file attachments.
-    -   **Changes:** Corrected API response handling, updated  to refresh local , replaced  with a state-driven message area, added  state. Removed blue gradient, limited editing to agents, adjusted comment display for left/right conversation view (Agent/Demandeur), and implemented auto-date setting to current day if status is hors scope and date is not set.
--   ****: Login page component.
-    -   **Summary:** Handles user authentication.
-    -   **Changes:** Removed the Compte de test informational text.
--   ****: Page for viewing and managing portability requests.
-    -   **Summary:** Displays portability requests and their statuses.
-    -   **Changes:** Added visual indicators to highlight effective dates that are today or past due.
--   ****: Form for creating/editing portability requests.
-    -   **Summary:** Handles input for new portability requests.
-    -   **Changes:** Implemented a  function to enforce a minimum requested date of +11 working days (excluding weekends) for , applied via  attribute and client-side validation.
--   ****: Main dashboard for statistics.
-    -   **Summary:** Displays various statistical data.
-    -   **Changes:** Integrated new production statistics (Non Terminé, Terminé, Bloqué) with corresponding cards, a pie chart (Répartition des Productions), and a bar chart (Productions par Statut).
--   ****: Page for managing client information.
-    -   **Summary:** Displays client lists and allows CRUD operations.
-    -   **Changes:**
-        *   Added states (, ) and  for managing demandeur societies.
-        *   Corrected pagination logic by refactoring  dependencies to prevent infinite loops and ensure correct page updates.
-        *   Adjusted the page layout to occupy full width, similar to , including a redesigned header with a refresh button.
-        *   Implemented a Société column in the client table and a corresponding filter for agents.
-        *   Integrated  field into the client creation/editing modal, with conditional visibility based on user role.
--   ****: Defines application layout and navigation.
-    -   **Summary:** Manages sidebar and main content rendering.
-    -   **Changes:** Added Mes Clients menu item for  users, ensuring consistent navigation and access.
--   ****: Backend API for Production request CRUD operations.
-    -   **Summary:** Supports filtering by multiple statuses.
-    -   **Changes:** Modified the main  query to include server-side calculation of  (progress percentage, excluding hors scope tasks) via a sub-query, to enable immediate display on the frontend.
--   ****: Backend API for managing tasks associated with production requests.
-    -   **Summary:** Implemented from scratch.
-    -   **Changes:** Extended to include email notification sending when a task status changes, using sub-queries for accurate  and  counts, and fetching complete author names for emails.
--   ****: Backend API for managing comments on production tasks.
-    -   **Summary:** Implemented from scratch.
-    -   **Changes:** Corrected SQL query from  to  and enhanced email logic for author names.
--   ****: Backend API for handling file uploads and attachments to production tasks.
-    -   **Summary:** Implemented from scratch.
-    -   **Changes:** Corrected SQL query from  to .
--   ****: Backend API for dashboard statistics.
-    -   **Summary:** Provides various statistical data for the dashboard.
-    -   **Changes:** Added SQL queries and mock data for new production-related statistics (Non Terminé, Terminé, Bloqué).
--   ****: Backend API for Client CRUD operations.
-    -   **Summary:** Manages client data.
-    -   **Changes:**
-        *   Modified  requests to filter clients by  for demandeurs and allow  filtering for agents, joining with  to retrieve society names.
-        *   Updated  and  requests to handle  assignment (automatic for demandeurs, selectable for agents).
-        *   Corrected a persistent PUT API error () by explicitly setting  in the SQL query, opting for this solution over complex database trigger reconfigurations.
--   ** (NEW)**: SQL script created to add  column to the  table, establish a foreign key constraint, and add an index for optimization.
--   ** (NEW)**: SQL script created to adjust the  table structure, making  and  columns nullable and ensuring the  column exists. (Proposed but not applied)
--   ** (NEW, modified)**: SQL script created (and later refined) to fix a problematic PostgreSQL trigger on the  table that was referencing a non-existent  field. The final version targets only the clients table without dropping the global trigger function. (Proposed but user opted not to apply)
--   ** (NEW)**: A diagnostic SQL script created to inspect and potentially correct the global  function. (Proposed but not applied)
--   ****: Updated automatically by the versioning script.
--   ****: Updated automatically by the versioning script.
--   ****: Updated automatically by the versioning script.
+
+-   ****:
+    -   **Importance**: Handles user authentication, domain-based logo display, and password reset.
+    -   **Changes**: Added logic for domain detection and logo fetching (). Integrated  for smoother UX. Implemented password reset modal and reCAPTCHA v2 (later migrated to v3). Fixed  access. Removed sensitive console logs. Fixed reCAPTCHA display and error handling.
+-   ****:
+    -   **Importance**: Manages demandeur and society data (CRUD).
+    -   **Changes**: Added Domaine field to the society creation/edit form. Implemented loading spinners for form submissions to improve UX.
+-   ****:
+    -   **Importance**: Defines the application's global layout and navigation.
+    -   **Changes**: Initially modified to embed a fixed footer, but this caused issues and was reverted/refactored. Updated Supervision Tickets menu item to Support. Adjusted height handling to fix sidebar rendering and ensure a single, global fixed footer.
+-   ****:
+    -   **Importance**: Displays and manages support tickets, including client selection.
+    -   **Changes**: Implemented scrollable list for tickets (). Renamed page title and menu item to Support. Refactored client search for ticket creation and filtering: removed redundant search fields, integrated server-side search (debounced for 3+ characters), handled agent/demandeur permissions, and fixed continuous API calls using  and carefully managed  dependencies.
+-   ****:
+    -   **Importance**: Manages production requests.
+    -   **Changes**: Implemented scrollable list for productions ().
+-   ****:
+    -   **Importance**: Manages client data.
+    -   **Changes**: Arranged client search fields side-by-side for better UX.
+-   ****:
+    -   **Importance**: Reusable component for searchable dropdowns.
+    -   **Changes**: Modified to support server-side search via an  prop, manage internal  with debouncing, and display loading states. Crucially fixed infinite loop by carefully managing  dependencies (removing ).
+-   ****:
+    -   **Importance**: Manages global authentication state and API interactions.
+    -   **Changes**: Removed sensitive console logs related to authentication and token expiry.
+-   ****:
+    -   **Importance**: Main application entry point, manages global routing and layout structure.
+    -   **Changes**: Restructured the main container using , , , and  to correctly position the global  component (defined outside ) at the bottom of the screen without interfering with internal page scrolling or sidebar layout.
+-   ****:
+    -   **Importance**: Stores frontend environment variables.
+    -   **Changes**: Added  for reCAPTCHA integration.
+-   ****:
+    -   **Importance**: Backend API for managing society data.
+    -   **Changes**: Added  field handling, including validation for domain format. Fixed recurring  errors by explicitly setting  in SQL.
+-   ** (NEW)**:
+    -   **Importance**: Provides an unauthenticated API to fetch society logo and name based on domain.
+    -   **Changes**: Created to query  table using the domain.
+-   ** (NEW)**:
+    -   **Importance**: Handles the password reset logic on the backend.
+    -   **Changes**: Created to validate email, generate secure random passwords, update  or  tables with hashed passwords, send emails via Mailjet, and integrate reCAPTCHA v3 secret key validation (enforcing score > 0.5). Iteratively fixed PostgreSQL trigger issues by separating password and  updates, and corrected Mailjet environment variable names.
+-   ****:
+    -   **Importance**: Manages backend dependencies.
+    -   **Changes**: Added  (for secure password generation) and  (likely implicit for other uses) dependencies.
+-   ** (NEW)**:
+    -   **Importance**: SQL script to add the  column to the  table.
+    -   **Changes**: Defines the  column with a  type and a check constraint () for valid domain format.
+-   ** (NEW)**:
+    -   **Importance**: SQL script to correct the  constraint.
+    -   **Changes**: Provides commands to drop and recreate the constraint with a more permissive regex.
+-   ** (NEW)**:
+    -   **Importance**: SQL script to resolve recurring PostgreSQL trigger issues (e.g., ) for the password reset tables.
+    -   **Changes**: Provides commands to drop and recreate trigger functions to correctly use the  column.
+-   ****:
+    -   **Importance**: Provides example environment variables.
+    -   **Changes**: Updated with Mailjet (, ), reCAPTCHA (, ) variables, reflecting the correct names and usage.
+-   ** (NEW)**:
+    -   **Importance**: Documentation for the password reset feature.
+    -   **Changes**: Detailed guide on the feature, configuration, security, and troubleshooting steps for reCAPTCHA and Mailjet.
+
 </code_architecture>
 
 <pending_tasks>
-- The previously listed tasks (execution of , , full testing of demandeur transfer, and investigation of local authentication failures) remain outstanding from the prior development cycle.
-- The user still needs to manually execute the  script on their Neon database if not done already.
-- The SQL scripts , , and  were provided but the user was advised not to apply them, relying on the API-side  fix. These database-side fixes remain optional for future manual application.
+-   Execute  and .
+-   Complete full testing of demandeur transfer.
+-   Investigate local authentication failures.
+-   Manually execute  on the Neon database.
+-   Manually execute  on Neon.
+-   Manually execute  on Neon.
+-   Manually execute  on Neon.
+-   Manually execute  on Neon.
+-   Manually execute  on Neon.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer completed a series of bug fixes and UX improvements for the application, leading to **Version 1.20.0**. The primary focus was on solidifying the Clients page functionality and ensuring UI/UX consistency across the application.
+Immediately before this summary request, the AI engineer was addressing a persistent bug related to infinite API calls () occurring during client search (both in the ticket creation form and the ticket list filter) after typing 3+ characters. The previous attempt to fix this involved using  for flags in  to control initial loads, but this did not resolve the issue.
 
-**Key areas of recent work:**
+The ultimate fix implemented was in . The  that triggered the  callback was continuously re-firing because  was included in its dependency array. When the API returned new , the  would re-run, causing another API call, leading to an infinite loop. The resolution was to:
+1.  **Separate  hooks**: One  now handles the search logic, triggered only by  and  (with debouncing).
+2.  **Remove  from search  dependencies**: This prevents the search API call from being re-triggered when the fetched options change.
+3.  A separate  now handles the visual update of  based on the  prop, ensuring the UI reflects the latest data without re-triggering the search.
 
-1.  **Clients Page Modernization and Bug Fixes:**
-    *   **Societe Relationship:** Implemented the crucial linkage of clients to . The backend () now handles filtering and assignment based on user role (global access with filter for agents, auto-scoping for demandeurs). The frontend () was updated with new states, data fetching logic for societies, a new Société column in the table, a society filter for agents, and integrated  into the client creation/editing form.
-    *   **Persistent API Error Resolution:** The recurring  error during client modifications was exhaustively diagnosed. It was determined to stem from a faulty PostgreSQL trigger referencing a non-existent field. While SQL scripts (, ) were provided for a database-side fix, the final chosen solution was to explicitly set  within the  API's PUT request, ensuring stability without requiring user database manipulation.
-    *   **Pagination Fix:** The  was debugged to fix a pagination issue where the page would revert to the first page after a momentary display of the correct one. This involved optimizing  dependencies to prevent infinite loops and ensure stable page navigation.
-    *   **Full-Page Layout:** The  layout was refactored to expand to full width, aligning its visual style with the  for a more consistent and modern user interface, including a redesigned header and a refresh button.
-    *   **Menu Visibility:** The Mes Clients menu item was added to the  user navigation in , ensuring proper access to the newly enhanced client management features for this user role.
-
-2.  **Production Feature Enhancements:**
-    *   **Server-Side Progress Calculation:** The  backend API was updated to calculate  (progress percentage, excluding hors scope tasks) directly via SQL queries. This allows the  to display the progress bar immediately without needing to expand individual production details, improving performance and user experience.
-    *   **Hors Scope Date Automation:** In , a new feature was added where if a task's status is set to hors scope and its delivery date is empty, the  automatically defaults to the current day.
-    *   **Portability Date Constraint:**  was updated with a client-side validation to ensure the requested portability date () is at least 11 working days (excluding weekends) from the current date.
-
-3.  **Styling Consistency:** Blue gradients were removed from  and  to align with the application's global styling.
-
-4.  **Versioning:** The application has progressed significantly, currently at **Version 1.20.0**, with all changes thoroughly documented via the automated versioning script () in  and other relevant files. The Mes Clients menu visibility was classified as a MINOR version bump (1.19.8 -> 1.20.0).
+The services were restarted to apply this critical correction.
 </current_work>
 
 <optional_next_step>
-The last explicit task of making the Mes clients menu visible for demandeurs was completed. I am awaiting further instructions from the user.
+Verify with the user if the infinite loop during client search (both in filters and the creation form) has been definitively resolved by the latest changes.
 </optional_next_step>
