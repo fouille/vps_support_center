@@ -56,6 +56,8 @@ exports.handler = async (event, context) => {
         const clientIdFilter = queryParams.get('client_id');
         const searchFilter = queryParams.get('search'); // Nouveau paramètre pour recherche par numéro
         
+        console.log('Query filters:', { statusFilter, clientIdFilter, searchFilter });
+        
         if ((decoded.type_utilisateur || decoded.type) === 'agent') {
           // Base query for agents (can see all tickets)
           let conditions = [];
