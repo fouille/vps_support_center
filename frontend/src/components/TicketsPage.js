@@ -175,9 +175,16 @@ const TicketsPage = () => {
     if (filterClientsLoadedRef.current) {
       return; // Éviter les re-appels si déjà chargé
     }
+    
+    // Éviter les appels si on a déjà des clients
+    if (clients.length > 0) {
+      filterClientsLoadedRef.current = true;
+      return;
+    }
 
     const loadInitialFilterClients = async () => {
       setLoadingFilterClients(true);
+      filterClientsLoadedRef.current = true; // Marquer tout de suite pour éviter les doubles appels
       
       try {
         const params = new URLSearchParams();
@@ -197,9 +204,9 @@ const TicketsPage = () => {
           // Fallback for old API format
           setClients(response.data);
         }
-        filterClientsLoadedRef.current = true; // Marquer comme chargé avec useRef
       } catch (error) {
         console.error('Erreur lors du chargement initial des clients pour filtres:', error);
+        filterClientsLoadedRef.current = false; // Permettre de réessayer en cas d'erreur
       } finally {
         setLoadingFilterClients(false);
       }
