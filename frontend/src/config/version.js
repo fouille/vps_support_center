@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 0,      // Version mineure - nouvelles fonctionnalités
-  patch: 5,      // Version patch - corrections de bugs
+  patch: 6,      // Version patch - corrections de bugs
   buildDate: "2025-08-29", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.0.6",
+    date: "2025-08-29",
+    type: "PATCH",
+    description: "Sécurité: suppression logs sensibles authentification - domaine, clés reCAPTCHA, emails utilisateurs"
+  },
+{
     version: "2.0.5",
     date: "2025-08-29",
     type: "PATCH",
