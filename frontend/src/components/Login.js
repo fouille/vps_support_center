@@ -64,7 +64,6 @@ const Login = () => {
   // Fonction pour exécuter reCAPTCHA v3
   const executeRecaptcha = async (action) => {
     if (!window.grecaptcha || !recaptchaLoaded) {
-      console.warn('reCAPTCHA not loaded');
       return null;
     }
 
@@ -73,10 +72,8 @@ const Login = () => {
       const token = await window.grecaptcha.execute(process.env.REACT_APP_RECAPTCHA_SITE_KEY, {
         action: action
       });
-      console.log('reCAPTCHA token generated for action:', action);
       return token;
     } catch (error) {
-      console.error('reCAPTCHA execution failed:', error);
       return null;
     }
   };
