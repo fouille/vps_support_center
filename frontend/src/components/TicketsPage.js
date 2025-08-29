@@ -135,10 +135,17 @@ const TicketsPage = () => {
     }
   }, [isAgent, statusFilter, clientFilter, searchFilter]); // Refetch when filters change
 
-  // Charger les clients au montage initial seulement
+  // Charger les clients pour les filtres au montage initial
   useEffect(() => {
-    fetchClients(); // Chargement initial sans recherche
+    fetchClients(); // Chargement des clients pour les filtres (100 clients)
   }, [isAgent, user?.societe_id]); // Recharger si le type d'utilisateur ou la société change
+
+  // Charger les clients pour le formulaire lors de l'ouverture du modal
+  useEffect(() => {
+    if (showModal) {
+      handleFormClientSearch(''); // Charger les 10 premiers clients par défaut
+    }
+  }, [showModal, handleFormClientSearch]);
 
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
