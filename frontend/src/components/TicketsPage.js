@@ -47,14 +47,14 @@ const TicketsPage = () => {
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
 
-  // Fonction de recherche de clients avec debouncing
-  const handleClientSearch = React.useCallback((searchTerm) => {
+  // Fonction de recherche de clients pour le formulaire avec debouncing
+  const handleFormClientSearch = React.useCallback((searchTerm) => {
     // Éviter les appels multiples pour les recherches vides
-    if (!searchTerm && clients.length === 10) {
+    if (!searchTerm && formClients.length === 10) {
       return; // On a déjà les 10 premiers clients
     }
     
-    setLoadingClients(true);
+    setLoadingFormClients(true);
     
     const searchClients = async () => {
       try {
@@ -68,7 +68,7 @@ const TicketsPage = () => {
           params.append('limit', '10'); // 10 premiers clients par défaut
         } else {
           // Moins de 3 caractères : ne pas faire d'appel
-          setLoadingClients(false);
+          setLoadingFormClients(false);
           return;
         }
         
@@ -81,15 +81,15 @@ const TicketsPage = () => {
         
         // Check if response has pagination structure (new API) or is just array (old API)
         if (response.data.data && response.data.pagination) {
-          setClients(response.data.data);
+          setFormClients(response.data.data);
         } else {
           // Fallback for old API format
-          setClients(response.data);
+          setFormClients(response.data);
         }
       } catch (error) {
-        console.error('Erreur lors du chargement des clients:', error);
+        console.error('Erreur lors du chargement des clients pour formulaire:', error);
       } finally {
-        setLoadingClients(false);
+        setLoadingFormClients(false);
       }
     };
 
@@ -100,7 +100,7 @@ const TicketsPage = () => {
       const timer = setTimeout(searchClients, 300);
       return () => clearTimeout(timer);
     }
-  }, [isAgent, user?.societe_id, api, clients.length]);
+  }, [isAgent, user?.societe_id, api, formClients.length]);
   
   const [formData, setFormData] = useState({
     titre: '',
