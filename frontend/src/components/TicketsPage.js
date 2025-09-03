@@ -54,6 +54,10 @@ const TicketsPage = () => {
   const [statusFilter, setStatusFilter] = useState('active'); // 'active' ou 'all'
   const [clientFilter, setClientFilter] = useState('');
   const [searchFilter, setSearchFilter] = useState(''); // Nouveau filtre pour recherche par numéro
+  
+  // État pour le menu déroulant Outils
+  const [showToolsMenu, setShowToolsMenu] = useState(false);
+  const toolsMenuRef = useRef(null);
 
   // Fonction de recherche avec debouncing pour le numéro de ticket
   const handleSearchFilterChange = React.useCallback((value) => {
