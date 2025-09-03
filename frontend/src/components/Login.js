@@ -89,9 +89,46 @@ const Login = () => {
         const data = await response.json();
         setLogo(data.logo_base64);
         setCompanyName(data.nom_societe);
+        setFavicon(data.favicon_base64);
+        setAppName(data.nom_application);
+
+        // Mettre à jour le favicon de la page si disponible
+        if (data.favicon_base64) {
+          updatePageFavicon(data.favicon_base64);
+        }
+
+        // Mettre à jour le titre de la page si un nom d'application est défini
+        if (data.nom_application) {
+          document.title = `${data.nom_application} - Connexion`;
+        }
       }
     } catch (error) {
       // Silencieux - pas de log d'erreur
+    }
+  };
+
+  // Fonction pour mettre à jour le favicon de la page
+  const updatePageFavicon = (faviconBase64) => {
+    try {
+      // Supprimer les anciens favicons
+      const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+      existingFavicons.forEach(favicon => favicon.remove());
+
+      // Créer le nouveau favicon
+      const faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      faviconLink.type = 'image/x-icon';
+      faviconLink.href = faviconBase64;
+      document.head.appendChild(faviconLink);
+
+      // Ajouter aussi une version shortcut icon pour compatibilité
+      const shortcutLink = document.createElement('link');
+      shortcutLink.rel = 'shortcut icon';
+      shortcutLink.type = 'image/x-icon';
+      shortcutLink.href = faviconBase64;
+      document.head.appendChild(shortcutLink);
+    } catch (error) {
+      // Silencieux - pas d'erreur critique
     }
   };
 
