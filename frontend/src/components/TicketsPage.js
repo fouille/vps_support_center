@@ -1079,9 +1079,9 @@ const TicketsPage = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex flex-col lg:flex-row gap-6">
               {/* Informations du ticket */}
-              <div className="space-y-6">
+              <div className="flex-1 space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
                     {viewingTicket.titre}
