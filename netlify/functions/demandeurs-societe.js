@@ -463,6 +463,15 @@ exports.handler = async (event, context) => {
         return { statusCode: 200, headers, body: JSON.stringify(updatedSociete[0]) };
 
       case 'DELETE':
+        // Vérification des permissions pour la suppression
+        if (isDemandeur) {
+          return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ detail: 'Seuls les agents peuvent supprimer des sociétés' })
+          };
+        }
+        
         // Check if society has associated demandeurs
         const associatedDemandeurs = await sql`
           SELECT id FROM demandeurs WHERE societe_id = ${societeId}
