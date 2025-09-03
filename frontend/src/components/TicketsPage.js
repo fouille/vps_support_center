@@ -287,6 +287,18 @@ const TicketsPage = () => {
     }
   }, [showModal]); // Seulement showModal comme dépendance
 
+  // Gérer les clics en dehors du menu Outils
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(event.target)) {
+        setShowToolsMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const fetchTickets = async (showLoader = false) => {
     if (showLoader) {
       setRefreshingTickets(true);
