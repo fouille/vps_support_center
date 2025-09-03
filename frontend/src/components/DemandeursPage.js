@@ -951,6 +951,59 @@ const DemandeursPage = () => {
                 </p>
               </div>
 
+              {/* Champ Favicon */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Favicon <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="file"
+                  accept=".ico"
+                  onChange={handleFaviconUpload}
+                  className="input"
+                />
+                <div className="mt-2">
+                  {societeFormData.favicon_base64 && (
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={societeFormData.favicon_base64} 
+                        alt="Favicon preview" 
+                        className="w-4 h-4 object-contain"
+                      />
+                      <span className="text-sm text-green-600">Favicon chargé</span>
+                      <button
+                        type="button"
+                        onClick={() => setSocieteFormData({ ...societeFormData, favicon_base64: '' })}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Format requis: .ico • Taille max: 1MB • Utilisé comme favicon sur la page de connexion
+                </p>
+              </div>
+
+              {/* Champ Nom d'application */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Nom de l'application
+                </label>
+                <input
+                  type="text"
+                  value={societeFormData.nom_application}
+                  onChange={(e) => setSocieteFormData({ ...societeFormData, nom_application: e.target.value })}
+                  className="input"
+                  placeholder="Support & Production"
+                  maxLength={100}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Nom personnalisé affiché dans l'application (laissez vide pour utiliser le nom par défaut)
+                </p>
+              </div>
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
