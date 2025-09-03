@@ -284,10 +284,15 @@ const DemandeursPage = () => {
       let currentSociete = null;
       let societes = [];
       
-      // Gérer les différentes structures de réponse
-      if (response.data && Array.isArray(response.data)) {
+      // Gérer les différentes structures de réponse avec axios
+      if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        // Structure axios: response.data.data = [...]
+        societes = response.data.data;
+      } else if (response.data && Array.isArray(response.data)) {
+        // Structure directe: response.data = [...]
         societes = response.data;
       } else if (response.data && response.data.societes && Array.isArray(response.data.societes)) {
+        // Structure imbriquée: response.data = { societes: [...] }
         societes = response.data.societes;
       }
       
