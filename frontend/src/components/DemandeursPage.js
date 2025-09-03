@@ -1330,6 +1330,168 @@ const DemandeursPage = () => {
           </div>
         </div>
       )}
+
+      {/* Modal Ma Société (pour demandeurs) */}
+      {showMySocieteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
+          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-2xl modal-content max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-dark-text">
+              Éditer Ma Société
+            </h2>
+
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800 text-sm">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleMySocieteSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={mySocieteFormData.email}
+                  onChange={(e) => setMySocieteFormData({ ...mySocieteFormData, email: e.target.value })}
+                  className="input"
+                  placeholder="contact@entreprise.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Logo de l'entreprise
+                </label>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleMyLogoUpload}
+                  className="input"
+                />
+                <div className="mt-2">
+                  {mySocieteFormData.logo_base64 && (
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={`data:image/jpeg;base64,${mySocieteFormData.logo_base64}`} 
+                        alt="Logo preview" 
+                        className="w-16 h-16 object-contain border rounded"
+                      />
+                      <span className="text-sm text-green-600">Logo chargé</span>
+                      <button
+                        type="button"
+                        onClick={() => setMySocieteFormData({ ...mySocieteFormData, logo_base64: '' })}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Formats acceptés: JPG, PNG, GIF, WebP • Taille max: 2MB
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Domaine
+                </label>
+                <input
+                  type="text"
+                  value={mySocieteFormData.domaine}
+                  onChange={(e) => setMySocieteFormData({ ...mySocieteFormData, domaine: e.target.value })}
+                  className="input"
+                  placeholder="exemple.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Domaine pour personnaliser la page de connexion (format: exemple.com, sans http/https)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Favicon
+                </label>
+                <input
+                  type="file"
+                  accept=".ico"
+                  onChange={handleMyFaviconUpload}
+                  className="input"
+                />
+                <div className="mt-2">
+                  {mySocieteFormData.favicon_base64 && (
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={mySocieteFormData.favicon_base64} 
+                        alt="Favicon preview" 
+                        className="w-4 h-4 object-contain"
+                      />
+                      <span className="text-sm text-green-600">Favicon chargé</span>
+                      <button
+                        type="button"
+                        onClick={() => setMySocieteFormData({ ...mySocieteFormData, favicon_base64: '' })}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Format requis: .ico • Taille max: 1MB • Utilisé comme favicon sur la page de connexion
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                  Nom de l'application
+                </label>
+                <input
+                  type="text"
+                  value={mySocieteFormData.nom_application}
+                  onChange={(e) => setMySocieteFormData({ ...mySocieteFormData, nom_application: e.target.value })}
+                  className="input"
+                  placeholder="Support & Production"
+                  maxLength={100}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Nom personnalisé affiché dans l'application (laissez vide pour utiliser le nom par défaut)
+                </p>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleCloseMySocieteModal}
+                  className="btn-secondary"
+                  disabled={mySocieteFormLoading}
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={mySocieteFormLoading}
+                >
+                  {mySocieteFormLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Enregistrement...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Enregistrer
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
