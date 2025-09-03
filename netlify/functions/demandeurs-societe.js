@@ -299,6 +299,47 @@ exports.handler = async (event, context) => {
         return { statusCode: 201, headers, body: JSON.stringify(createdSociete[0]) };
 
       case 'PUT':
+        // Vérification des permissions pour la modification
+        if (isDemandeur) {
+          // Les demandeurs ne peuvent modifier que leur propre société
+          const demandeurInfo = await sql`
+            SELECT societe_id, societe 
+            FROM demandeurs 
+            WHERE id = ${decoded.id}
+          `;
+          
+          if (demandeurInfo.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Utilisateur demandeur non trouvé' })
+            };
+          }
+          
+          const demandeur = demandeurInfo[0];
+          let canModify = false;
+          
+          // Vérifier si la société à modifier appartient au demandeur
+          if (demandeur.societe_id && demandeur.societe_id === societeId) {
+            canModify = true;
+          } else if (demandeur.societe) {
+            // Fallback: vérifier par nom de société
+            const societeCheck = await sql`
+              SELECT id FROM demandeurs_societe WHERE id = ${societeId} AND nom_societe = ${demandeur.societe}
+            `;
+            canModify = societeCheck.length > 0;
+          }
+          
+          if (!canModify) {
+            return {
+              statusCode: 403,
+              headers,
+              body: JSON.stringify({ detail: 'Vous ne pouvez modifier que votre propre société' })
+            };
+          }
+        }
+        // Les agents peuvent modifier toutes les sociétés (pas de restriction supplémentaire)
+
         const updateData = JSON.parse(event.body);
         const { 
           nom_societe: upd_nom, 
