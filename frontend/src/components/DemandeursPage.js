@@ -50,6 +50,15 @@ const DemandeursPage = () => {
     nom_application: ''
   });
 
+  // Données pour "Ma Société" (champs limités pour les demandeurs)
+  const [mySocieteFormData, setMySocieteFormData] = useState({
+    email: '',
+    logo_base64: '',
+    domaine: '',
+    favicon_base64: '',
+    nom_application: ''
+  });
+
   const isAgent = user?.type_utilisateur === 'agent';
 
   useEffect(() => {
