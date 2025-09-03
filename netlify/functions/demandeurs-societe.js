@@ -180,6 +180,15 @@ exports.handler = async (event, context) => {
         };
 
       case 'POST':
+        // Vérification des permissions pour la création
+        if (isDemandeur) {
+          return {
+            statusCode: 403,
+            headers,
+            body: JSON.stringify({ detail: 'Seuls les agents peuvent créer de nouvelles sociétés' })
+          };
+        }
+        
         console.log('Creating demandeurs societe...');
         const newSociete = JSON.parse(event.body);
         const { 
