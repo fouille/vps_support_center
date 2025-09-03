@@ -39,11 +39,11 @@ exports.handler = async (event, context) => {
 
     console.log('Searching logo for domain:', domaine);
 
-    // Chercher le logo pour ce domaine
+    // Chercher le logo, favicon et nom d'application pour ce domaine
     const result = await sql`
-      SELECT logo_base64, nom_societe 
+      SELECT logo_base64, nom_societe, favicon_base64, nom_application
       FROM demandeurs_societe 
-      WHERE domaine = ${domaine} AND logo_base64 IS NOT NULL
+      WHERE domaine = ${domaine}
     `;
 
     if (result.length === 0) {
