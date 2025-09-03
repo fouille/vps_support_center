@@ -11,6 +11,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [logo, setLogo] = useState(null);
   const [companyName, setCompanyName] = useState('');
+  const [favicon, setFavicon] = useState(null);
+  const [appName, setAppName] = useState('');
   
   // États pour le modal de récupération de mot de passe
   const [showResetModal, setShowResetModal] = useState(false);
