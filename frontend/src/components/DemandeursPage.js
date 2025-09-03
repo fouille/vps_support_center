@@ -268,7 +268,10 @@ const DemandeursPage = () => {
 
   const handleMySocieteSubmit = async (e) => {
     e.preventDefault();
-    if (!user?.societe_id) return;
+    if (!user?.societe_id && !user?.societe) {
+      setError('Impossible de déterminer votre société');
+      return;
+    }
 
     setMySocieteFormLoading(true);
     setError('');
@@ -276,11 +279,31 @@ const DemandeursPage = () => {
     try {
       // Récupérer d'abord les données complètes de la société
       const response = await api.get(`/api/demandeurs-societe`);
-      const currentSociete = response.data.societes?.find(s => s.id === user.societe_id);
+      
+      let currentSociete = null;
+      
+      // Chercher la société par ID ou par nom
+      if (response.data.societes) {
+        if (user.societe_id) {
+          currentSociete = response.data.societes.find(s => s.id === user.societe_id);
+        }
+        if (!currentSociete && user.societe) {
+          currentSociete = response.data.societes.find(s => s.nom_societe === user.societe);
+        }
+      } else if (Array.isArray(response.data)) {
+        if (user.societe_id) {
+          currentSociete = response.data.find(s => s.id === user.societe_id);
+        }
+        if (!currentSociete && user.societe) {
+          currentSociete = response.data.find(s => s.nom_societe === user.societe);
+        }
+      }
       
       if (!currentSociete) {
-        throw new Error('Société non trouvée');
+        throw new Error('Société non trouvée pour la mise à jour');
       }
+
+      console.log('Société à mettre à jour:', currentSociete);
 
       // Préparer les données en gardant les valeurs existantes pour les champs non modifiables
       const updateData = {
@@ -288,7 +311,7 @@ const DemandeursPage = () => {
         ...mySocieteFormData // Écraser seulement les champs modifiables
       };
 
-      await api.put(`/api/demandeurs-societe/${user.societe_id}`, updateData);
+      await api.put(`/api/demandeurs-societe/${currentSociete.id}`, updateData);
       
       // Rafraîchir les données si on est sur l'onglet sociétés
       if (isAgent) {
