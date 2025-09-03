@@ -37,7 +37,7 @@ export const VERSION_HISTORY = [
     version: "2.4.1",
     date: "2025-09-03",
     type: "PATCH",
-    description: "patch"
+    description: "Corrections nom application header + récupération données 'Ma Société' - ajout societe_id dans auth.js"
   },
 {
     version: "2.4.0",
