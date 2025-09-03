@@ -179,13 +179,36 @@ const DemandeursPage = () => {
 
   // Fonctions pour "Ma Société" (demandeurs)
   const fetchMySociete = async () => {
-    if (!user?.societe_id) return;
+    if (!user?.societe_id) {
+      setError('Aucune société associée à votre compte');
+      return;
+    }
 
     try {
-      const response = await api.get(`/api/demandeurs-societe`);
-      const societe = response.data.societes?.find(s => s.id === user.societe_id);
+      let societe = null;
+      
+      // Essai 1: Récupérer via l'API avec l'ID spécifique
+      try {
+        const directResponse = await api.get(`/api/demandeurs-societe/${user.societe_id}`);
+        societe = directResponse.data;
+      } catch (directError) {
+        // Essai 2: Récupérer via l'API générale avec filtre
+        const response = await api.get(`/api/demandeurs-societe?search=&limit=1000`);
+        
+        // Vérifier la structure de la réponse
+        console.log('Réponse API sociétés:', response.data);
+        
+        if (response.data.societes) {
+          societe = response.data.societes.find(s => s.id === user.societe_id);
+        } else if (Array.isArray(response.data)) {
+          societe = response.data.find(s => s.id === user.societe_id);
+        } else if (response.data.id === user.societe_id) {
+          societe = response.data;
+        }
+      }
       
       if (societe) {
+        console.log('Société trouvée:', societe);
         setMySocieteFormData({
           email: societe.email || '',
           logo_base64: societe.logo_base64 || '',
@@ -193,10 +216,16 @@ const DemandeursPage = () => {
           favicon_base64: societe.favicon_base64 || '',
           nom_application: societe.nom_application || ''
         });
+        
+        // Effacer toute erreur précédente
+        setError('');
+      } else {
+        console.log('Société non trouvée pour l\'ID:', user.societe_id);
+        setError('Impossible de récupérer les données de votre société');
       }
     } catch (error) {
       console.error('Erreur lors de la récupération de ma société:', error);
-      setError('Erreur lors de la récupération des données de la société');
+      setError('Erreur lors de la récupération des données de la société: ' + (error.response?.data?.detail || error.message));
     }
   };
 
