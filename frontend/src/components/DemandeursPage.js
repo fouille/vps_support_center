@@ -177,6 +177,141 @@ const DemandeursPage = () => {
     reader.readAsDataURL(file);
   };
 
+  // Fonctions pour "Ma Société" (demandeurs)
+  const fetchMySociete = async () => {
+    if (!user?.societe_id) return;
+
+    try {
+      const response = await api.get(`/api/demandeurs-societe`);
+      const societe = response.data.societes?.find(s => s.id === user.societe_id);
+      
+      if (societe) {
+        setMySocieteFormData({
+          email: societe.email || '',
+          logo_base64: societe.logo_base64 || '',
+          domaine: societe.domaine || '',
+          favicon_base64: societe.favicon_base64 || '',
+          nom_application: societe.nom_application || ''
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de ma société:', error);
+      setError('Erreur lors de la récupération des données de la société');
+    }
+  };
+
+  const handleMySocieteEdit = () => {
+    fetchMySociete();
+    setShowMySocieteModal(true);
+  };
+
+  const handleCloseMySocieteModal = () => {
+    setShowMySocieteModal(false);
+    setMySocieteFormLoading(false);
+    setMySocieteFormData({
+      email: '',
+      logo_base64: '',
+      domaine: '',
+      favicon_base64: '',
+      nom_application: ''
+    });
+    setError('');
+  };
+
+  const handleMySocieteSubmit = async (e) => {
+    e.preventDefault();
+    if (!user?.societe_id) return;
+
+    setMySocieteFormLoading(true);
+    setError('');
+    
+    try {
+      // Récupérer d'abord les données complètes de la société
+      const response = await api.get(`/api/demandeurs-societe`);
+      const currentSociete = response.data.societes?.find(s => s.id === user.societe_id);
+      
+      if (!currentSociete) {
+        throw new Error('Société non trouvée');
+      }
+
+      // Préparer les données en gardant les valeurs existantes pour les champs non modifiables
+      const updateData = {
+        ...currentSociete, // Garder toutes les données existantes
+        ...mySocieteFormData // Écraser seulement les champs modifiables
+      };
+
+      await api.put(`/api/demandeurs-societe/${user.societe_id}`, updateData);
+      
+      // Rafraîchir les données si on est sur l'onglet sociétés
+      if (isAgent) {
+        fetchSocietes();
+      }
+      
+      handleCloseMySocieteModal();
+      
+      // Message de succès
+      setError('');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de ma société:', error);
+      setError(error.response?.data?.detail || 'Erreur lors de la mise à jour de la société');
+    } finally {
+      setMySocieteFormLoading(false);
+    }
+  };
+
+  // Fonctions d'upload pour "Ma Société"
+  const handleMyLogoUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      setError('Logo trop volumineux (limite: 2MB)');
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Format d\'image non autorisé. Utilisez JPG, PNG, GIF ou WebP.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setMySocieteFormData(prev => ({
+        ...prev,
+        logo_base64: e.target.result.split(',')[1]
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleMyFaviconUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const maxSize = 1 * 1024 * 1024; // 1MB
+    if (file.size > maxSize) {
+      setError('Favicon trop volumineux (limite: 1MB)');
+      return;
+    }
+
+    // Vérifier que c'est bien un fichier .ico
+    if (file.type !== 'image/x-icon' && file.type !== 'image/vnd.microsoft.icon' && !file.name.toLowerCase().endsWith('.ico')) {
+      setError('Le favicon doit être un fichier .ico');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setMySocieteFormData(prev => ({
+        ...prev,
+        favicon_base64: e.target.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setDemandeurFormLoading(true);
