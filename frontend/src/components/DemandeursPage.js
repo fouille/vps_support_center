@@ -538,6 +538,15 @@ const DemandeursPage = () => {
           {isAgent ? 'Gestion des Demandeurs' : 'Mes Collaborateurs'}
         </h1>
         <div className="flex space-x-3">
+          {!isAgent && (
+            <button
+              onClick={handleMySocieteEdit}
+              className="btn-secondary flex items-center"
+            >
+              <Building className="h-5 w-5 mr-2" />
+              Ma Société
+            </button>
+          )}
           {isAgent && (
             <button
               onClick={() => setShowSocieteModal(true)}
