@@ -34,10 +34,10 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
-    version: "2.3.1",
+    version: "2.4.0",
     date: "2025-09-03",
-    type: "PATCH",
-    description: "minor"
+    type: "MINOR",
+    description: "Ajout fonction 'Ma Société' pour demandeurs - édition des champs Email, Logo, Domaine, Favicon et Nom application"
   },
 {
     version: "2.3.0",
