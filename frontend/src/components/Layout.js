@@ -23,6 +23,37 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   const [darkMode, setDarkMode] = useState(true);
   const [appName, setAppName] = useState('Support & Production');
 
+  // Récupérer le nom d'application basé sur la société de l'utilisateur
+  useEffect(() => {
+    const fetchAppName = async () => {
+      if (!user?.societe_id) return;
+
+      try {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+        const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const userSociete = data.societes?.find(s => s.id === user.societe_id);
+          
+          if (userSociete?.nom_application) {
+            setAppName(userSociete.nom_application);
+            // Mettre à jour le titre de la page aussi
+            document.title = `${userSociete.nom_application} - Gestion de Tickets`;
+          }
+        }
+      } catch (error) {
+        // Utiliser le nom par défaut en cas d'erreur
+      }
+    };
+
+    fetchAppName();
+  }, [user?.societe_id]);
+
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
