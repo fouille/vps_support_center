@@ -26,44 +26,17 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   // Récupérer le nom d'application basé sur la société de l'utilisateur
   useEffect(() => {
     const fetchAppName = async () => {
-      if (!user?.societe_id) return;
+      if (!user) return;
 
       try {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+        let appName = null;
+        let favicon = null;
         
-        // Pour les agents, utiliser l'API complète des sociétés
-        if (user.type_utilisateur === 'agent') {
-          const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const userSociete = data.societes?.find(s => s.id === user.societe_id);
-            
-            if (userSociete?.nom_application) {
-              setAppName(userSociete.nom_application);
-              document.title = `${userSociete.nom_application} - Gestion de Tickets`;
-            }
-          }
-        } else {
-          // Pour les demandeurs, utiliser l'API get-logo-by-domain basée sur le domaine actuel
-          const currentDomain = window.location.hostname;
-          
-          // D'abord essayer avec le domaine actuel
-          const domainResponse = await fetch(`${backendUrl}/api/get-logo-by-domain?domaine=${encodeURIComponent(currentDomain)}`);
-          
-          if (domainResponse.ok) {
-            const domainData = await domainResponse.json();
-            if (domainData.nom_application) {
-              setAppName(domainData.nom_application);
-              document.title = `${domainData.nom_application} - Gestion de Tickets`;
-            }
-          } else {
-            // Si le domaine ne correspond pas, essayer de récupérer via l'API sociétés avec des droits limités
-            const response = await fetch(`${backendUrl}/api/demandeurs-societe`, {
+        // Méthode 1: Si l'utilisateur a un societe_id, récupérer via l'API sociétés
+        if (user.societe_id) {
+          try {
+            const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
               headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
               }
@@ -73,21 +46,82 @@ const Layout = ({ children, currentPage, onNavigate }) => {
               const data = await response.json();
               const userSociete = data.societes?.find(s => s.id === user.societe_id);
               
-              if (userSociete?.nom_application) {
-                setAppName(userSociete.nom_application);
-                document.title = `${userSociete.nom_application} - Gestion de Tickets`;
+              if (userSociete) {
+                appName = userSociete.nom_application;
+                favicon = userSociete.favicon_base64;
               }
             }
+          } catch (error) {
+            console.log('Erreur API sociétés:', error);
           }
         }
+        
+        // Méthode 2: Si pas de societe_id ou échec, essayer par domaine
+        if (!appName) {
+          try {
+            const currentDomain = window.location.hostname;
+            const domainResponse = await fetch(`${backendUrl}/api/get-logo-by-domain?domaine=${encodeURIComponent(currentDomain)}`);
+            
+            if (domainResponse.ok) {
+              const domainData = await domainResponse.json();
+              appName = domainData.nom_application;
+              favicon = domainData.favicon_base64;
+            }
+          } catch (error) {
+            console.log('Erreur API domaine:', error);
+          }
+        }
+
+        // Appliquer les changements si on a trouvé des données
+        if (appName) {
+          setAppName(appName);
+          document.title = `${appName} - Gestion de Tickets`;
+        } else {
+          // Garder les valeurs par défaut
+          setAppName('Support & Production');
+          document.title = 'Support & Production - Gestion de Tickets';
+        }
+
+        // Appliquer le favicon si disponible
+        if (favicon) {
+          updatePageFavicon(favicon);
+        }
+        
       } catch (error) {
-        // Utiliser le nom par défaut en cas d'erreur
         console.log('Erreur lors de la récupération du nom d\'application:', error);
+        // Utiliser les valeurs par défaut en cas d'erreur
+        setAppName('Support & Production');
+        document.title = 'Support & Production - Gestion de Tickets';
       }
     };
 
     fetchAppName();
-  }, [user?.societe_id, user?.type_utilisateur]);
+  }, [user]);
+
+  // Fonction pour mettre à jour le favicon
+  const updatePageFavicon = (faviconBase64) => {
+    try {
+      // Supprimer les anciens favicons
+      const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+      existingFavicons.forEach(favicon => favicon.remove());
+
+      // Créer le nouveau favicon
+      const faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      faviconLink.type = 'image/x-icon';
+      faviconLink.href = faviconBase64;
+      document.head.appendChild(faviconLink);
+
+      // Ajouter aussi une version shortcut icon pour compatibilité
+      const shortcutLink = document.createElement('link');
+      shortcutLink.rel = 'shortcut icon';
+      shortcutLink.type = 'image/x-icon';
+      shortcutLink.href = faviconBase64;
+      document.head.appendChild(shortcutLink);
+    } catch (error) {
+      console.log('Erreur mise à jour favicon:', error);
+    }
+  };
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
