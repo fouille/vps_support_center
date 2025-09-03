@@ -194,42 +194,39 @@ const DemandeursPage = () => {
       console.log('Recherche société par societe_id:', user.societe_id, 'ou par nom:', user.societe);
       
       let societe = null;
+      let societes = [];
       
-      // Essayer différentes structures de réponse
-      if (response.data && response.data.societes && Array.isArray(response.data.societes)) {
+      // Gérer les différentes structures de réponse
+      if (response.data && Array.isArray(response.data)) {
+        // Structure directe: response.data = [...]
+        societes = response.data;
+      } else if (response.data && response.data.societes && Array.isArray(response.data.societes)) {
+        // Structure imbriquée: response.data = { societes: [...] }
+        societes = response.data.societes;
+      }
+      
+      console.log('Sociétés extraites:', societes.map(s => ({ 
+        id: s.id, 
+        nom: s.nom_societe 
+      })));
+      
+      // Chercher la société du demandeur
+      if (societes.length > 0) {
         // Chercher d'abord par societe_id si disponible
         if (user.societe_id) {
-          societe = response.data.societes.find(s => s.id === user.societe_id);
+          societe = societes.find(s => s.id === user.societe_id);
+          console.log('Recherche par ID:', user.societe_id, '→', societe ? 'Trouvée' : 'Non trouvée');
         }
         
         // Si pas trouvé par ID, chercher par nom de société
         if (!societe && user.societe) {
-          societe = response.data.societes.find(s => s.nom_societe === user.societe);
+          societe = societes.find(s => s.nom_societe === user.societe);
+          console.log('Recherche par nom:', user.societe, '→', societe ? 'Trouvée' : 'Non trouvée');
         }
-        
-        console.log('Sociétés trouvées:', response.data.societes.map(s => ({ 
-          id: s.id, 
-          nom: s.nom_societe 
-        })));
-      } else if (Array.isArray(response.data)) {
-        // Chercher d'abord par societe_id si disponible
-        if (user.societe_id) {
-          societe = response.data.find(s => s.id === user.societe_id);
-        }
-        
-        // Si pas trouvé par ID, chercher par nom de société
-        if (!societe && user.societe) {
-          societe = response.data.find(s => s.nom_societe === user.societe);
-        }
-        
-        console.log('Sociétés trouvées (array direct):', response.data.map(s => ({ 
-          id: s.id, 
-          nom: s.nom_societe 
-        })));
       }
       
       if (societe) {
-        console.log('Société trouvée:', societe);
+        console.log('Société trouvée pour le formulaire:', societe);
         setMySocieteFormData({
           email: societe.email || '',
           logo_base64: societe.logo_base64 || '',
@@ -240,7 +237,8 @@ const DemandeursPage = () => {
         
         setError(''); // Effacer toute erreur précédente
       } else {
-        setError(`Société non trouvée. ID: ${user.societe_id || 'N/A'}, Nom: ${user.societe || 'N/A'}. Vérifiez vos permissions.`);
+        const availableSocietes = societes.map(s => `${s.nom_societe} (ID: ${s.id})`).join(', ');
+        setError(`Société non trouvée. Recherché - ID: ${user.societe_id || 'N/A'}, Nom: ${user.societe || 'N/A'}. Disponibles: ${availableSocietes}`);
       }
     } catch (error) {
       console.error('Erreur lors de la récupération de ma société:', error);
