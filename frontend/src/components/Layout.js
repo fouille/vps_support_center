@@ -21,6 +21,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   const { user, logout, isAgent } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
+  const [appName, setAppName] = useState('Support & Production');
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
