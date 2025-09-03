@@ -563,6 +563,13 @@ const ProductionsPage = () => {
                             </div>
                           ))}
                         </div>
+                      ) : production.taches && production.taches.filter(tache => tache.status !== 'hors_scope').length === 0 ? (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          {production.taches && production.taches.length > 0 
+                            ? "Toutes les tâches sont hors scope" 
+                            : "Aucune tâche disponible"
+                          }
+                        </p>
                       ) : (
                         <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune tâche disponible</p>
                       )}
