@@ -34,10 +34,10 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
-    version: "2.2.1",
+    version: "2.3.0",
     date: "2025-09-03",
-    type: "PATCH",
-    description: "minor"
+    type: "MINOR",
+    description: "Ajout upload favicon .ico et nom d'application personnalisé pour les sociétés + intégration dans login et layout"
   },
 {
     version: "2.2.0",
