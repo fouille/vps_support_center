@@ -1242,7 +1242,7 @@ const TicketsPage = () => {
               </div>
 
               {/* Section commentaires/échanges */}
-              <div className="flex flex-col h-full min-h-[500px]">
+              <div className="flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
                     Échanges et commentaires
@@ -1266,9 +1266,9 @@ const TicketsPage = () => {
                 </div>
                 
                 {/* Liste des commentaires avec scroll amélioré */}
-                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg mb-4 bg-gray-50 dark:bg-dark-card relative">
+                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg mb-4 bg-gray-50 dark:bg-dark-card relative" style={{minHeight: '400px'}}>
                   {/* Container de messagerie avec scroll et padding bottom */}
-                  <div className="h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 pb-8 comments-scroll-container bg-gradient-to-b from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-surface">
+                  <div className="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 pb-8 comments-scroll-container bg-gradient-to-b from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-surface">
                     {loadingComments ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
