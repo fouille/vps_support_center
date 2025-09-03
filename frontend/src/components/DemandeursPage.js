@@ -279,21 +279,22 @@ const DemandeursPage = () => {
       const response = await api.get(`/api/demandeurs-societe`);
       
       let currentSociete = null;
+      let societes = [];
+      
+      // Gérer les différentes structures de réponse
+      if (response.data && Array.isArray(response.data)) {
+        societes = response.data;
+      } else if (response.data && response.data.societes && Array.isArray(response.data.societes)) {
+        societes = response.data.societes;
+      }
       
       // Chercher la société par ID ou par nom
-      if (response.data.societes) {
+      if (societes.length > 0) {
         if (user.societe_id) {
-          currentSociete = response.data.societes.find(s => s.id === user.societe_id);
+          currentSociete = societes.find(s => s.id === user.societe_id);
         }
         if (!currentSociete && user.societe) {
-          currentSociete = response.data.societes.find(s => s.nom_societe === user.societe);
-        }
-      } else if (Array.isArray(response.data)) {
-        if (user.societe_id) {
-          currentSociete = response.data.find(s => s.id === user.societe_id);
-        }
-        if (!currentSociete && user.societe) {
-          currentSociete = response.data.find(s => s.nom_societe === user.societe);
+          currentSociete = societes.find(s => s.nom_societe === user.societe);
         }
       }
       
