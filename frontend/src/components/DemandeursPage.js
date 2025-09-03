@@ -139,6 +139,33 @@ const DemandeursPage = () => {
     reader.readAsDataURL(file);
   };
 
+  // Fonction pour gérer l'upload du favicon (.ico uniquement)
+  const handleFaviconUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const maxSize = 1 * 1024 * 1024; // 1MB
+    if (file.size > maxSize) {
+      setError('Favicon trop volumineux (limite: 1MB)');
+      return;
+    }
+
+    // Vérifier que c'est bien un fichier .ico
+    if (file.type !== 'image/x-icon' && file.type !== 'image/vnd.microsoft.icon' && !file.name.toLowerCase().endsWith('.ico')) {
+      setError('Le favicon doit être un fichier .ico');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setSocieteFormData(prev => ({
+        ...prev,
+        favicon_base64: e.target.result
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setDemandeurFormLoading(true);
