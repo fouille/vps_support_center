@@ -34,7 +34,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         let favicon = null;
         
         // Méthode 1: Si l'utilisateur a un societe_id, récupérer via l'API sociétés
-        if (user.societe_id) {
+        if (user.societe_id || user.societe) {
           try {
             const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
               headers: {
@@ -44,7 +44,17 @@ const Layout = ({ children, currentPage, onNavigate }) => {
 
             if (response.ok) {
               const data = await response.json();
-              const userSociete = data.societes?.find(s => s.id === user.societe_id);
+              let userSociete = null;
+              
+              // Chercher d'abord par ID si disponible
+              if (user.societe_id && data.societes) {
+                userSociete = data.societes.find(s => s.id === user.societe_id);
+              }
+              
+              // Si pas trouvé par ID, chercher par nom
+              if (!userSociete && user.societe && data.societes) {
+                userSociete = data.societes.find(s => s.nom_societe === user.societe);
+              }
               
               if (userSociete) {
                 appName = userSociete.nom_application;
@@ -56,7 +66,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           }
         }
         
-        // Méthode 2: Si pas de societe_id ou échec, essayer par domaine
+        // Méthode 2: Si pas de societe_id/societe ou échec, essayer par domaine
         if (!appName) {
           try {
             const currentDomain = window.location.hostname;
