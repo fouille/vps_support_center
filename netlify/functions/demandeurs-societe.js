@@ -88,6 +88,7 @@ exports.handler = async (event, context) => {
           societeQuery = sql`
             SELECT id, nom_societe, siret, adresse, adresse_complement, 
                    code_postal, ville, numero_tel, email, logo_base64, domaine,
+                   favicon_base64, nom_application,
                    created_at, updated_at
             FROM demandeurs_societe 
             ORDER BY nom_societe
