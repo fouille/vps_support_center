@@ -34,10 +34,10 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
-    version: "2.1.1",
+    version: "2.2.0",
     date: "2025-09-03",
-    type: "PATCH",
-    description: "minor"
+    type: "MINOR",
+    description: "Filtrage tâches hors scope dans résumé productions + menu Outils avec G711.org dans Support"
   },
 {
     version: "2.1.0",
