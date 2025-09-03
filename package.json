@@ -1,6 +1,6 @@
 {
   "name": "voipservices-support-center",
-  "version": "2.3.1",
+  "version": "2.4.1",
   "description": "Centre de support VOIPServices avec gestion tickets et portabilités",
   "scripts": {
     "build": "cd frontend && yarn build",
