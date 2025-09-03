@@ -32,13 +32,17 @@ exports.handler = async (event, context) => {
     const authHeader = event.headers.authorization || event.headers.Authorization;
     const decoded = verifyToken(authHeader);
     
-    // Check if user is agent (only agents can manage societies)
+    // Check user permissions
     const userType = decoded.type_utilisateur || decoded.type;
-    if (userType !== 'agent') {
+    const isAgent = userType === 'agent';
+    const isDemandeur = userType === 'demandeur';
+    
+    // Agents have full access, demandeurs have limited access to their own society
+    if (!isAgent && !isDemandeur) {
       return {
         statusCode: 403,
         headers,
-        body: JSON.stringify({ detail: 'Accès non autorisé. Seuls les agents peuvent gérer les sociétés.' })
+        body: JSON.stringify({ detail: 'Accès non autorisé' })
       };
     }
 
