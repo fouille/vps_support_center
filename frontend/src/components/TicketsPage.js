@@ -708,6 +708,39 @@ const TicketsPage = () => {
           {isAgent ? 'Support' : 'Mes Tickets'}
         </h1>
         <div className="flex space-x-3">
+          {/* Menu Outils - affiché seulement pour les agents */}
+          {isAgent && (
+            <div className="relative" ref={toolsMenuRef}>
+              <button
+                onClick={() => setShowToolsMenu(!showToolsMenu)}
+                className="btn-secondary flex items-center"
+                title="Outils"
+              >
+                <Settings className="h-5 w-5 mr-2" />
+                Outils
+                <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${showToolsMenu ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Menu déroulant */}
+              {showToolsMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg shadow-lg z-50">
+                  <div className="py-1">
+                    <a
+                      href="https://g711.org"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text hover:bg-gray-100 dark:hover:bg-dark-card transition-colors"
+                      onClick={() => setShowToolsMenu(false)}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-3" />
+                      G711.org
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
           <button
             onClick={() => fetchTickets(true)}
             className="btn-secondary flex items-center"
