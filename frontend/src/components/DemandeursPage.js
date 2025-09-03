@@ -24,6 +24,7 @@ const DemandeursPage = () => {
   const [transferLoading, setTransferLoading] = useState(false);
   const [demandeurFormLoading, setDemandeurFormLoading] = useState(false);
   const [societeFormLoading, setSocieteFormLoading] = useState(false);
+  const [mySocieteFormLoading, setMySocieteFormLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     nom: '',
