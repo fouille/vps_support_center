@@ -30,29 +30,64 @@ const Layout = ({ children, currentPage, onNavigate }) => {
 
       try {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
-        const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        
+        // Pour les agents, utiliser l'API complète des sociétés
+        if (user.type_utilisateur === 'agent') {
+          const response = await fetch(`${backendUrl}/api/demandeurs-societe?search=&limit=1000`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          const userSociete = data.societes?.find(s => s.id === user.societe_id);
+          if (response.ok) {
+            const data = await response.json();
+            const userSociete = data.societes?.find(s => s.id === user.societe_id);
+            
+            if (userSociete?.nom_application) {
+              setAppName(userSociete.nom_application);
+              document.title = `${userSociete.nom_application} - Gestion de Tickets`;
+            }
+          }
+        } else {
+          // Pour les demandeurs, utiliser l'API get-logo-by-domain basée sur le domaine actuel
+          const currentDomain = window.location.hostname;
           
-          if (userSociete?.nom_application) {
-            setAppName(userSociete.nom_application);
-            // Mettre à jour le titre de la page aussi
-            document.title = `${userSociete.nom_application} - Gestion de Tickets`;
+          // D'abord essayer avec le domaine actuel
+          const domainResponse = await fetch(`${backendUrl}/api/get-logo-by-domain?domaine=${encodeURIComponent(currentDomain)}`);
+          
+          if (domainResponse.ok) {
+            const domainData = await domainResponse.json();
+            if (domainData.nom_application) {
+              setAppName(domainData.nom_application);
+              document.title = `${domainData.nom_application} - Gestion de Tickets`;
+            }
+          } else {
+            // Si le domaine ne correspond pas, essayer de récupérer via l'API sociétés avec des droits limités
+            const response = await fetch(`${backendUrl}/api/demandeurs-societe`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+              }
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const userSociete = data.societes?.find(s => s.id === user.societe_id);
+              
+              if (userSociete?.nom_application) {
+                setAppName(userSociete.nom_application);
+                document.title = `${userSociete.nom_application} - Gestion de Tickets`;
+              }
+            }
           }
         }
       } catch (error) {
         // Utiliser le nom par défaut en cas d'erreur
+        console.log('Erreur lors de la récupération du nom d\'application:', error);
       }
     };
 
     fetchAppName();
-  }, [user?.societe_id]);
+  }, [user?.societe_id, user?.type_utilisateur]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
