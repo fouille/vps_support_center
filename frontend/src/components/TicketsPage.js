@@ -1266,9 +1266,9 @@ const TicketsPage = () => {
                 </div>
                 
                 {/* Liste des commentaires avec scroll amélioré */}
-                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg mb-4 bg-gray-50 dark:bg-dark-card relative">
+                <div className="flex-1 border border-gray-200 dark:border-dark-border rounded-lg bg-gray-50 dark:bg-dark-card relative flex flex-col">
                   {/* Container de messagerie avec scroll et padding bottom */}
-                  <div className="h-full min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 pb-8 comments-scroll-container bg-gradient-to-b from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-surface">
+                  <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent p-4 pb-8 comments-scroll-container bg-gradient-to-b from-gray-50 to-gray-100 dark:from-dark-card dark:to-dark-surface">
                     {loadingComments ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
