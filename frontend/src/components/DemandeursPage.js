@@ -44,7 +44,9 @@ const DemandeursPage = () => {
     numero_tel: '',
     email: '',
     logo_base64: '',
-    domaine: ''
+    domaine: '',
+    favicon_base64: '',
+    nom_application: ''
   });
 
   const isAgent = user?.type_utilisateur === 'agent';
