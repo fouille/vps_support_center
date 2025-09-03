@@ -162,6 +162,20 @@ exports.handler = async (event, context) => {
           }
         }
 
+        // Validation du favicon (doit être au format .ico en base64)
+        if (favicon_base64) {
+          // Vérifier que c'est bien du base64 d'un fichier .ico
+          if (!favicon_base64.startsWith('data:image/x-icon;base64,') && !favicon_base64.startsWith('data:image/vnd.microsoft.icon;base64,')) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ 
+                detail: 'Le favicon doit être un fichier .ico valide' 
+              })
+            };
+          }
+        }
+
         // Check if domain already exists (if provided)
         if (domaine) {
           const existingDomaine = await sql`
