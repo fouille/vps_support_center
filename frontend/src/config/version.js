@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 4,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  patch: 2,      // Version patch - corrections de bugs
   buildDate: "2025-09-03", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.4.2",
+    date: "2025-09-03",
+    type: "PATCH",
+    description: "patch"
+  },
+{
     version: "2.4.1",
     date: "2025-09-03",
     type: "PATCH",
