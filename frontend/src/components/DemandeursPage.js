@@ -12,6 +12,7 @@ const DemandeursPage = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showSocieteModal, setShowSocieteModal] = useState(false);
+  const [showMySocieteModal, setShowMySocieteModal] = useState(false); // Nouveau modal pour "Ma Société"
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [editingDemandeur, setEditingDemandeur] = useState(null);
   const [editingSociete, setEditingSociete] = useState(null);
