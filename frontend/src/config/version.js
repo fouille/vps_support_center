@@ -37,7 +37,7 @@ export const VERSION_HISTORY = [
     version: "2.4.2",
     date: "2025-09-03",
     type: "PATCH",
-    description: "patch"
+    description: "Support recherche société par nom si societe_id absent - compatibilité migration incomplète"
   },
 {
     version: "2.4.1",
