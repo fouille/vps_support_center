@@ -312,7 +312,9 @@ const DemandeursPage = () => {
       numero_tel: societe.numero_tel || '',
       email: societe.email,
       logo_base64: societe.logo_base64 || '',
-      domaine: societe.domaine || ''
+      domaine: societe.domaine || '',
+      favicon_base64: societe.favicon_base64 || '',
+      nom_application: societe.nom_application || ''
     });
     setShowSocieteModal(true);
   };
