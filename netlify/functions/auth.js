@@ -40,7 +40,7 @@ exports.handler = async (event, context) => {
 
     // Check in demandeurs table first
     let user = await sql`
-      SELECT id, email, password, nom, prenom, societe, telephone, 'demandeur' as type_utilisateur 
+      SELECT id, email, password, nom, prenom, societe, telephone, societe_id, 'demandeur' as type_utilisateur 
       FROM demandeurs 
       WHERE email = ${email}
     `;
@@ -48,7 +48,7 @@ exports.handler = async (event, context) => {
     // If not found in demandeurs, check in agents table
     if (user.length === 0) {
       user = await sql`
-        SELECT id, email, password, nom, prenom, societe, NULL as telephone, 'agent' as type_utilisateur 
+        SELECT id, email, password, nom, prenom, societe, NULL as telephone, societe_id, 'agent' as type_utilisateur 
         FROM agents 
         WHERE email = ${email}
       `;
