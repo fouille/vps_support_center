@@ -1353,7 +1353,7 @@ const TicketsPage = () => {
                 </div>
 
                 {/* Formulaire d'ajout de commentaire amélioré avec émojis */}
-                <div className="border-t border-gray-200 dark:border-dark-border pt-4">
+                <div className="border-t border-gray-200 dark:border-dark-border pt-4 mt-4">
                   <form onSubmit={handleAddComment} className="space-y-3">
                     {/* Barre d'émojis */}
                     <div className="relative">
