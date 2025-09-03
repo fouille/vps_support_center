@@ -541,7 +541,9 @@ const ProductionsPage = () => {
                         </div>
                       ) : production.taches && production.taches.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {production.taches.map(tache => (
+                          {production.taches
+                            .filter(tache => tache.status !== 'hors_scope') // Exclure les tâches "Hors Scope"
+                            .map(tache => (
                             <div
                               key={tache.id}
                               className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:shadow-sm transition-shadow cursor-pointer"
