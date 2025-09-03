@@ -251,7 +251,9 @@ exports.handler = async (event, context) => {
           numero_tel: upd_tel, 
           email: upd_email,
           logo_base64: upd_logo,
-          domaine: upd_domaine
+          domaine: upd_domaine,
+          favicon_base64: upd_favicon,
+          nom_application: upd_app_name
         } = updateData;
         
         // Validation du format de domaine si fourni
