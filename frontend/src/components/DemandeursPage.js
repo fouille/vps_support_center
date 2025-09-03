@@ -179,36 +179,29 @@ const DemandeursPage = () => {
 
   // Fonctions pour "Ma Société" (demandeurs)
   const fetchMySociete = async () => {
+    console.log('User object:', user); // Log pour debug
+    
     if (!user?.societe_id) {
-      setError('Aucune société associée à votre compte');
+      setError(`Aucune société associée à votre compte. User: ${JSON.stringify(user)}`);
       return;
     }
-
-    console.log('Récupération de la société pour l\'utilisateur:', user);
 
     try {
       // Utiliser l'API générale avec les paramètres par défaut
       const response = await api.get(`/api/demandeurs-societe?search=&limit=1000`);
       
-      // Log pour debug
-      console.log('Réponse complète API:', response);
-      console.log('Données reçues:', response.data);
+      console.log('Réponse API complète:', response.data);
       console.log('societe_id recherché:', user.societe_id);
       
       let societe = null;
       
       // Essayer différentes structures de réponse
       if (response.data && response.data.societes && Array.isArray(response.data.societes)) {
-        console.log('Structure: response.data.societes (array)');
         societe = response.data.societes.find(s => s.id === user.societe_id);
-        console.log('Sociétés disponibles:', response.data.societes.map(s => ({ id: s.id, nom: s.nom_societe })));
+        console.log('Sociétés trouvées:', response.data.societes.map(s => ({ id: s.id, nom: s.nom_societe })));
       } else if (Array.isArray(response.data)) {
-        console.log('Structure: response.data (direct array)');
         societe = response.data.find(s => s.id === user.societe_id);
-        console.log('Sociétés disponibles:', response.data.map(s => ({ id: s.id, nom: s.nom_societe })));
-      } else if (response.data && response.data.id === user.societe_id) {
-        console.log('Structure: response.data (single object)');
-        societe = response.data;
+        console.log('Sociétés trouvées (array direct):', response.data.map(s => ({ id: s.id, nom: s.nom_societe })));
       }
       
       if (societe) {
@@ -221,16 +214,12 @@ const DemandeursPage = () => {
           nom_application: societe.nom_application || ''
         });
         
-        // Effacer toute erreur précédente
-        setError('');
+        setError(''); // Effacer toute erreur précédente
       } else {
-        console.log('Société non trouvée pour l\'ID:', user.societe_id);
-        console.log('Type user.societe_id:', typeof user.societe_id);
-        setError(`Impossible de récupérer les données de votre société (ID: ${user.societe_id})`);
+        setError(`Société non trouvée pour l'ID: ${user.societe_id}. Vérifiez vos permissions.`);
       }
     } catch (error) {
-      console.error('Erreur complète lors de la récupération de ma société:', error);
-      console.error('Réponse d\'erreur:', error.response);
+      console.error('Erreur lors de la récupération de ma société:', error);
       setError('Erreur lors de la récupération des données de la société: ' + (error.response?.data?.detail || error.message));
     }
   };
