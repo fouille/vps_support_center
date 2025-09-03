@@ -63,43 +63,98 @@ exports.handler = async (event, context) => {
         let societeQuery;
         let countQuery;
         
-        if (search) {
-          societeQuery = sql`
-            SELECT id, nom_societe, siret, adresse, adresse_complement, 
-                   code_postal, ville, numero_tel, email, logo_base64, domaine,
-                   favicon_base64, nom_application,
-                   created_at, updated_at
-            FROM demandeurs_societe 
-            WHERE nom_societe ILIKE ${'%' + search + '%'} 
-               OR siret ILIKE ${'%' + search + '%'}
-               OR email ILIKE ${'%' + search + '%'}
-               OR ville ILIKE ${'%' + search + '%'}
-               OR domaine ILIKE ${'%' + search + '%'}
-            ORDER BY nom_societe
-            LIMIT ${limit} OFFSET ${offset}
+        if (isAgent) {
+          // Agents can see all societies
+          if (search) {
+            societeQuery = sql`
+              SELECT id, nom_societe, siret, adresse, adresse_complement, 
+                     code_postal, ville, numero_tel, email, logo_base64, domaine,
+                     favicon_base64, nom_application,
+                     created_at, updated_at
+              FROM demandeurs_societe 
+              WHERE nom_societe ILIKE ${'%' + search + '%'} 
+                 OR siret ILIKE ${'%' + search + '%'}
+                 OR email ILIKE ${'%' + search + '%'}
+                 OR ville ILIKE ${'%' + search + '%'}
+                 OR domaine ILIKE ${'%' + search + '%'}
+              ORDER BY nom_societe
+              LIMIT ${limit} OFFSET ${offset}
+            `;
+            
+            countQuery = sql`
+              SELECT COUNT(*) as total 
+              FROM demandeurs_societe 
+              WHERE nom_societe ILIKE ${'%' + search + '%'} 
+                 OR siret ILIKE ${'%' + search + '%'}
+                 OR email ILIKE ${'%' + search + '%'}
+                 OR ville ILIKE ${'%' + search + '%'}
+                 OR domaine ILIKE ${'%' + search + '%'}
+            `;
+          } else {
+            societeQuery = sql`
+              SELECT id, nom_societe, siret, adresse, adresse_complement, 
+                     code_postal, ville, numero_tel, email, logo_base64, domaine,
+                     favicon_base64, nom_application,
+                     created_at, updated_at
+              FROM demandeurs_societe 
+              ORDER BY nom_societe
+              LIMIT ${limit} OFFSET ${offset}
+            `;
+            
+            countQuery = sql`
+              SELECT COUNT(*) as total FROM demandeurs_societe
+            `;
+          }
+        } else if (isDemandeur) {
+          // Demandeurs can only see their own society
+          // First, get the demandeur's society info
+          const demandeurInfo = await sql`
+            SELECT societe_id, societe 
+            FROM demandeurs 
+            WHERE id = ${decoded.id}
           `;
           
-          countQuery = sql`
-            SELECT COUNT(*) as total 
-            FROM demandeurs_societe 
-            WHERE nom_societe ILIKE ${'%' + search + '%'} 
-               OR siret ILIKE ${'%' + search + '%'}
-               OR email ILIKE ${'%' + search + '%'}
-               OR ville ILIKE ${'%' + search + '%'}
-               OR domaine ILIKE ${'%' + search + '%'}
-          `;
-        } else {
-          societeQuery = sql`
-            SELECT id, nom_societe, siret, adresse, adresse_complement, 
-                   code_postal, ville, numero_tel, email, logo_base64, domaine,
-                   favicon_base64, nom_application,
-                   created_at, updated_at
-            FROM demandeurs_societe 
-            ORDER BY nom_societe
-            LIMIT ${limit} OFFSET ${offset}
-          `;
+          if (demandeurInfo.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Utilisateur demandeur non trouvé' })
+            };
+          }
           
-          countQuery = sql`SELECT COUNT(*) as total FROM demandeurs_societe`;
+          const demandeur = demandeurInfo[0];
+          
+          // Build query based on available society identification
+          if (demandeur.societe_id) {
+            // Use societe_id if available (new system)
+            societeQuery = sql`
+              SELECT id, nom_societe, siret, adresse, adresse_complement, 
+                     code_postal, ville, numero_tel, email, logo_base64, domaine,
+                     favicon_base64, nom_application,
+                     created_at, updated_at
+              FROM demandeurs_societe 
+              WHERE id = ${demandeur.societe_id}
+            `;
+          } else if (demandeur.societe) {
+            // Fallback to society name (old system)
+            societeQuery = sql`
+              SELECT id, nom_societe, siret, adresse, adresse_complement, 
+                     code_postal, ville, numero_tel, email, logo_base64, domaine,
+                     favicon_base64, nom_application,
+                     created_at, updated_at
+              FROM demandeurs_societe 
+              WHERE nom_societe = ${demandeur.societe}
+            `;
+          } else {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Aucune société associée à votre compte' })
+            };
+          }
+          
+          // For demandeurs, we don't need pagination as they only see one society
+          countQuery = sql`SELECT 1 as total`;
         }
 
         const [societes, totalResult] = await Promise.all([societeQuery, countQuery]);
