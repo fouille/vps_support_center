@@ -47,22 +47,24 @@ exports.handler = async (event, context) => {
     `;
 
     if (result.length === 0) {
-      console.log('No logo found for domain:', domaine);
+      console.log('No company found for domain:', domaine);
       return {
         statusCode: 404,
         headers,
-        body: JSON.stringify({ detail: 'Aucun logo trouvé pour ce domaine' })
+        body: JSON.stringify({ detail: 'Aucune société trouvée pour ce domaine' })
       };
     }
 
-    console.log('Logo found for domain:', domaine, 'company:', result[0].nom_societe);
+    console.log('Company found for domain:', domaine, 'company:', result[0].nom_societe);
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         logo_base64: result[0].logo_base64,
-        nom_societe: result[0].nom_societe
+        nom_societe: result[0].nom_societe,
+        favicon_base64: result[0].favicon_base64,
+        nom_application: result[0].nom_application
       })
     };
 
