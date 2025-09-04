@@ -191,6 +191,12 @@ const TrunkTemplateModal = ({ tache, onClose, onRefresh }) => {
       });
       
       setShowAttachmentDialog(false);
+      
+      // Rafraîchir les données de la tâche pour voir immédiatement la pièce jointe
+      if (onRefresh) {
+        onRefresh();
+      }
+      
       onClose(); // Fermer le modal Template
     } catch (error) {
       console.error('Erreur lors de l\'ajout du PDF en pièce jointe:', error);
