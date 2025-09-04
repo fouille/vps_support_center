@@ -19,6 +19,8 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
 
   const [errors, setErrors] = useState({});
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showAttachmentDialog, setShowAttachmentDialog] = useState(false);
+  const [generatedPdf, setGeneratedPdf] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
