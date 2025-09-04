@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'https://supportdesk-5.preview.emergentagent.com';
+const BASE_URL = 'https://ticketmanage-1.preview.emergentagent.com';
 
 // Test user credentials (assuming we have a test agent)
 const testAgent = {

@@ -11,7 +11,7 @@ import sys
 from datetime import datetime
 
 # Configuration - Production URL
-BACKEND_URL = "https://supportdesk-5.preview.emergentagent.com"
+BACKEND_URL = "https://ticketmanage-1.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
