@@ -157,12 +157,42 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
 
   const handleConfirmYes = () => {
     setShowConfirmDialog(false);
-    onClose(); // Fermer le modal Template
+    setShowAttachmentDialog(true); // Afficher le dialogue d'ajout en pièce jointe
   };
 
   const handleConfirmNo = () => {
     setShowConfirmDialog(false);
+    setGeneratedPdf(null); // Nettoyer le PDF généré
     // Rester sur le formulaire, ne pas vider les champs
+  };
+
+  const handleAttachYes = async () => {
+    if (!generatedPdf) return;
+    
+    try {
+      // Créer un FormData pour l'upload
+      const formData = new FormData();
+      formData.append('file', generatedPdf.blob, generatedPdf.fileName);
+      formData.append('production_tache_id', tache.id);
+      
+      // Uploader le fichier
+      await api.post('/api/production-tache-fichiers', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      setShowAttachmentDialog(false);
+      onClose(); // Fermer le modal Template
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du PDF en pièce jointe:', error);
+      alert('Erreur lors de l\'ajout du PDF en pièce jointe');
+    }
+  };
+
+  const handleAttachNo = () => {
+    setShowAttachmentDialog(false);
+    onClose(); // Fermer le modal Template sans ajouter la pièce jointe
   };
 
   return (
