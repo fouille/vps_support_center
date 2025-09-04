@@ -401,6 +401,37 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
           </div>
         </div>
 
+        {/* Dialogue de confirmation */}
+        {showConfirmDialog && (
+          <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-10">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md mx-4">
+              <div className="text-center">
+                <div className="text-4xl mb-4">📄</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">
+                  PDF généré avec succès !
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Le PDF vous convient-il ?
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={handleConfirmYes}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    ✅ Oui
+                  </button>
+                  <button
+                    onClick={handleConfirmNo}
+                    className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    ❌ Non, modifier
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
