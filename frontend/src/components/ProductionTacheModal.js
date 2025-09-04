@@ -581,6 +581,14 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
           </div>
         </div>
       </div>
+      
+      {/* Modal Template Trunk */}
+      {showTrunkTemplate && (
+        <TrunkTemplateModal
+          tache={tache}
+          onClose={() => setShowTrunkTemplate(false)}
+        />
+      )}
     </div>
   );
 };
