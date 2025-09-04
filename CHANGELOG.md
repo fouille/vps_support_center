@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.7.0] - 2025-09-04
+### Added
+- ✨ Ajout dialogue confirmation PDF Template Trunk et correction nom client
+
 ## [2.6.0] - 2025-09-04
 ### Added
 - ✨ Ajout bouton Template pour tâche Trunk Only avec génération PDF

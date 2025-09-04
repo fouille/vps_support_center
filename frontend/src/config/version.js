@@ -6,7 +6,7 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 6,      // Version mineure - nouvelles fonctionnalités
+  minor: 7,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-09-04", // Date de build automatique
 };
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.7.0",
+    date: "2025-09-04",
+    type: "MINOR",
+    description: "Ajout dialogue confirmation PDF Template Trunk et correction nom client"
+  },
+{
     version: "2.6.0",
     date: "2025-09-04",
     type: "MINOR",
