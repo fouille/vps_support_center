@@ -587,6 +587,10 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
         <TrunkTemplateModal
           tache={tache}
           onClose={() => setShowTrunkTemplate(false)}
+          onRefresh={() => {
+            fetchCommentaires();
+            fetchFichiers();
+          }}
         />
       )}
     </div>
