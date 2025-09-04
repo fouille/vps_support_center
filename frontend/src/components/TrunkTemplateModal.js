@@ -70,10 +70,14 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
 
     const doc = new jsPDF();
     
-    // Header - Corriger le nom du client
+    // Header - Récupérer le nom du client depuis les bonnes propriétés
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    const clientName = tache.production?.client?.nom || tache.production?.client?.nom_societe || 'Client';
+    const clientName = tache.production?.nom_societe || 
+                      tache.production?.client_display || 
+                      tache.production?.client?.nom || 
+                      tache.production?.client?.nom_societe || 
+                      'Client';
     doc.text(`Livraison Trunk - ${clientName}`, 20, 20);
     
     // Line separator
