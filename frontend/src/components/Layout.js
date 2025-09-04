@@ -60,6 +60,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
               if (userSociete) {
                 appName = userSociete.nom_application;
                 favicon = userSociete.favicon_base64;
+                setLogoBase64(userSociete.logo_base64);
               }
             }
           } catch (error) {
