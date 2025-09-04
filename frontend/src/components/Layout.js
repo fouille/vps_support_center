@@ -186,9 +186,18 @@ const Layout = ({ children, currentPage, onNavigate }) => {
         
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
-          <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-            {appName}
-          </h1>
+          <div className="flex items-center space-x-3">
+            {logoBase64 && (
+              <img 
+                src={logoBase64} 
+                alt="Logo" 
+                className="h-8 w-8 object-contain"
+              />
+            )}
+            <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
+              {appName}
+            </h1>
+          </div>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text"
