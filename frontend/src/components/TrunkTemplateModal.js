@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import jsPDF from 'jspdf';
 
 const TrunkTemplateModal = ({ tache, onClose }) => {
+  const { api } = useAuth();
   const [formData, setFormData] = useState({
     methode: 'REGISTER',
     identifiant: '',
