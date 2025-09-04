@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.8.3] - 2025-09-04
+### Fixed
+- 🔧 Ajout loader sur bouton ajout PDF pièce jointe pour améliorer UX
+
 ## [2.8.2] - 2025-09-04
 ### Fixed
 - 🔧 Ajout rafraîchissement automatique tâche après ajout PDF en pièce jointe
