@@ -168,7 +168,9 @@ const TrunkTemplateModal = ({ tache, onClose, onRefresh }) => {
   };
 
   const handleAttachYes = async () => {
-    if (!generatedPdf) return;
+    if (!generatedPdf || uploadingAttachment) return;
+    
+    setUploadingAttachment(true);
     
     try {
       // Convertir le blob PDF en base64
@@ -202,6 +204,8 @@ const TrunkTemplateModal = ({ tache, onClose, onRefresh }) => {
     } catch (error) {
       console.error('Erreur lors de l\'ajout du PDF en pièce jointe:', error);
       alert('Erreur lors de l\'ajout du PDF en pièce jointe');
+    } finally {
+      setUploadingAttachment(false);
     }
   };
 
