@@ -33,12 +33,44 @@ function determineVersionType(description) {
   return 'patch';
 }
 
-// Auto-incrémentation basée sur la description
-function autoIncrement(description) {
-  const type = determineVersionType(description);
-  const newVersion = incrementVersion(type);
+// Fonction pour normaliser les types de version
+function normalizeVersionType(type) {
+  if (!type) return null;
   
-  console.log(`🤖 Auto-versioning détecté: ${type.toUpperCase()}`);
+  const normalizedType = type.toLowerCase();
+  
+  // Mapper les alias vers les types standards
+  const typeMap = {
+    'majeure': 'major',
+    'major': 'major',
+    'mineure': 'minor', 
+    'minor': 'minor',
+    'patch': 'patch'
+  };
+  
+  return typeMap[normalizedType] || null;
+}
+
+// Auto-incrémentation basée sur la description ou type explicite
+function autoIncrement(description, explicitVersionType = null) {
+  let type;
+  
+  if (explicitVersionType) {
+    // Utiliser le type explicite fourni
+    type = normalizeVersionType(explicitVersionType);
+    if (!type) {
+      console.log(`⚠️  Type de version invalide: ${explicitVersionType}`);
+      console.log('Types valides: majeure, major, mineure, minor, patch');
+      process.exit(1);
+    }
+    console.log(`🎯 Type de version explicite: ${type.toUpperCase()}`);
+  } else {
+    // Auto-détection basée sur la description
+    type = determineVersionType(description);
+    console.log(`🤖 Auto-versioning détecté: ${type.toUpperCase()}`);
+  }
+  
+  const newVersion = incrementVersion(type);
   updateVersionFile(newVersion, type, description);
   
   return {
