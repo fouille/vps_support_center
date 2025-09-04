@@ -170,15 +170,23 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
     if (!generatedPdf) return;
     
     try {
-      // Créer un FormData pour l'upload
-      const formData = new FormData();
-      formData.append('file', generatedPdf.blob, generatedPdf.fileName);
-      formData.append('production_tache_id', tache.id);
+      // Convertir le blob PDF en base64
+      const arrayBuffer = await generatedPdf.blob.arrayBuffer();
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+      const base64WithPrefix = `data:application/pdf;base64,${base64}`;
+      
+      // Préparer les données au format attendu par l'API
+      const requestData = {
+        production_tache_id: tache.id,
+        nom_fichier: generatedPdf.fileName,
+        type_fichier: 'application/pdf',
+        contenu_base64: base64WithPrefix
+      };
       
       // Uploader le fichier
-      await api.post('/api/production-tache-fichiers', formData, {
+      await api.post('/api/production-tache-fichiers', requestData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
       
