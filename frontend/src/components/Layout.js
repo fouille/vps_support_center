@@ -78,6 +78,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
               const domainData = await domainResponse.json();
               appName = domainData.nom_application;
               favicon = domainData.favicon_base64;
+              setLogoBase64(domainData.logo_base64);
             }
           } catch (error) {
             console.log('Erreur API domaine:', error);
