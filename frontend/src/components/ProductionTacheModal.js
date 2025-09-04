@@ -249,6 +249,14 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getTacheStatusBadgeClass(tacheData.status)}`}>
                 {getTacheStatusLabel(tacheData.status)}
               </span>
+              {user?.type_utilisateur === 'agent' && tache.nom_tache === 'Trunk Only' && (
+                <button
+                  onClick={() => setShowTrunkTemplate(true)}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                >
+                  📄 Template
+                </button>
+              )}
               {user?.type_utilisateur === 'agent' && (
                 <button
                   onClick={() => setEditingTache(!editingTache)}
