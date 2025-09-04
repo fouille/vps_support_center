@@ -6,9 +6,9 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 4,      // Version mineure - nouvelles fonctionnalités
-  patch: 2,      // Version patch - corrections de bugs
-  buildDate: "2025-09-03", // Date de build automatique
+  minor: 5,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
+  buildDate: "2025-09-04", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.5.0",
+    date: "2025-09-04",
+    type: "MINOR",
+    description: "Ajout affichage logo société dans header à côté du nom d'application"
+  },
+{
     version: "2.4.2",
     date: "2025-09-03",
     type: "PATCH",
