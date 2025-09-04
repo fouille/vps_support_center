@@ -484,6 +484,37 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
           </div>
         )}
 
+        {/* Dialogue d'ajout en pièce jointe */}
+        {showAttachmentDialog && (
+          <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center z-10">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md mx-4">
+              <div className="text-center">
+                <div className="text-4xl mb-4">📎</div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-dark-text mb-4">
+                  Ajouter le PDF en pièce jointe ?
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Voulez-vous ajouter automatiquement ce PDF comme pièce jointe à la tâche "Trunk Only" ?
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={handleAttachYes}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    ✅ Oui, ajouter
+                  </button>
+                  <button
+                    onClick={handleAttachNo}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    ❌ Non, continuer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
