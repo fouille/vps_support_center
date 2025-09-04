@@ -399,6 +399,7 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
                 value={formData.sda}
                 onChange={handleInputChange}
                 rows={4}
+                autoComplete="off"
                 placeholder="Saisissez les SDA (un par ligne ou séparés par des virgules)..."
                 className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-vertical ${
                   errors.sda ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
