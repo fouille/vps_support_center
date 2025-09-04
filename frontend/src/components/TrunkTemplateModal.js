@@ -268,6 +268,7 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
                 name="pass"
                 value={formData.pass}
                 onChange={handleInputChange}
+                autoComplete="off"
                 className={`w-full border rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-dark-text focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
                   errors.pass ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
