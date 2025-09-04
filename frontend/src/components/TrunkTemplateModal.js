@@ -70,10 +70,10 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
 
     const doc = new jsPDF();
     
-    // Header
+    // Header - Corriger le nom du client
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    const clientName = tache.production?.client?.nom || 'Client';
+    const clientName = tache.production?.client?.nom || tache.production?.client?.nom_societe || 'Client';
     doc.text(`Livraison Trunk - ${clientName}`, 20, 20);
     
     // Line separator
@@ -134,8 +134,8 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
     const fileName = `Livraison_Trunk_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
     doc.save(fileName);
     
-    // Close modal after successful generation
-    onClose();
+    // Afficher le dialogue de confirmation au lieu de fermer directement
+    setShowConfirmDialog(true);
   };
 
   return (
