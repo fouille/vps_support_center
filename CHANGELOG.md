@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.8.0] - 2025-09-04
+### Added
+- ✨ Ajout fonctionnalité ajout automatique PDF en pièce jointe et corrections Template Trunk
+
 ## [2.7.2] - 2025-09-04
 ### Fixed
 - 🔧 Correction récupération nom société dans PDF Template Trunk Only
