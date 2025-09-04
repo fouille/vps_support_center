@@ -138,11 +138,20 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
     const currentDate = new Date().toLocaleDateString('fr-FR');
     doc.text(`Généré le ${currentDate}`, 20, 280);
     
-    // Download PDF
+    // Conserver le PDF en mémoire pour l'upload potentiel
+    const pdfBlob = doc.output('blob');
     const fileName = `Livraison_Trunk_${clientName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.pdf`;
+    
+    setGeneratedPdf({
+      blob: pdfBlob,
+      fileName: fileName,
+      doc: doc
+    });
+    
+    // Download PDF
     doc.save(fileName);
     
-    // Afficher le dialogue de confirmation au lieu de fermer directement
+    // Afficher le dialogue de confirmation
     setShowConfirmDialog(true);
   };
 
