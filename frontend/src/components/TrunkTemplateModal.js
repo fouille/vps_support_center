@@ -18,6 +18,7 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
