@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 7,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  patch: 2,      // Version patch - corrections de bugs
   buildDate: "2025-09-04", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.7.2",
+    date: "2025-09-04",
+    type: "PATCH",
+    description: "Correction récupération nom société dans PDF Template Trunk Only"
+  },
+{
     version: "2.7.1",
     date: "2025-09-04",
     type: "PATCH",
