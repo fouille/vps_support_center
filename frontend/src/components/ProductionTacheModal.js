@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import TrunkTemplateModal from './TrunkTemplateModal';
 
 const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const { api, user } = useAuth();
