@@ -189,7 +189,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           <div className="flex items-center space-x-3">
             {logoBase64 && (
               <img 
-                src={logoBase64} 
+                src={logoBase64.startsWith('data:') ? logoBase64 : `data:image/png;base64,${logoBase64}`} 
                 alt="Logo" 
                 className="h-8 w-8 object-contain"
               />
