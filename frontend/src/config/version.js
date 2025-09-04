@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 8,      // Version mineure - nouvelles fonctionnalités
-  patch: 0,      // Version patch - corrections de bugs
+  patch: 1,      // Version patch - corrections de bugs
   buildDate: "2025-09-04", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.8.1",
+    date: "2025-09-04",
+    type: "PATCH",
+    description: "Correction format envoi PDF pour ajout pièce jointe - conversion blob vers base64"
+  },
+{
     version: "2.8.0",
     date: "2025-09-04",
     type: "MINOR",
