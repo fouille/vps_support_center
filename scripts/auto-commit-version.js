@@ -30,7 +30,7 @@ function getModifiedFiles() {
 }
 
 // Fonction principale
-function autoCommitVersion(description) {
+function autoCommitVersion(description, explicitVersionType = null) {
   if (!description) {
     console.log('❌ Veuillez fournir une description');
     console.log('Usage: node scripts/auto-commit-version.js "Description du changement"');
@@ -43,8 +43,8 @@ function autoCommitVersion(description) {
     return;
   }
 
-  // Incrémenter la version
-  const result = autoIncrement(description);
+  // Incrémenter la version avec le type explicite ou auto-détection
+  const result = autoIncrement(description, explicitVersionType);
   
   // Obtenir la liste des fichiers modifiés
   const modifiedFiles = getModifiedFiles();
