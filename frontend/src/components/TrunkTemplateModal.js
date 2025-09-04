@@ -8,7 +8,7 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
     pass: '',
     serveur_enregistrement: 'siprouter.atea-com.fr',
     port_register: '5060',
-    expiration: '60s → 120s',
+    expiration: '60 à 120 secondes',
     ip_publique: '',
     dtmf: 'RFC2833 a=rtpmap:101 telephone-event/8000',
     codec: 'alaw (PCMA, G.711a)',
