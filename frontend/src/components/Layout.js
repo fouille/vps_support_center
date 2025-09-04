@@ -22,6 +22,7 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [appName, setAppName] = useState('Support & Production');
+  const [logoBase64, setLogoBase64] = useState(null);
 
   // Récupérer le nom d'application basé sur la société de l'utilisateur
   useEffect(() => {
