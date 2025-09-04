@@ -138,6 +138,16 @@ const TrunkTemplateModal = ({ tache, onClose }) => {
     setShowConfirmDialog(true);
   };
 
+  const handleConfirmYes = () => {
+    setShowConfirmDialog(false);
+    onClose(); // Fermer le modal Template
+  };
+
+  const handleConfirmNo = () => {
+    setShowConfirmDialog(false);
+    // Rester sur le formulaire, ne pas vider les champs
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] overflow-hidden">
