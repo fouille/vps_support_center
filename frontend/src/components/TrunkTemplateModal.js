@@ -518,13 +518,22 @@ const TrunkTemplateModal = ({ tache, onClose, onRefresh }) => {
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={handleAttachYes}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    disabled={uploadingAttachment}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
-                    ✅ Oui, ajouter
+                    {uploadingAttachment ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Ajout en cours...
+                      </>
+                    ) : (
+                      '✅ Oui, ajouter'
+                    )}
                   </button>
                   <button
                     onClick={handleAttachNo}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    disabled={uploadingAttachment}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     ❌ Non, continuer
                   </button>
