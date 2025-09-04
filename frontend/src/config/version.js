@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 8,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  patch: 2,      // Version patch - corrections de bugs
   buildDate: "2025-09-04", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.8.2",
+    date: "2025-09-04",
+    type: "PATCH",
+    description: "Ajout rafraîchissement automatique tâche après ajout PDF en pièce jointe"
+  },
+{
     version: "2.8.1",
     date: "2025-09-04",
     type: "PATCH",
