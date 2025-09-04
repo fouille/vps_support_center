@@ -95,5 +95,6 @@ if (require.main === module) {
 
 module.exports = {
   determineVersionType,
-  autoIncrement
+  autoIncrement,
+  normalizeVersionType
 };
