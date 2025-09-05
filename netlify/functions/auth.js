@@ -28,7 +28,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email, password } = JSON.parse(event.body);
+    let { email, password } = JSON.parse(event.body);
 
     if (!email || !password) {
       return {
@@ -36,6 +36,14 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({ detail: 'Email et mot de passe requis' })
       };
+    }
+
+    // Décoder le mot de passe depuis base64
+    try {
+      password = atob(password);
+    } catch (error) {
+      console.log('Erreur décodage base64, utilisation mot de passe direct');
+      // Si le décodage échoue, utiliser le mot de passe tel quel (rétrocompatibilité)
     }
 
     // Check in demandeurs table first
@@ -48,7 +56,7 @@ exports.handler = async (event, context) => {
     // If not found in demandeurs, check in agents table
     if (user.length === 0) {
       user = await sql`
-        SELECT id, email, password, nom, prenom, societe, NULL as telephone, societe_id, 'agent' as type_utilisateur 
+        SELECT id, email, password, nom, prenom, societe, NULL as telephone, NULL as societe_id, 'agent' as type_utilisateur 
         FROM agents 
         WHERE email = ${email}
       `;
