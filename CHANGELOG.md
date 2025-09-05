@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.8.5] - 2025-09-05
+### Fixed
+- 🔧 Correction login agents - societe_id inexistant et encodage base64 mot de passe
+
 ## [2.8.4] - 2025-09-04
 ### Fixed
 - 🔧 Correction trigger productions - erreur updated_at inexistant

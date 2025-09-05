@@ -7,8 +7,8 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 8,      // Version mineure - nouvelles fonctionnalités
-  patch: 4,      // Version patch - corrections de bugs
-  buildDate: "2025-09-04", // Date de build automatique
+  patch: 5,      // Version patch - corrections de bugs
+  buildDate: "2025-09-05", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.8.5",
+    date: "2025-09-05",
+    type: "PATCH",
+    description: "Correction login agents - societe_id inexistant et encodage base64 mot de passe"
+  },
+{
     version: "2.8.4",
     date: "2025-09-04",
     type: "PATCH",
