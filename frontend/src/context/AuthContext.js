@@ -181,7 +181,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/api/auth', { email, password });
+      // Encoder le mot de passe en base64 avant l'envoi
+      const encodedPassword = btoa(password);
+      const response = await api.post('/api/auth', { email, password: encodedPassword });
       const { access_token, user: userData } = response.data;
       
       localStorage.setItem('token', access_token);
