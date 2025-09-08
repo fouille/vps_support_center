@@ -1,5 +1,18 @@
 // Service email utilisant Brevo avec la nouvelle API @getbrevo/brevo
-const { TransactionalEmailsApi, SendSmtpEmail } = require('@getbrevo/brevo');
+console.log('email-service.js: Starting to load...');
+
+let TransactionalEmailsApi, SendSmtpEmail;
+try {
+  const brevoImport = require('@getbrevo/brevo');
+  TransactionalEmailsApi = brevoImport.TransactionalEmailsApi;
+  SendSmtpEmail = brevoImport.SendSmtpEmail;
+  console.log('email-service.js: Brevo imports successful');
+} catch (error) {
+  console.error('email-service.js: Failed to import Brevo:', error);
+  // Fallback pour éviter que le module échoue complètement
+  TransactionalEmailsApi = null;
+  SendSmtpEmail = null;
+}
 
 let brevoClient = null;
 
