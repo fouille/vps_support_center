@@ -5,10 +5,11 @@
   "dependencies": {
     "@netlify/neon": "^0.1.0",
     "bcrypt": "^5.1.1",
+    "crypto": "^1.0.1",
     "jsonwebtoken": "^9.0.2",
     "node-mailjet": "^6.0.6",
-    "uuid": "^10.0.0",
+    "sib-api-v3-sdk": "^8.5.0",
     "uri-js": "^4.4.1",
-    "crypto": "^1.0.1"
+    "uuid": "^10.0.0"
   }
 }
