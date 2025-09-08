@@ -128,7 +128,7 @@ VoIP Services - Système de gestion des tickets`
               <strong>Auteur :</strong> ${author.prenom} ${author.nom} (${author.type_utilisateur})<br>
               <strong>Date :</strong> ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}<br><br>
               <strong>Commentaire :</strong><br>
-              ${comment.contenu.replace(/\n/g, '<br>')}
+              ${(comment.contenu || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
