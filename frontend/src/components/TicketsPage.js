@@ -1086,7 +1086,7 @@ const TicketsPage = () => {
 
             <div className="flex flex-col lg:flex-row gap-6 min-w-0">
               {/* Informations du ticket */}
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 space-y-6 min-w-0">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text mb-2">
                     {viewingTicket.titre}
