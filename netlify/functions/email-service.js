@@ -159,7 +159,8 @@ ${comment.contenu || ''}
 Titre du ticket : ${ticket.titre}
 
 VoIP Services - Système de gestion des tickets`
-  }),
+    };
+  },
 
   // Template pour le changement de statut
   statusChanged: (ticket, oldStatus, newStatus, author) => ({
