@@ -712,6 +712,112 @@ const emailService = {
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de la création d'une portabilité
+  sendPortabiliteCreationEmail: async (portabiliteDetail) => {
+    const template = createEmailTemplate.portabiliteCreated(
+      portabiliteDetail, 
+      { nom_societe: portabiliteDetail.nom_societe },
+      { 
+        prenom: portabiliteDetail.demandeur_prenom, 
+        nom: portabiliteDetail.demandeur_nom,
+        email: portabiliteDetail.demandeur_email 
+      }
+    );
+    
+    // Envoyer à contact@voipservices.fr et au demandeur
+    const recipients = [
+      { email: 'contact@voipservices.fr', name: 'Support VoIP Services' }
+    ];
+    
+    if (portabiliteDetail.demandeur_email) {
+      recipients.push({ 
+        email: portabiliteDetail.demandeur_email, 
+        name: `${portabiliteDetail.demandeur_prenom || ''} ${portabiliteDetail.demandeur_nom || ''}`.trim() 
+      });
+    }
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email pour changement de statut de portabilité
+  sendPortabiliteStatusChangeEmail: async (portabiliteDetail, oldStatus, newStatus) => {
+    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null);
+    
+    // Envoyer au demandeur si disponible
+    if (portabiliteDetail.demandeur_email) {
+      const recipient = { 
+        email: portabiliteDetail.demandeur_email, 
+        name: `${portabiliteDetail.demandeur_prenom || ''} ${portabiliteDetail.demandeur_nom || ''}`.trim() 
+      };
+      return await sendEmail(recipient, template.subject, template.html, template.text);
+    }
+    
+    return { success: false, error: 'No recipient email available' };
+  },
+
+  // Envoi d'email pour commentaire sur portabilité
+  sendPortabiliteCommentEmail: async (portabiliteInfo, commentDetail, userType) => {
+    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail);
+    
+    // Déterminer le destinataire selon le type d'utilisateur qui commente
+    let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
+    
+    if (portabiliteInfo.demandeur_email && userType === 'agent') {
+      // Si un agent commente, notifier le demandeur
+      recipients.push({ 
+        email: portabiliteInfo.demandeur_email, 
+        name: `${portabiliteInfo.demandeur_prenom || ''} ${portabiliteInfo.demandeur_nom || ''}`.trim() 
+      });
+    }
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email lors de la création d'une production
+  sendProductionCreationEmail: async (productionDetail) => {
+    const template = createEmailTemplate.productionCreated(
+      productionDetail, 
+      { nom_societe: productionDetail.nom_societe },
+      { 
+        prenom: productionDetail.demandeur_prenom, 
+        nom: productionDetail.demandeur_nom,
+        email: productionDetail.demandeur_email 
+      }
+    );
+    
+    // Envoyer à contact@voipservices.fr et au demandeur
+    const recipients = [
+      { email: 'contact@voipservices.fr', name: 'Support VoIP Services' }
+    ];
+    
+    if (productionDetail.demandeur_email) {
+      recipients.push({ 
+        email: productionDetail.demandeur_email, 
+        name: `${productionDetail.demandeur_prenom || ''} ${productionDetail.demandeur_nom || ''}`.trim() 
+      });
+    }
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
+  },
+
+  // Envoi d'email pour commentaire sur production
+  sendProductionCommentEmail: async (productionInfo, tache, comment, author) => {
+    const template = createEmailTemplate.productionCommentAdded(productionInfo, tache, comment, author);
+    
+    // Déterminer le destinataire selon le type d'utilisateur qui commente
+    let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
+    
+    if (productionInfo.demandeur_email && author.type_utilisateur === 'agent') {
+      // Si un agent commente, notifier le demandeur
+      recipients.push({ 
+        email: productionInfo.demandeur_email, 
+        name: `${productionInfo.demandeur_prenom || ''} ${productionInfo.demandeur_nom || ''}`.trim() 
+      });
+    }
+
+    return await sendEmail(recipients, template.subject, template.html, template.text);
   }
 };
 
