@@ -315,7 +315,19 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
       email: 'noreply@voipservices.fr'
     };
     
-    message.to = Array.isArray(to) ? to : [{ email: to }];
+    // Normaliser le format des destinataires
+    let recipients;
+    if (Array.isArray(to)) {
+      recipients = to;
+    } else if (typeof to === 'string') {
+      recipients = [{ email: to }];
+    } else if (typeof to === 'object' && to.email) {
+      recipients = [{ email: to.email, name: to.name }];
+    } else {
+      recipients = [{ email: to }];
+    }
+    
+    message.to = recipients;
     message.subject = subject;
     message.htmlContent = htmlContent;
     message.textContent = textContent;
@@ -328,6 +340,9 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
     return { success: true, data: result };
   } catch (error) {
     console.error('Error sending email:', error);
+    if (error.response && error.response.data) {
+      console.error('Brevo API error details:', error.response.data);
+    }
     return { success: false, error: error.message };
   }
 };
