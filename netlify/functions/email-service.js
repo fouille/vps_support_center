@@ -317,6 +317,282 @@ Titre : ${production.titre}
 Client : ${production.nom_societe || production.client_display || 'N/A'}
 
 VoIP Services - Système de production`
+  }),
+
+  // Template pour la création d'une portabilité
+  portabiliteCreated: (portabilite, client, demandeur) => ({
+    subject: `Nouvelle portabilité #${portabilite.numero_portabilite} - ${portabilite.numeros_portes}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .portabilite-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nouvelle portabilité</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour,</p>
+            <p>Une nouvelle portabilité a été créée :</p>
+            <div class="portabilite-info">
+              <strong>Numéro :</strong> #${portabilite.numero_portabilite}<br>
+              <strong>Numéros portés :</strong> ${portabilite.numeros_portes}<br>
+              <strong>Client :</strong> ${client?.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}<br>
+              <strong>Demandeur :</strong> ${demandeur?.prenom || ''} ${demandeur?.nom || 'N/A'}<br>
+              <strong>Email client :</strong> ${portabilite.email_client || 'N/A'}<br>
+              <strong>Statut :</strong> ${portabilite.status}<br>
+              <strong>Date demandée :</strong> ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
+            </div>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de portabilité</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouvelle portabilité
+
+Numéro : #${portabilite.numero_portabilite}
+Numéros portés : ${portabilite.numeros_portes}
+Client : ${client?.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}
+Demandeur : ${demandeur?.prenom || ''} ${demandeur?.nom || 'N/A'}
+Email client : ${portabilite.email_client || 'N/A'}
+Statut : ${portabilite.status}
+Date demandée : ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
+
+VoIP Services - Système de portabilité`
+  }),
+
+  // Template pour changement de statut de portabilité
+  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author) => ({
+    subject: `Portabilité #${portabilite.numero_portabilite} - Statut modifié`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
+          .old-status { color: #dc2626; }
+          .new-status { color: #16a34a; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Portabilité - Statut modifié</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour,</p>
+            <p>Le statut de la portabilité #${portabilite.numero_portabilite} a été modifié :</p>
+            <div class="status-change">
+              <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
+              <small>Par ${author?.prenom || ''} ${author?.nom || 'Système'}</small>
+            </div>
+            <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
+            <p><strong>Client :</strong> ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}</p>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de portabilité</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Portabilité #${portabilite.numero_portabilite} - Statut modifié
+
+Ancien statut : ${oldStatus}
+Nouveau statut : ${newStatus}
+Par : ${author?.prenom || ''} ${author?.nom || 'Système'}
+
+Numéros portés : ${portabilite.numeros_portes}
+Client : ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}
+
+VoIP Services - Système de portabilité`
+  }),
+
+  // Template pour commentaire sur portabilité
+  portabiliteCommentAdded: (portabilite, comment, author) => ({
+    subject: `Commentaire ajouté - Portabilité #${portabilite.numero_portabilite}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #7c3aed; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nouveau commentaire</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour,</p>
+            <p>Un nouveau commentaire a été ajouté à la portabilité #${portabilite.numero_portabilite} :</p>
+            <div class="comment">
+              <strong>Auteur :</strong> ${author?.auteur_nom || (author?.prenom + ' ' + author?.nom) || 'Utilisateur inconnu'}<br>
+              <strong>Date :</strong> ${new Date(comment.created_at).toLocaleDateString('fr-FR')}<br><br>
+              <strong>Commentaire :</strong><br>
+              ${(comment.message || '').replace(/\n/g, '<br>')}
+            </div>
+            <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de portabilité</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}
+
+Auteur : ${author?.auteur_nom || (author?.prenom + ' ' + author?.nom) || 'Utilisateur inconnu'}
+Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
+
+Commentaire :
+${comment.message || ''}
+
+Numéros portés : ${portabilite.numeros_portes}
+
+VoIP Services - Système de portabilité`
+  }),
+
+  // Template pour la création d'une production
+  productionCreated: (production, client, demandeur) => ({
+    subject: `Nouvelle production #${production.numero_production} - ${production.titre}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #16a34a; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .production-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nouvelle production</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour,</p>
+            <p>Une nouvelle production a été créée :</p>
+            <div class="production-info">
+              <strong>Numéro :</strong> #${production.numero_production}<br>
+              <strong>Titre :</strong> ${production.titre}<br>
+              <strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}<br>
+              <strong>Demandeur :</strong> ${production.demandeur_prenom || ''} ${production.demandeur_nom || 'N/A'}<br>
+              <strong>Priorité :</strong> ${production.priorite}<br>
+              <strong>Statut :</strong> ${production.status}<br>
+              <strong>Date de création :</strong> ${new Date(production.date_creation).toLocaleDateString('fr-FR')}
+            </div>
+            ${production.description ? `<p><strong>Description :</strong><br>${production.description}</p>` : ''}
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de production</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouvelle production
+
+Numéro : #${production.numero_production}
+Titre : ${production.titre}
+Client : ${production.nom_societe || production.client_display || 'N/A'}
+Demandeur : ${production.demandeur_prenom || ''} ${production.demandeur_nom || 'N/A'}
+Priorité : ${production.priorite}
+Statut : ${production.status}
+Date de création : ${new Date(production.date_creation).toLocaleDateString('fr-FR')}
+
+${production.description ? `Description : ${production.description}` : ''}
+
+VoIP Services - Système de production`
+  }),
+
+  // Template pour commentaire sur production
+  productionCommentAdded: (production, tache, comment, author) => ({
+    subject: `Commentaire ajouté - Production #${production.numero_production} - ${tache?.nom_tache || 'Tâche'}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #16a34a; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #16a34a; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nouveau commentaire</h1>
+          </div>
+          <div class="content">
+            <p>Bonjour,</p>
+            <p>Un nouveau commentaire a été ajouté à la production #${production.numero_production} :</p>
+            <div class="comment">
+              <strong>Auteur :</strong> ${author?.prenom || ''} ${author?.nom || 'Utilisateur inconnu'} (${author?.type_utilisateur || 'inconnu'})<br>
+              <strong>Tâche :</strong> ${tache?.nom_tache || 'N/A'}<br>
+              <strong>Date :</strong> ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}<br><br>
+              <strong>Commentaire :</strong><br>
+              ${(comment.contenu || '').replace(/\n/g, '<br>')}
+            </div>
+            <p><strong>Titre de production :</strong> ${production.titre}</p>
+            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
+          </div>
+          <div class="footer">
+            <p>VoIP Services - Système de production</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+    text: `Nouveau commentaire sur la production #${production.numero_production}
+
+Auteur : ${author?.prenom || ''} ${author?.nom || 'Utilisateur inconnu'} (${author?.type_utilisateur || 'inconnu'})
+Tâche : ${tache?.nom_tache || 'N/A'}
+Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
+
+Commentaire :
+${comment.contenu || ''}
+
+Titre de production : ${production.titre}
+Client : ${production.nom_societe || production.client_display || 'N/A'}
+
+VoIP Services - Système de production`
   })
 };
 
