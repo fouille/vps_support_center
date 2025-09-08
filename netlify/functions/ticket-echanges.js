@@ -7,9 +7,13 @@ const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
 // Import conditionnel du service email
 const loadEmailService = () => {
   try {
-    return require('./email-service');
+    console.log('Loading email service...');
+    const service = require('./email-service');
+    console.log('Email service loaded successfully, functions available:', Object.keys(service));
+    return service;
   } catch (error) {
     console.error('Failed to load email service:', error);
+    console.error('Error stack:', error.stack);
     return null;
   }
 };
