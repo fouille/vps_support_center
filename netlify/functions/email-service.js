@@ -1,20 +1,17 @@
-// Service email utilisant Brevo (ex-SendInBlue)
-let SibApiV3Sdk = null;
+// Service email utilisant Brevo avec la nouvelle API @getbrevo/brevo
+const { TransactionalEmailsApi, SendSmtpEmail } = require('@getbrevo/brevo');
+
 let brevoClient = null;
 
 const initializeBrevo = () => {
   if (brevoClient) return brevoClient;
   
   try {
-    SibApiV3Sdk = require('sib-api-v3-sdk');
-    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    // Créer l'instance API
+    brevoClient = new TransactionalEmailsApi();
     
     // Configuration de l'API key
-    const apiKey = defaultClient.authentications['api-key'];
-    apiKey.apiKey = process.env.BREVO_API_KEY;
-    
-    // Créer l'instance API
-    brevoClient = new SibApiV3Sdk.TransactionalEmailsApi();
+    brevoClient.authentications.apiKey.apiKey = process.env.BREVO_API_KEY;
     
     return brevoClient;
   } catch (error) {
@@ -310,20 +307,23 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
       return { success: false, error: 'Brevo API key not configured' };
     }
 
-    // Créer l'objet email selon l'API Brevo
-    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    // Créer l'objet email selon la nouvelle API Brevo
+    const message = new SendSmtpEmail();
     
-    sendSmtpEmail.sender = {
+    message.sender = {
       name: 'VoIP Services - Support',
       email: 'noreply@voipservices.fr'
     };
     
-    sendSmtpEmail.to = Array.isArray(to) ? to : [{ email: to }];
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.htmlContent = htmlContent;
-    sendSmtpEmail.textContent = textContent;
+    message.to = Array.isArray(to) ? to : [{ email: to }];
+    message.subject = subject;
+    message.htmlContent = htmlContent;
+    message.textContent = textContent;
 
-    const result = await brevoClient.sendTransacEmail(sendSmtpEmail);
+    console.log('Sending email via Brevo to:', message.to);
+    console.log('Subject:', subject);
+
+    const result = await brevoClient.sendTransacEmail(message);
     console.log('Email sent successfully:', result);
     return { success: true, data: result };
   } catch (error) {
