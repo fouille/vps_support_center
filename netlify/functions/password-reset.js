@@ -42,91 +42,29 @@ const generateSecurePassword = () => {
   return password.split('').sort(() => 0.5 - Math.random()).join('');
 };
 
-// Fonction pour envoyer l'email avec Mailjet
-const sendPasswordResetEmail = async (email, newPassword, userName) => {
+// Fonction pour envoyer l'email avec Brevo
+const sendPasswordResetEmail = async (user, newPassword) => {
   try {
-    const mailjetApiKey = process.env.MJ_APIKEY_PUBLIC;
-    const mailjetSecretKey = process.env.MJ_APIKEY_PRIVATE;
+    const emailService = loadEmailService();
     
-    console.log('Mailjet config check:');
-    console.log('API Key length:', mailjetApiKey ? mailjetApiKey.length : 0);
-    console.log('Secret Key length:', mailjetSecretKey ? mailjetSecretKey.length : 0);
-    
-    if (!mailjetApiKey || !mailjetSecretKey) {
-      console.log('Mailjet non configuré - Variables manquantes');
-      console.log('MJ_APIKEY_PUBLIC:', mailjetApiKey ? 'définie' : 'manquante');
-      console.log('MJ_APIKEY_PRIVATE:', mailjetSecretKey ? 'définie' : 'manquante');
+    if (!emailService) {
+      console.log('Service email non disponible - Email ne sera pas envoyé');
       return false;
     }
 
-    const mailjetUrl = 'https://api.mailjet.com/v3.1/send';
-    const auth = Buffer.from(`${mailjetApiKey}:${mailjetSecretKey}`).toString('base64');
+    if (!process.env.BREVO_API_KEY) {
+      console.log('Brevo API key non configurée - Email ne sera pas envoyé');
+      return false;
+    }
 
-    const emailData = {
-      Messages: [{
-        From: {
-          Email: "noreply@voipservices.fr",
-          Name: "Support VoIP Services"
-        },
-        To: [{
-          Email: email,
-          Name: userName
-        }],
-        Subject: "Réinitialisation de votre mot de passe",
-        HTMLPart: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background-color: #4F46E5; color: white; padding: 20px; text-align: center;">
-              <h1>Réinitialisation de mot de passe</h1>
-            </div>
-            <div style="padding: 20px; background-color: #f8f9fa;">
-              <p>Bonjour ${userName},</p>
-              <p>Votre mot de passe a été réinitialisé avec succès.</p>
-              <div style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0;">
-                <p><strong>Votre nouveau mot de passe :</strong></p>
-                <p style="font-family: monospace; font-size: 18px; background-color: white; padding: 10px; border-radius: 4px; word-break: break-all;">
-                  ${newPassword}
-                </p>
-              </div>
-              <p style="color: #d32f2f; font-weight: bold;">⚠️ Important :</p>
-              <ul style="color: #666;">
-                <li>Nous vous recommandons de changer ce mot de passe après votre première connexion</li>
-                <li>Ne partagez jamais vos identifiants de connexion</li>
-                <li>Si vous n'avez pas demandé cette réinitialisation, contactez-nous immédiatement</li>
-              </ul>
-              <div style="margin-top: 30px; text-align: center;">
-                <a href="#" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">
-                  Se connecter
-                </a>
-              </div>
-            </div>
-            <div style="padding: 20px; text-align: center; color: #666; font-size: 12px; background-color: #f1f1f1;">
-              <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
-              <p>© ${new Date().getFullYear()} Support VoIP Services. Tous droits réservés.</p>
-            </div>
-          </div>
-        `
-      }]
-    };
-
-    const response = await fetch(mailjetUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(emailData)
-    });
-
-    console.log('Mailjet response status:', response.status);
-    console.log('Mailjet response headers:', Object.fromEntries(response.headers.entries()));
-
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log('Email de réinitialisation envoyé avec succès:', responseData);
+    // Utiliser le service Brevo pour envoyer l'email
+    const result = await emailService.sendPasswordResetEmail(user, newPassword);
+    
+    if (result.success) {
+      console.log('Email de réinitialisation envoyé avec succès via Brevo');
       return true;
     } else {
-      const errorData = await response.text();
-      console.error('Erreur envoi email Mailjet:', response.status, errorData);
+      console.error('Erreur envoi email Brevo:', result.error);
       return false;
     }
 
