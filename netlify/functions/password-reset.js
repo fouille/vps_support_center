@@ -237,8 +237,7 @@ exports.handler = async (event, context) => {
     console.log('Mot de passe mis à jour pour:', user.email);
 
     // Envoyer l'email avec le nouveau mot de passe
-    const userName = `${user.prenom} ${user.nom}`;
-    const emailSent = await sendPasswordResetEmail(user.email, newPassword, userName);
+    const emailSent = await sendPasswordResetEmail(user, newPassword);
 
     if (!emailSent) {
       console.log('Email non envoyé mais mot de passe réinitialisé pour:', user.email);
