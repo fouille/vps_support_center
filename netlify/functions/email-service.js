@@ -618,14 +618,6 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
       return { success: false, error: 'Brevo API key not configured' };
     }
 
-    // Créer l'objet email selon la nouvelle API Brevo
-    const message = new SendSmtpEmail();
-    
-    message.sender = {
-      name: 'VoIP Services - Support',
-      email: 'noreply@voipservices.fr'
-    };
-    
     // Normaliser le format des destinataires
     let recipients;
     if (Array.isArray(to)) {
@@ -637,11 +629,18 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
     } else {
       recipients = [{ email: to }];
     }
-    
-    message.to = recipients;
-    message.subject = subject;
-    message.htmlContent = htmlContent;
-    message.textContent = textContent;
+
+    // Créer l'objet email selon la nouvelle API Brevo (format objet simple)
+    const emailData = {
+      sender: {
+        name: 'VoIP Services - Support',
+        email: 'noreply@voipservices.fr'
+      },
+      to: recipients,
+      subject: subject,
+      htmlContent: htmlContent,
+      textContent: textContent
+    };
 
     console.log('Sending email via Brevo to:', message.to);
     console.log('Subject:', subject);
