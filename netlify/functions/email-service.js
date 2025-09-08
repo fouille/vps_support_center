@@ -145,7 +145,7 @@ Auteur : ${author.prenom} ${author.nom} (${author.type_utilisateur})
 Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
 
 Commentaire :
-${comment.contenu}
+${comment.contenu || ''}
 
 Titre du ticket : ${ticket.titre}
 
