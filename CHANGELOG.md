@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.9.3] - 2025-09-08
+### Fixed
+- 🔧 Correction format destinataires email Brevo - erreur invalid_parameter
+
 ## [2.9.2] - 2025-09-08
 ### Fixed
 - 🔧 Correction export email-service et migration password-reset vers Brevo
