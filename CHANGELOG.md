@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.9.1] - 2025-09-08
+### Fixed
+- 🔧 Correction variable fileId et migration Brevo vers nouvelle API @getbrevo/brevo
+
 ## [2.9.0] - 2025-09-08
 ### Added
 - ✨ Correction téléchargement fichiers tickets et migration vers Brevo

@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 9,      // Version mineure - nouvelles fonctionnalités
-  patch: 0,      // Version patch - corrections de bugs
+  patch: 1,      // Version patch - corrections de bugs
   buildDate: "2025-09-08", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.9.1",
+    date: "2025-09-08",
+    type: "PATCH",
+    description: "Correction variable fileId et migration Brevo vers nouvelle API @getbrevo/brevo"
+  },
+{
     version: "2.9.0",
     date: "2025-09-08",
     type: "MINOR",
