@@ -312,6 +312,11 @@ VoIP Services - Système de production`
 // Fonction principale pour envoyer un email avec Brevo
 const sendEmail = async (to, subject, htmlContent, textContent) => {
   try {
+    if (!SendSmtpEmail) {
+      console.error('SendSmtpEmail class not available');
+      return { success: false, error: 'Brevo not properly loaded' };
+    }
+
     const brevoClient = initializeBrevo();
     
     if (!brevoClient) {
