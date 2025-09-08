@@ -1,40 +1,24 @@
-// Import conditionnel de mailjet seulement quand nécessaire
-let mj = null;
+// Service email utilisant Brevo (ex-SendInBlue)
+let SibApiV3Sdk = null;
+let brevoClient = null;
 
-const initializeMailjet = () => {
-  if (mj) return mj;
+const initializeBrevo = () => {
+  if (brevoClient) return brevoClient;
   
   try {
-    const mailjet = require('node-mailjet');
+    SibApiV3Sdk = require('sib-api-v3-sdk');
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
     
-    // Pour la version 6.x de node-mailjet, utiliser mailjet.Client.apiConnect
-    if (mailjet.Client && typeof mailjet.Client.apiConnect === 'function') {
-      mj = mailjet.Client.apiConnect(
-        process.env.MJ_APIKEY_PUBLIC,
-        process.env.MJ_APIKEY_PRIVATE
-      );
-    } else if (typeof mailjet.apiConnect === 'function') {
-      mj = mailjet.apiConnect(
-        process.env.MJ_APIKEY_PUBLIC,
-        process.env.MJ_APIKEY_PRIVATE
-      );
-    } else if (typeof mailjet.connect === 'function') {
-      // Fallback pour anciennes versions
-      mj = mailjet.connect(
-        process.env.MJ_APIKEY_PUBLIC,
-        process.env.MJ_APIKEY_PRIVATE
-      );
-    } else {
-      // Si c'est une fonction directe (nouvelle API)
-      mj = mailjet(
-        process.env.MJ_APIKEY_PUBLIC,
-        process.env.MJ_APIKEY_PRIVATE
-      );
-    }
+    // Configuration de l'API key
+    const apiKey = defaultClient.authentications['api-key'];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
     
-    return mj;
+    // Créer l'instance API
+    brevoClient = new SibApiV3Sdk.TransactionalEmailsApi();
+    
+    return brevoClient;
   } catch (error) {
-    console.error('Failed to initialize Mailjet:', error);
+    console.error('Failed to initialize Brevo:', error);
     return null;
   }
 };
