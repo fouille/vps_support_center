@@ -482,25 +482,30 @@ const TicketsPage = () => {
     }
   };
 
-  const downloadFile = (file) => {
+  const downloadFile = async (file) => {
     try {
-      const byteCharacters = atob(file.contenu_base64);
+      // Récupérer le fichier complet avec son contenu
+      const response = await api.get(`/api/ticket-fichiers?ticketId=${selectedTicket.id}&fileId=${file.id}`);
+      const fileData = response.data;
+      
+      const byteCharacters = atob(fileData.contenu_base64);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: file.type_fichier });
+      const blob = new Blob([byteArray], { type: fileData.type_fichier });
       
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = file.nom_fichier;
+      link.download = fileData.nom_fichier;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
+      console.error('Download error:', error);
       setError('Erreur lors du téléchargement du fichier');
     }
   };
