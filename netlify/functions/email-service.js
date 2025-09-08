@@ -136,9 +136,9 @@ VoIP Services - Système de gestion des tickets`
             <p>Un nouveau commentaire a été ajouté au ticket #${ticket.numero_ticket} :</p>
             <div class="comment">
               <strong>Auteur :</strong> ${author.prenom} ${author.nom} (${author.type_utilisateur})<br>
-              <strong>Date :</strong> ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}<br><br>
+              <strong>Date :</strong> ${new Date(comment.created_at).toLocaleDateString('fr-FR')}<br><br>
               <strong>Commentaire :</strong><br>
-              ${(comment.contenu || '').replace(/\n/g, '<br>')}
+              ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
