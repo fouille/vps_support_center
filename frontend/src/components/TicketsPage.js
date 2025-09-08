@@ -1071,7 +1071,7 @@ const TicketsPage = () => {
       {/* Modal de visualisation */}
       {showViewModal && viewingTicket && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-overlay">
-          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-4xl modal-content max-h-90vh overflow-y-auto">
+          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 w-full max-w-4xl modal-content max-h-90vh overflow-y-auto overflow-x-hidden">
             <div className="flex justify-between items-start mb-6">
               <h2 className="text-xl font-bold text-gray-900 dark:text-dark-text">
                 Détail du Ticket
@@ -1084,7 +1084,7 @@ const TicketsPage = () => {
               </button>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex flex-col lg:flex-row gap-6 min-w-0">
               {/* Informations du ticket */}
               <div className="flex-1 space-y-6">
                 <div>
