@@ -36,54 +36,56 @@ const createEmailTemplate = {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .ticket-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea; }
-          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-          .status-nouveau { background: #e3f2fd; color: #1565c0; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-          .btn { background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 10px 0; }
+          .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .ticket-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎫 Nouveau Ticket Créé</h1>
-            <p>Un nouveau ticket de support a été créé</p>
+            <h1>Nouveau ticket de support</h1>
           </div>
           <div class="content">
+            <p>Bonjour,</p>
+            <p>Un nouveau ticket de support a été créé :</p>
             <div class="ticket-info">
-              <h2>Ticket #${ticket.numero_ticket}</h2>
-              <h3>${ticket.titre}</h3>
-              <p><strong>Client:</strong> ${client.nom_societe}</p>
-              <p><strong>Demandeur:</strong> ${demandeur.prenom} ${demandeur.nom} (${demandeur.email})</p>
-              <p><strong>Statut:</strong> <span class="status-badge status-nouveau">Nouveau</span></p>
-              <p><strong>Date de création:</strong> ${new Date(ticket.date_creation).toLocaleDateString('fr-FR', { 
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}</p>
-              ${ticket.date_fin_prevue ? `<p><strong>Échéance:</strong> ${new Date(ticket.date_fin_prevue).toLocaleDateString('fr-FR')}</p>` : ''}
+              <strong>Numéro :</strong> #${ticket.numero_ticket}<br>
+              <strong>Titre :</strong> ${ticket.titre}<br>
+              <strong>Client :</strong> ${client.nom_societe || client.nom}<br>
+              <strong>Demandeur :</strong> ${demandeur.prenom} ${demandeur.nom}<br>
+              <strong>Email :</strong> ${demandeur.email}<br>
+              <strong>Statut :</strong> ${ticket.status}<br>
+              <strong>Date :</strong> ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
             </div>
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h4>Requête initiale:</h4>
-              <p style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 3px solid #28a745;">
-                ${ticket.requete_initiale}
-              </p>
-            </div>
+            ${ticket.description ? `<p><strong>Description :</strong><br>${ticket.description}</p>` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
-            <p>Cet email a été envoyé automatiquement.</p>
           </div>
         </div>
       </body>
       </html>
     `,
-    text: `Nouveau ticket #${ticket.numero_ticket} créé\n\nTitre: ${ticket.titre}\nClient: ${client.nom_societe}\nDemandeur: ${demandeur.prenom} ${demandeur.nom}\nRequête: ${ticket.requete_initiale}`
+    text: `Nouveau ticket de support
+
+Numéro : #${ticket.numero_ticket}
+Titre : ${ticket.titre}
+Client : ${client.nom_societe || client.nom}
+Demandeur : ${demandeur.prenom} ${demandeur.nom}
+Email : ${demandeur.email}
+Statut : ${ticket.status}
+Date : ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
+
+${ticket.description ? `Description : ${ticket.description}` : ''}
+
+VoIP Services - Système de gestion des tickets`
   }),
 
-  // Template pour les commentaires
-  commentAdded: (ticket, comment, author, recipient) => ({
-    subject: `Nouveau commentaire sur le ticket #${ticket.numero_ticket}`,
+  // Template pour l'ajout d'un commentaire
+  commentAdded: (ticket, comment, author, recipientEmail) => ({
+    subject: `Commentaire ajouté - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -92,136 +94,51 @@ const createEmailTemplate = {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .comment-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745; }
-          .author-info { display: flex; align-items: center; margin-bottom: 15px; }
-          .avatar { width: 40px; height: 40px; border-radius: 50%; background: #667eea; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #2563eb; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>💬 Nouveau Commentaire</h1>
-            <p>Un commentaire a été ajouté au ticket #${ticket.numero_ticket}</p>
+            <h1>Nouveau commentaire</h1>
           </div>
           <div class="content">
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3>Ticket: ${ticket.titre}</h3>
-              <p><strong>Client:</strong> ${ticket.client_nom}</p>
+            <p>Bonjour,</p>
+            <p>Un nouveau commentaire a été ajouté au ticket #${ticket.numero_ticket} :</p>
+            <div class="comment">
+              <strong>Auteur :</strong> ${author.prenom} ${author.nom} (${author.type_utilisateur})<br>
+              <strong>Date :</strong> ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}<br><br>
+              <strong>Commentaire :</strong><br>
+              ${comment.contenu.replace(/\n/g, '<br>')}
             </div>
-            <div class="comment-box">
-              <div class="author-info">
-                <div class="avatar">${author.prenom ? author.prenom[0] : 'A'}${author.nom ? author.nom[0] : 'G'}</div>
-                <div>
-                  <strong>${author.prenom} ${author.nom}</strong>
-                  <div style="font-size: 12px; color: #666;">
-                    ${new Date(comment.created_at).toLocaleDateString('fr-FR', { 
-                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}
-                  </div>
-                </div>
-              </div>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                ${comment.message}
-              </div>
-            </div>
+            <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
-            <p>Pour répondre, connectez-vous au système de gestion des tickets.</p>
           </div>
         </div>
       </body>
       </html>
     `,
-    text: `Nouveau commentaire sur le ticket #${ticket.numero_ticket}\n\nDe: ${author.prenom} ${author.nom}\nMessage: ${comment.message}`
+    text: `Nouveau commentaire sur le ticket #${ticket.numero_ticket}
+
+Auteur : ${author.prenom} ${author.nom} (${author.type_utilisateur})
+Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
+
+Commentaire :
+${comment.contenu}
+
+Titre du ticket : ${ticket.titre}
+
+VoIP Services - Système de gestion des tickets`
   }),
 
-  // Template pour les changements de statut
-  statusChanged: (ticket, oldStatus, newStatus, client, demandeur) => {
-    const statusLabels = {
-      'nouveau': 'Nouveau',
-      'en_cours': 'En cours',
-      'en_attente': 'En attente',
-      'repondu': 'Répondu',
-      'resolu': 'Résolu',
-      'ferme': 'Fermé'
-    };
-
-    const statusColors = {
-      'nouveau': '#17a2b8',
-      'en_cours': '#ffc107',
-      'en_attente': '#fd7e14',
-      'repondu': '#28a745',
-      'resolu': '#20c997',
-      'ferme': '#6c757d'
-    };
-
-    return {
-      subject: `Statut du ticket #${ticket.numero_ticket} mis à jour: ${statusLabels[newStatus]}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-            .status-change { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-            .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; color: white; margin: 0 10px; }
-            .arrow { font-size: 24px; margin: 0 15px; color: #666; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🔄 Statut Mis à Jour</h1>
-              <p>Le statut de votre ticket a été modifié</p>
-            </div>
-            <div class="content">
-              <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3>Ticket #${ticket.numero_ticket}</h3>
-                <h4>${ticket.titre}</h4>
-                <p><strong>Client:</strong> ${client.nom_societe}</p>
-              </div>
-              <div class="status-change">
-                <h3>Changement de statut</h3>
-                <div style="margin: 30px 0;">
-                  <span class="status-badge" style="background-color: ${statusColors[oldStatus] || '#6c757d'};">
-                    ${statusLabels[oldStatus] || oldStatus}
-                  </span>
-                  <span class="arrow">➡️</span>
-                  <span class="status-badge" style="background-color: ${statusColors[newStatus] || '#6c757d'};">
-                    ${statusLabels[newStatus] || newStatus}
-                  </span>
-                </div>
-                <p style="color: #666; font-style: italic;">
-                  Mis à jour le ${new Date().toLocaleDateString('fr-FR', { 
-                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                  })}
-                </p>
-              </div>
-            </div>
-            <div class="footer">
-              <p>VoIP Services - Système de gestion des tickets</p>
-              <p>Pour plus de détails, connectez-vous au système de gestion des tickets.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `Le statut du ticket #${ticket.numero_ticket} a été mis à jour de "${statusLabels[oldStatus]}" vers "${statusLabels[newStatus]}"\n\nTitre: ${ticket.titre}\nClient: ${client.nom_societe}`
-    };
-  },
-
-  // Template pour la création d'une portabilité
-  portabiliteCreated: (portabilite) => ({
-    subject: `Nouvelle demande de portabilité #${portabilite.numero_portabilite}`,
+  // Template pour le changement de statut
+  statusChanged: (ticket, oldStatus, newStatus, author) => ({
+    subject: `Statut modifié - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -230,55 +147,49 @@ const createEmailTemplate = {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #8e44ad 0%, #3498db 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .portabilite-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #8e44ad; }
-          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-          .status-nouveau { background: #e3f2fd; color: #1565c0; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
+          .old-status { color: #dc2626; }
+          .new-status { color: #16a34a; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>📞 Nouvelle Demande de Portabilité</h1>
-            <p>Une nouvelle demande de portabilité a été créée</p>
+            <h1>Statut modifié</h1>
           </div>
           <div class="content">
-            <div class="portabilite-info">
-              <h2>Portabilité #${portabilite.numero_portabilite}</h2>
-              <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
-              <p><strong>Demandeur:</strong> ${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}</p>
-              <p><strong>Statut:</strong> <span class="status-badge status-nouveau">Nouveau</span></p>
-              <p><strong>Date de création:</strong> ${new Date(portabilite.date_creation).toLocaleDateString('fr-FR', { 
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}</p>
-              ${portabilite.date_portabilite_demandee ? `<p><strong>Date souhaitée:</strong> ${new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR')}</p>` : ''}
+            <p>Bonjour,</p>
+            <p>Le statut du ticket #${ticket.numero_ticket} a été modifié :</p>
+            <div class="status-change">
+              <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
+              <small>Par ${author.prenom} ${author.nom}</small>
             </div>
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h4>Numéros à porter:</h4>
-              <p style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 3px solid #8e44ad;">
-                ${portabilite.numeros_portes}
-              </p>
-              ${portabilite.adresse ? `<p><strong>Adresse:</strong> ${portabilite.adresse}, ${portabilite.code_postal} ${portabilite.ville}</p>` : ''}
-              ${portabilite.nom_client ? `<p><strong>Contact client:</strong> ${portabilite.nom_client} ${portabilite.prenom_client}</p>` : ''}
-              ${portabilite.email_client ? `<p><strong>Email client:</strong> ${portabilite.email_client}</p>` : ''}
-            </div>
+            <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
           <div class="footer">
-            <p>VoIP Services - Système de gestion des portabilités</p>
-            <p>Cet email a été envoyé automatiquement.</p>
+            <p>VoIP Services - Système de gestion des tickets</p>
           </div>
         </div>
       </body>
       </html>
     `,
-    text: `Nouvelle demande de portabilité #${portabilite.numero_portabilite}\n\nClient: ${portabilite.nom_societe}\nDemandeur: ${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}\nNuméros: ${portabilite.numeros_portes}`
+    text: `Le statut du ticket #${ticket.numero_ticket} a été modifié
+
+Ancien statut : ${oldStatus}
+Nouveau statut : ${newStatus}
+Par : ${author.prenom} ${author.nom}
+
+Titre du ticket : ${ticket.titre}
+
+VoIP Services - Système de gestion des tickets`
   }),
 
-  // Template pour les commentaires sur portabilité
-  portabiliteCommentAdded: (portabilite, comment, authorType) => ({
-    subject: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}`,
+  // Template pour réinitialisation de mot de passe
+  passwordReset: (user, newPassword) => ({
+    subject: 'Réinitialisation de votre mot de passe',
     html: `
       <!DOCTYPE html>
       <html>
@@ -287,226 +198,50 @@ const createEmailTemplate = {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #16a085 0%, #27ae60 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .comment-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #16a085; }
-          .author-info { display: flex; align-items: center; margin-bottom: 15px; }
-          .avatar { width: 40px; height: 40px; border-radius: 50%; background: #8e44ad; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .header { background-color: #2563eb; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .password { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; font-family: monospace; font-size: 18px; font-weight: bold; }
+          .warning { background-color: #fef3c7; border: 1px solid #f59e0b; padding: 10px; border-radius: 5px; margin: 10px 0; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>💬 Nouveau Commentaire</h1>
-            <p>Un commentaire a été ajouté à la portabilité #${portabilite.numero_portabilite}</p>
+            <h1>Nouveau mot de passe</h1>
           </div>
           <div class="content">
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3>Portabilité #${portabilite.numero_portabilite}</h3>
-              <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
+            <p>Bonjour ${user.prenom} ${user.nom},</p>
+            <p>Votre mot de passe a été réinitialisé. Voici votre nouveau mot de passe :</p>
+            <div class="password">${newPassword}</div>
+            <div class="warning">
+              ⚠️ Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe lors de votre prochaine connexion.
             </div>
-            <div class="comment-box">
-              <div class="author-info">
-                <div class="avatar">${comment.auteur_nom ? comment.auteur_nom.split(' ').map(n => n[0]).join('') : 'A'}</div>
-                <div>
-                  <strong>${comment.auteur_nom}</strong>
-                  <div style="font-size: 12px; color: #666;">
-                    ${new Date(comment.created_at).toLocaleDateString('fr-FR', { 
-                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}
-                  </div>
-                </div>
-              </div>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                ${comment.message}
-              </div>
-            </div>
+            <p>Vous pouvez vous connecter avec ce nouveau mot de passe sur votre espace client.</p>
           </div>
           <div class="footer">
-            <p>VoIP Services - Système de gestion des portabilités</p>
-            <p>Pour répondre, connectez-vous au système de gestion des portabilités.</p>
+            <p>VoIP Services - Système de gestion des tickets</p>
           </div>
         </div>
       </body>
       </html>
     `,
-    text: `Nouveau commentaire sur la portabilité #${portabilite.numero_portabilite}\n\nDe: ${comment.auteur_nom}\nMessage: ${comment.message}`
-  }),
+    text: `Réinitialisation de votre mot de passe
 
-  // Template pour la création d'une production
-  productionCreated: (production) => ({
-    subject: `Nouvelle demande de production #${production.numero_production} - ${production.titre}`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .production-info { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #e74c3c; }
-          .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-          .status-en-attente { background: #fff3cd; color: #856404; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🏭 Nouvelle Demande de Production</h1>
-            <p>Une nouvelle demande de production a été créée</p>
-          </div>
-          <div class="content">
-            <div class="production-info">
-              <h2>Production #${production.numero_production}</h2>
-              <p><strong>Titre:</strong> ${production.titre}</p>
-              <p><strong>Client:</strong> ${production.nom_societe}</p>
-              <p><strong>Demandeur:</strong> ${production.demandeur_prenom} ${production.demandeur_nom}</p>
-              <p><strong>Société:</strong> ${production.societe_nom}</p>
-              <p><strong>Statut:</strong> <span class="status-badge status-en-attente">En attente</span></p>
-              <p><strong>Priorité:</strong> ${production.priorite}</p>
-              <p><strong>Date de création:</strong> ${new Date(production.date_creation).toLocaleDateString('fr-FR', { 
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}</p>
-              ${production.date_livraison_prevue ? `<p><strong>Date de livraison prévue:</strong> ${new Date(production.date_livraison_prevue).toLocaleDateString('fr-FR')}</p>` : ''}
-            </div>
-            ${production.description ? `
-            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h4>Description:</h4>
-              <p style="background: #f8f9fa; padding: 15px; border-radius: 6px; border-left: 3px solid #e74c3c;">
-                ${production.description}
-              </p>
-            </div>` : ''}
-          </div>
-          <div class="footer">
-            <p>VoIP Services - Système de gestion des productions</p>
-            <p>Cet email a été envoyé automatiquement.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `Nouvelle demande de production #${production.numero_production}\n\nTitre: ${production.titre}\nClient: ${production.nom_societe}\nDemandeur: ${production.demandeur_prenom} ${production.demandeur_nom}`
-  }),
+Bonjour ${user.prenom} ${user.nom},
 
-  // Template pour les commentaires sur production
-  productionCommentAdded: (production, tache, comment, author) => ({
-    subject: `Nouveau commentaire sur la production #${production.numero_production} - Tâche: ${tache.nom_tache}`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .comment-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #e67e22; }
-          .author-info { display: flex; align-items: center; margin-bottom: 15px; }
-          .avatar { width: 40px; height: 40px; border-radius: 50%; background: #e74c3c; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>💬 Nouveau Commentaire</h1>
-            <p>Un commentaire a été ajouté à la production #${production.numero_production}</p>
-          </div>
-          <div class="content">
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3>Production #${production.numero_production}</h3>
-              <p><strong>Titre:</strong> ${production.titre}</p>
-              <p><strong>Client:</strong> ${production.nom_societe}</p>
-              <p><strong>Tâche:</strong> ${tache.nom_tache}</p>
-            </div>
-            <div class="comment-box">
-              <div class="author-info">
-                <div class="avatar">${author.nom ? author.nom.split(' ').map(n => n[0]).join('') : 'A'}</div>
-                <div>
-                  <strong>${author.nom} ${author.prenom}</strong>
-                  <div style="font-size: 12px; color: #666;">
-                    ${new Date(comment.date_creation).toLocaleDateString('fr-FR', { 
-                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}
-                  </div>
-                </div>
-              </div>
-              <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
-                ${comment.contenu}
-              </div>
-            </div>
-          </div>
-          <div class="footer">
-            <p>VoIP Services - Système de gestion des productions</p>
-            <p>Pour répondre, connectez-vous au système de gestion des productions.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `Nouveau commentaire sur la production #${production.numero_production}\n\nTâche: ${tache.nom_tache}\nDe: ${author.nom} ${author.prenom}\nMessage: ${comment.contenu}`
-  }),
+Votre mot de passe a été réinitialisé. Voici votre nouveau mot de passe :
 
-  // Template pour upload de fichier
-  productionFileUploaded: (production, tache, fichier, author) => ({
-    subject: `Nouveau fichier sur la production #${production.numero_production} - Tâche: ${tache.nom_tache}`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #27ae60 0%, #16a085 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .file-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #27ae60; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>📎 Nouveau Fichier</h1>
-            <p>Un fichier a été ajouté à la production #${production.numero_production}</p>
-          </div>
-          <div class="content">
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3>Production #${production.numero_production}</h3>
-              <p><strong>Titre:</strong> ${production.titre}</p>
-              <p><strong>Client:</strong> ${production.nom_societe}</p>
-              <p><strong>Tâche:</strong> ${tache.nom_tache}</p>
-            </div>
-            <div class="file-box">
-              <h4>📎 Fichier ajouté</h4>
-              <p><strong>Nom:</strong> ${fichier.nom_fichier}</p>
-              <p><strong>Type:</strong> ${fichier.type_fichier || 'Non spécifié'}</p>
-              <p><strong>Taille:</strong> ${Math.round(fichier.taille_fichier / 1024)} KB</p>
-              <p><strong>Ajouté par:</strong> ${author.nom} ${author.prenom}</p>
-              <p><strong>Date:</strong> ${new Date(fichier.date_upload).toLocaleDateString('fr-FR', { 
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}</p>
-            </div>
-          </div>
-          <div class="footer">
-            <p>VoIP Services - Système de gestion des productions</p>
-            <p>Pour accéder au fichier, connectez-vous au système de gestion.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `Nouveau fichier sur la production #${production.numero_production}\n\nTâche: ${tache.nom_tache}\nFichier: ${fichier.nom_fichier}\nAjouté par: ${author.nom} ${author.prenom}`
+${newPassword}
+
+Pour des raisons de sécurité, nous vous recommandons de changer ce mot de passe lors de votre prochaine connexion.
+
+VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour changement de statut de production
-  productionStatusChanged: (production, oldStatus, newStatus) => ({
-    subject: `Changement de statut - Production #${production.numero_production}`,
+  productionStatusChanged: (production, oldStatus, newStatus, author) => ({
+    subject: `Production #${production.numero_production} - Statut modifié`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -515,164 +250,82 @@ const createEmailTemplate = {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-          .status-change { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #3498db; }
-          .status-old { background: #ffeaa7; color: #2d3436; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-right: 10px; }
-          .status-new { background: #00b894; color: white; padding: 8px 12px; border-radius: 4px; display: inline-block; }
-          .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+          .header { background-color: #16a34a; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background-color: #f9fafb; }
+          .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+          .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
+          .old-status { color: #dc2626; }
+          .new-status { color: #16a34a; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>📊 Changement de Statut</h1>
-            <p>Le statut de votre production a été mis à jour</p>
+            <h1>Production - Statut modifié</h1>
           </div>
           <div class="content">
-            <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-              <h3>Production #${production.numero_production}</h3>
-              <p><strong>Titre:</strong> ${production.titre}</p>
-              <p><strong>Client:</strong> ${production.nom_societe}</p>
-            </div>
+            <p>Bonjour,</p>
+            <p>Le statut de la production #${production.numero_production} a été modifié :</p>
             <div class="status-change">
-              <h4>Changement de statut</h4>
-              <p>
-                <span class="status-old">${oldStatus}</span> → <span class="status-new">${newStatus}</span>
-              </p>
-              <p><strong>Date de mise à jour:</strong> ${new Date().toLocaleDateString('fr-FR', { 
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-              })}</p>
+              <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
+              <small>Par ${author.prenom} ${author.nom}</small>
             </div>
+            <p><strong>Titre :</strong> ${production.titre}</p>
+            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
           </div>
           <div class="footer">
-            <p>VoIP Services - Système de gestion des productions</p>
-            <p>Pour plus de détails, connectez-vous au système de gestion.</p>
+            <p>VoIP Services - Système de production</p>
           </div>
         </div>
       </body>
       </html>
     `,
-    text: `Changement de statut - Production #${production.numero_production}\n\nStatut: ${oldStatus} → ${newStatus}\nTitre: ${production.titre}\nClient: ${production.nom_societe}`
-  }),
+    text: `Production #${production.numero_production} - Statut modifié
 
-  // Template pour les changements de statut de portabilité
-  portabiliteStatusChanged: (portabilite, oldStatus) => {
-    const statusLabels = {
-      'nouveau': 'Nouveau',
-      'bloque': 'Bloqué',
-      'rejete': 'Rejeté',
-      'en_cours': 'En cours',
-      'demande': 'Demandé',
-      'valide': 'Validé',
-      'termine': 'Terminé'
-    };
+Ancien statut : ${oldStatus}
+Nouveau statut : ${newStatus}
+Par : ${author.prenom} ${author.nom}
 
-    const statusColors = {
-      'nouveau': '#17a2b8',
-      'bloque': '#dc3545',
-      'rejete': '#dc3545',
-      'en_cours': '#ffc107',
-      'demande': '#fd7e14',
-      'valide': '#28a745',
-      'termine': '#20c997'
-    };
+Titre : ${production.titre}
+Client : ${production.nom_societe || production.client_display || 'N/A'}
 
-    return {
-      subject: `Statut de la portabilité #${portabilite.numero_portabilite} mis à jour: ${statusLabels[portabilite.status]}`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
-            .status-change { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-            .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; text-transform: uppercase; color: white; margin: 0 10px; }
-            .arrow { font-size: 24px; margin: 0 15px; color: #666; }
-            .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🔄 Statut Mis à Jour</h1>
-              <p>Le statut de votre portabilité a été modifié</p>
-            </div>
-            <div class="content">
-              <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <h3>Portabilité #${portabilite.numero_portabilite}</h3>
-                <p><strong>Client:</strong> ${portabilite.nom_societe}</p>
-              </div>
-              <div class="status-change">
-                <h3>Changement de statut</h3>
-                <div style="margin: 30px 0;">
-                  <span class="status-badge" style="background-color: ${statusColors[oldStatus] || '#6c757d'};">
-                    ${statusLabels[oldStatus] || oldStatus}
-                  </span>
-                  <span class="arrow">➡️</span>
-                  <span class="status-badge" style="background-color: ${statusColors[portabilite.status] || '#6c757d'};">
-                    ${statusLabels[portabilite.status] || portabilite.status}
-                  </span>
-                </div>
-                <p style="color: #666; font-style: italic;">
-                  Mis à jour le ${new Date().toLocaleDateString('fr-FR', { 
-                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                  })}
-                </p>
-              </div>
-            </div>
-            <div class="footer">
-              <p>VoIP Services - Système de gestion des portabilités</p>
-              <p>Pour plus de détails, connectez-vous au système de gestion des portabilités.</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `Le statut de la portabilité #${portabilite.numero_portabilite} a été mis à jour de "${statusLabels[oldStatus]}" vers "${statusLabels[portabilite.status]}"\n\nClient: ${portabilite.nom_societe}`
-    };
-  }
+VoIP Services - Système de production`
+  })
 };
 
-// Fonction principale pour envoyer un email
+// Fonction principale pour envoyer un email avec Brevo
 const sendEmail = async (to, subject, htmlContent, textContent) => {
   try {
-    const mailjetClient = initializeMailjet();
+    const brevoClient = initializeBrevo();
     
-    if (!mailjetClient) {
-      console.log('Mailjet not initialized. Email would be sent to:', to);
+    if (!brevoClient) {
+      console.log('Brevo not initialized. Email would be sent to:', to);
       console.log('Subject:', subject);
-      return { success: false, error: 'Mailjet not configured' };
+      return { success: false, error: 'Brevo not configured' };
     }
 
-    if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
-      console.log('Mailjet API keys not configured. Email would be sent to:', to);
+    if (!process.env.BREVO_API_KEY) {
+      console.log('Brevo API key not configured. Email would be sent to:', to);
       console.log('Subject:', subject);
-      return { success: false, error: 'Mailjet API keys not configured' };
+      return { success: false, error: 'Brevo API key not configured' };
     }
 
-    const request = mailjetClient.post('send', { version: 'v3.1' }).request({
-      Messages: [
-        {
-          From: {
-            Email: 'noreply@voipservices.fr',
-            Name: 'VoIP Services - Support'
-          },
-          To: Array.isArray(to) ? to : [{ Email: to }],
-          Subject: subject,
-          HTMLPart: htmlContent,
-          TextPart: textContent
-        }
-      ]
-    });
+    // Créer l'objet email selon l'API Brevo
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    
+    sendSmtpEmail.sender = {
+      name: 'VoIP Services - Support',
+      email: 'noreply@voipservices.fr'
+    };
+    
+    sendSmtpEmail.to = Array.isArray(to) ? to : [{ email: to }];
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = htmlContent;
+    sendSmtpEmail.textContent = textContent;
 
-    const result = await request;
-    console.log('Email sent successfully:', result.body);
-    return { success: true, data: result.body };
+    const result = await brevoClient.sendTransacEmail(sendSmtpEmail);
+    console.log('Email sent successfully:', result);
+    return { success: true, data: result };
   } catch (error) {
     console.error('Error sending email:', error);
     return { success: false, error: error.message };
@@ -687,8 +340,8 @@ const emailService = {
     
     // Envoyer à contact@voipservices.fr et au demandeur
     const recipients = [
-      { Email: 'contact@voipservices.fr', Name: 'Support VoIP Services' },
-      { Email: demandeur.email, Name: `${demandeur.prenom} ${demandeur.nom}` }
+      { email: 'contact@voipservices.fr', name: 'Support VoIP Services' },
+      { email: demandeur.email, name: `${demandeur.prenom} ${demandeur.nom}` }
     ];
 
     return await sendEmail(recipients, template.subject, template.html, template.text);
@@ -698,171 +351,39 @@ const emailService = {
   sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName) => {
     const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail);
     
-    const recipient = { Email: recipientEmail, Name: recipientName };
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
+    const recipient = { email: recipientEmail, name: recipientName };
+    return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
   // Envoi d'email lors du changement de statut
-  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, client, demandeur) => {
-    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, client, demandeur);
+  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, author, recipientEmail, recipientName) => {
+    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, author);
     
-    // Envoyer seulement au demandeur
-    const recipient = { Email: demandeur.email, Name: `${demandeur.prenom} ${demandeur.nom}` };
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
+    const recipient = { email: recipientEmail, name: recipientName };
+    return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
-  // Envoi d'email lors de la création d'une portabilité
-  sendPortabiliteCreationEmail: async (portabilite) => {
-    const template = createEmailTemplate.portabiliteCreated(portabilite);
+  // Envoi d'email pour la réinitialisation de mot de passe
+  sendPasswordResetEmail: async (user, newPassword) => {
+    const template = createEmailTemplate.passwordReset(user, newPassword);
     
-    // Envoyer à contact@voipservices.fr et au demandeur
-    const recipients = [
-      { Email: 'contact@voipservices.fr', Name: 'Support VoIP Services' },
-      { Email: portabilite.demandeur_email, Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` }
-    ];
-
-    return await sendEmail(recipients, template.subject, template.html, template.text);
+    const recipient = { email: user.email, name: `${user.prenom} ${user.nom}` };
+    return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
-  // Envoi d'email lors de l'ajout d'un commentaire sur une portabilité
-  sendPortabiliteCommentEmail: async (portabilite, comment, authorType) => {
-    const template = createEmailTemplate.portabiliteCommentAdded(portabilite, comment, authorType);
+  // Envoi d'email pour changement de statut de production
+  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName) => {
+    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author);
     
-    // Déterminer le destinataire selon l'auteur
-    let recipient;
-    if (authorType === 'agent') {
-      // Si l'agent commente, envoyer au demandeur
-      recipient = { 
-        Email: portabilite.demandeur_email, 
-        Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` 
-      };
-    } else {
-      // Si le demandeur commente, envoyer à l'agent ou au support
-      recipient = { 
-        Email: portabilite.agent_email || 'contact@voipservices.fr', 
-        Name: portabilite.agent_nom && portabilite.agent_prenom ? 
-          `${portabilite.agent_prenom} ${portabilite.agent_nom}` : 'Support VoIP Services'
-      };
-    }
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
-  },
-
-  // Envoi d'email lors du changement de statut d'une portabilité
-  sendPortabiliteStatusChangeEmail: async (portabilite, oldStatus) => {
-    const template = createEmailTemplate.portabiliteStatusChanged(portabilite, oldStatus);
-    
-    // Envoyer seulement au demandeur
-    const recipient = { 
-      Email: portabilite.demandeur_email, 
-      Name: `${portabilite.demandeur_prenom} ${portabilite.demandeur_nom}` 
-    };
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
-  },
-
-  // Envoi d'email lors de la création d'une production
-  sendProductionCreationEmail: async (production) => {
-    const template = createEmailTemplate.productionCreated(production);
-    
-    // Envoyer à contact@voipservices.fr et au demandeur
-    const recipients = [
-      { Email: 'contact@voipservices.fr', Name: 'Support VoIP Services' },
-      { Email: production.demandeur_email, Name: `${production.demandeur_prenom} ${production.demandeur_nom}` }
-    ];
-
-    return await sendEmail(recipients, template.subject, template.html, template.text);
-  },
-
-  // Envoi d'email lors de l'ajout d'un commentaire sur une production
-  sendProductionCommentEmail: async (production, tache, comment, author) => {
-    const template = createEmailTemplate.productionCommentAdded(production, tache, comment, author);
-    
-    // Déterminer le destinataire selon l'auteur
-    let recipient;
-    if ((author.type_utilisateur || author.type) === 'agent') {
-      // Si l'agent commente, envoyer au demandeur
-      recipient = { 
-        Email: production.demandeur_email, 
-        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
-      };
-    } else {
-      // Si le demandeur commente, envoyer au support
-      recipient = { 
-        Email: 'contact@voipservices.fr', 
-        Name: 'Support VoIP Services'
-      };
-    }
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
-  },
-
-  // Envoi d'email lors de l'upload d'un fichier sur une production
-  sendProductionFileUploadEmail: async (production, tache, fichier, author) => {
-    const template = createEmailTemplate.productionFileUploaded(production, tache, fichier, author);
-    
-    // Déterminer le destinataire selon l'auteur
-    let recipient;
-    if ((author.type_utilisateur || author.type) === 'agent') {
-      // Si l'agent upload, envoyer au demandeur
-      recipient = { 
-        Email: production.demandeur_email, 
-        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
-      };
-    } else {
-      // Si le demandeur upload, envoyer au support
-      recipient = { 
-        Email: 'contact@voipservices.fr', 
-        Name: 'Support VoIP Services'
-      };
-    }
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
-  },
-
-  // Envoi d'email lors de la suppression d'un fichier sur une production
-  sendProductionFileDeleteEmail: async (production, fichier, author) => {
-    const template = createEmailTemplate.productionFileUploaded(production, { nom_tache: 'Fichier supprimé' }, fichier, author);
-    // Modifier le sujet pour indiquer la suppression
-    const deleteTemplate = {
-      ...template,
-      subject: `Fichier supprimé sur la production #${production.numero_production}`,
-      html: template.html.replace('📎 Nouveau Fichier', '🗑️ Fichier Supprimé').replace('Un fichier a été ajouté', 'Un fichier a été supprimé')
-    };
-    
-    // Déterminer le destinataire selon l'auteur
-    let recipient;
-    if ((author.type_utilisateur || author.type) === 'agent') {
-      // Si l'agent supprime, envoyer au demandeur
-      recipient = { 
-        Email: production.demandeur_email, 
-        Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
-      };
-    } else {
-      // Si le demandeur supprime, envoyer au support
-      recipient = { 
-        Email: 'contact@voipservices.fr', 
-        Name: 'Support VoIP Services'
-      };
-    }
-    
-    return await sendEmail([recipient], deleteTemplate.subject, deleteTemplate.html, deleteTemplate.text);
-  },
-
-  // Envoi d'email lors du changement de statut d'une production
-  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus) => {
-    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus);
-    
-    // Envoyer seulement au demandeur
-    const recipient = { 
-      Email: production.demandeur_email, 
-      Name: `${production.demandeur_prenom} ${production.demandeur_nom}` 
-    };
-    
-    return await sendEmail([recipient], template.subject, template.html, template.text);
+    const recipient = { email: recipientEmail, name: recipientName };
+    return await sendEmail(recipient, template.subject, template.html, template.text);
   }
 };
 
-module.exports = emailService;
+// Export du service
+module.exports = {
+  emailService,
+  initializeBrevo,
+  sendEmail,
+  createEmailTemplate
+};
