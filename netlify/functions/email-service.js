@@ -152,10 +152,10 @@ VoIP Services - Système de gestion des tickets`
     text: `Nouveau commentaire sur le ticket #${ticket.numero_ticket}
 
 Auteur : ${author.prenom} ${author.nom} (${author.type_utilisateur})
-Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
+Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
 
 Commentaire :
-${comment.contenu || ''}
+${comment.message || ''}
 
 Titre du ticket : ${ticket.titre}
 
