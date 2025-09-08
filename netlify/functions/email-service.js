@@ -642,10 +642,10 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
       textContent: textContent
     };
 
-    console.log('Sending email via Brevo to:', message.to);
+    console.log('Sending email via Brevo to:', emailData.to);
     console.log('Subject:', subject);
 
-    const result = await brevoClient.sendTransacEmail(message);
+    const result = await brevoClient.sendTransacEmail(emailData);
     console.log('Email sent successfully:', result);
     return { success: true, data: result };
   } catch (error) {
