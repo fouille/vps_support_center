@@ -430,3 +430,5 @@ const emailService = {
 
 // Export du service - Export direct des fonctions pour compatibilité
 module.exports = emailService;
+
+console.log('email-service.js: Module loaded successfully, exported functions:', Object.keys(emailService));
