@@ -201,8 +201,8 @@ exports.handler = async (event, context) => {
 
       case 'DELETE':
         // Supprimer un fichier
-        const fileId = event.queryStringParameters?.fileId;
-        if (!fileId) {
+        const deleteFileId = event.queryStringParameters?.fileId;
+        if (!deleteFileId) {
           return {
             statusCode: 400,
             headers,
@@ -219,7 +219,7 @@ exports.handler = async (event, context) => {
           // Les demandeurs ne peuvent supprimer que leurs propres fichiers
           const demandeur = await sql`SELECT id FROM demandeurs WHERE email = ${decoded.sub}`;
           if (demandeur.length > 0) {
-            const file = await sql`SELECT * FROM ticket_fichiers WHERE id = ${fileId} AND uploaded_by = ${demandeur[0].id}`;
+            const file = await sql`SELECT * FROM ticket_fichiers WHERE id = ${deleteFileId} AND uploaded_by = ${demandeur[0].id}`;
             canDelete = file.length > 0;
           }
         }
@@ -232,7 +232,7 @@ exports.handler = async (event, context) => {
           };
         }
 
-        await sql`DELETE FROM ticket_fichiers WHERE id = ${fileId}`;
+        await sql`DELETE FROM ticket_fichiers WHERE id = ${deleteFileId}`;
         
         return { statusCode: 200, headers, body: JSON.stringify({ message: 'Fichier supprimé' }) };
 
