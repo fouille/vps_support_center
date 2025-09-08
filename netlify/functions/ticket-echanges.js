@@ -187,13 +187,13 @@ exports.handler = async (event, context) => {
               // Récupérer les informations de l'auteur du commentaire
               if (auteurType === 'agent') {
                 const agentInfo = await sql`SELECT nom, prenom, email FROM agents WHERE id = ${auteurId}`;
-                authorInfo = agentInfo[0];
+                authorInfo = { ...agentInfo[0], type_utilisateur: 'agent' };
                 // Si c'est un agent qui commente, notifier le demandeur
                 recipientEmail = ticket.demandeur_email;
                 recipientName = `${ticket.demandeur_prenom} ${ticket.demandeur_nom}`;
               } else {
                 const demandeurInfo = await sql`SELECT nom, prenom, email FROM demandeurs WHERE id = ${auteurId}`;
-                authorInfo = demandeurInfo[0];
+                authorInfo = { ...demandeurInfo[0], type_utilisateur: 'demandeur' };
                 // Si c'est un demandeur qui commente, notifier l'agent (ou contact@voipservices.fr si pas d'agent assigné)
                 if (ticket.agent_email) {
                   recipientEmail = ticket.agent_email;
