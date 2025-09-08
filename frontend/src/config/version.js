@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 9,      // Version mineure - nouvelles fonctionnalités
-  patch: 3,      // Version patch - corrections de bugs
+  patch: 4,      // Version patch - corrections de bugs
   buildDate: "2025-09-08", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.9.4",
+    date: "2025-09-08",
+    type: "PATCH",
+    description: "Ajout logs debugging pour password-reset Brevo format destinataires"
+  },
+{
     version: "2.9.3",
     date: "2025-09-08",
     type: "PATCH",
