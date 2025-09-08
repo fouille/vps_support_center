@@ -43,6 +43,7 @@ exports.handler = async (event, context) => {
     const decoded = verifyToken(authHeader);
 
     const ticketId = event.queryStringParameters?.ticketId;
+    const fileId = event.queryStringParameters?.fileId;
     
     if (!ticketId) {
       return {
@@ -54,7 +55,41 @@ exports.handler = async (event, context) => {
 
     switch (event.httpMethod) {
       case 'GET':
-        // Récupérer tous les fichiers d'un ticket
+        // Si fileId est fourni, télécharger un fichier spécifique
+        if (fileId) {
+          console.log('Downloading file:', fileId, 'for ticket:', ticketId);
+          const fichier = await sql`
+            SELECT tf.* 
+            FROM ticket_fichiers tf
+            WHERE tf.id = ${fileId} AND tf.ticket_id = ${ticketId}
+          `;
+          
+          if (fichier.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Fichier non trouvé' })
+            };
+          }
+          
+          const file = fichier[0];
+          return { 
+            statusCode: 200, 
+            headers: {
+              ...headers,
+              'Content-Type': file.type_fichier || 'application/octet-stream'
+            }, 
+            body: JSON.stringify({
+              id: file.id,
+              nom_fichier: file.nom_fichier,
+              type_fichier: file.type_fichier,
+              taille_fichier: file.taille_fichier,
+              contenu_base64: file.contenu_base64
+            }) 
+          };
+        }
+        
+        // Sinon, récupérer la liste des fichiers d'un ticket
         console.log('Getting files for ticket:', ticketId);
         const fichiers = await sql`
           SELECT tf.*, 
