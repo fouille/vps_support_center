@@ -104,7 +104,8 @@ VoIP Services - Système de gestion des tickets`
     console.log('commentAdded template called with:', {
       ticketId: ticket?.id,
       commentId: comment?.id,
-      commentContenu: comment?.contenu,
+      commentContenu: comment?.message,  // Corrigé: message au lieu de contenu
+      commentCreatedAt: comment?.created_at,  // Ajouté pour debug
       authorId: author?.id,
       recipientEmail
     });
