@@ -100,8 +100,17 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour l'ajout d'un commentaire
-  commentAdded: (ticket, comment, author, recipientEmail) => ({
-    subject: `Commentaire ajouté - Ticket #${ticket.numero_ticket}`,
+  commentAdded: (ticket, comment, author, recipientEmail) => {
+    console.log('commentAdded template called with:', {
+      ticketId: ticket?.id,
+      commentId: comment?.id,
+      commentContenu: comment?.contenu,
+      authorId: author?.id,
+      recipientEmail
+    });
+    
+    return {
+      subject: `Commentaire ajouté - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
