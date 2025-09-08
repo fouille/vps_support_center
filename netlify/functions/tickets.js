@@ -567,12 +567,19 @@ exports.handler = async (event, context) => {
               ]);
 
               if (clientInfo.length > 0 && demandeurInfo.length > 0) {
+                const authorInfo = { 
+                  prenom: decoded.prenom || 'Utilisateur',
+                  nom: decoded.nom || '',
+                  type_utilisateur: decoded.type_utilisateur || decoded.type || 'utilisateur'
+                };
+                
                 await emailService.sendStatusChangeEmail(
                   updatedTicket[0],
                   oldStatus,
                   upd_status,
-                  clientInfo[0],
-                  demandeurInfo[0]
+                  authorInfo,
+                  demandeurInfo[0].email,
+                  `${demandeurInfo[0].prenom} ${demandeurInfo[0].nom}`
                 );
                 console.log('Status change email sent successfully');
               }
