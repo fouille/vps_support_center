@@ -79,8 +79,7 @@ exports.handler = async (event, context) => {
   
   // Debug des variables d'environnement
   console.log('Environment variables check:');
-  console.log('MJ_APIKEY_PUBLIC present:', !!process.env.MJ_APIKEY_PUBLIC);
-  console.log('MJ_APIKEY_PRIVATE present:', !!process.env.MJ_APIKEY_PRIVATE);
+  console.log('BREVO_API_KEY present:', !!process.env.BREVO_API_KEY);
   console.log('RECAPTCHA_SECRET_KEY present:', !!process.env.RECAPTCHA_SECRET_KEY);
   
   if (event.httpMethod === 'OPTIONS') {
