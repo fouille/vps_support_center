@@ -498,7 +498,10 @@ exports.handler = async (event, context) => {
             await emailService.sendProductionStatusChangeEmail(
               productionDetail, 
               currentProduction.status, 
-              status
+              status,
+              { prenom: decoded.prenom, nom: decoded.nom }, // author info
+              productionDetail.demandeur_email,
+              `${productionDetail.demandeur_prenom || ''} ${productionDetail.demandeur_nom || ''}`.trim()
             );
           }
         } catch (emailError) {
