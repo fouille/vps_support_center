@@ -97,8 +97,7 @@ Date : ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
 ${ticket.description ? `Description : ${ticket.description}` : ''}
 
 VoIP Services - Système de gestion des tickets`
-    };
-  },
+  }),
 
   // Template pour l'ajout d'un commentaire
   commentAdded: (ticket, comment, author, recipientEmail) => {
