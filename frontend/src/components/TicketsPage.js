@@ -1200,18 +1200,19 @@ const TicketsPage = () => {
                     <div className="space-y-2 max-h-32 overflow-y-auto">
                       {ticketFiles.map((file) => (
                         <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-dark-card rounded border">
-                          <div className="flex items-center space-x-3 flex-1">
-                            <span className="text-lg">{getFileIcon(file.type_fichier)}</span>
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
+                            <span className="text-lg flex-shrink-0">{getFileIcon(file.type_fichier)}</span>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-gray-900 dark:text-dark-text truncate">
+                              <p className="text-sm font-medium text-gray-900 dark:text-dark-text break-words" 
+                                 style={{ wordBreak: 'break-all', lineHeight: '1.3' }}>
                                 {file.nom_fichier}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-dark-muted">
+                              <p className="text-xs text-gray-500 dark:text-dark-muted mt-1">
                                 {formatFileSize(file.taille_fichier)} • {file.uploaded_by_name} • {format(new Date(file.uploaded_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
                               </p>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
                             <button
                               onClick={() => downloadFile(file)}
                               className="p-1 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
