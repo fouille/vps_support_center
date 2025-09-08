@@ -19,6 +19,11 @@ let brevoClient = null;
 const initializeBrevo = () => {
   if (brevoClient) return brevoClient;
   
+  if (!TransactionalEmailsApi || !SendSmtpEmail) {
+    console.error('Brevo classes not available, cannot initialize');
+    return null;
+  }
+  
   try {
     // Créer l'instance API
     brevoClient = new TransactionalEmailsApi();
@@ -26,6 +31,7 @@ const initializeBrevo = () => {
     // Configuration de l'API key
     brevoClient.authentications.apiKey.apiKey = process.env.BREVO_API_KEY;
     
+    console.log('email-service.js: Brevo client initialized successfully');
     return brevoClient;
   } catch (error) {
     console.error('Failed to initialize Brevo:', error);
