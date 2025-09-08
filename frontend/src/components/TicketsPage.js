@@ -485,7 +485,7 @@ const TicketsPage = () => {
   const downloadFile = async (file) => {
     try {
       // Récupérer le fichier complet avec son contenu
-      const response = await api.get(`/api/ticket-fichiers?ticketId=${selectedTicket.id}&fileId=${file.id}`);
+      const response = await api.get(`/api/ticket-fichiers?ticketId=${viewingTicket.id}&fileId=${file.id}`);
       const fileData = response.data;
       
       const byteCharacters = atob(fileData.contenu_base64);
