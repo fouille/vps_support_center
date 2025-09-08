@@ -380,9 +380,18 @@ const emailService = {
 
   // Envoi d'email pour la réinitialisation de mot de passe
   sendPasswordResetEmail: async (user, newPassword) => {
+    console.log('sendPasswordResetEmail called with user:', JSON.stringify({
+      id: user.id,
+      email: user.email,
+      nom: user.nom,
+      prenom: user.prenom
+    }, null, 2));
+    
     const template = createEmailTemplate.passwordReset(user, newPassword);
     
     const recipient = { email: user.email, name: `${user.prenom} ${user.nom}` };
+    console.log('Password reset recipient structure:', JSON.stringify(recipient, null, 2));
+    
     return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
