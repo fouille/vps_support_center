@@ -205,6 +205,12 @@ exports.handler = async (event, context) => {
               }
 
               if (recipientEmail && authorInfo) {
+                console.log('Email data debug:');
+                console.log('- ticket:', { id: ticket.id, numero_ticket: ticket.numero_ticket, titre: ticket.titre });
+                console.log('- comment (echangeWithAuthor[0]):', echangeWithAuthor[0]);
+                console.log('- authorInfo:', authorInfo);
+                console.log('- recipientEmail:', recipientEmail);
+                
                 await emailService.sendCommentEmail(
                   ticket,
                   echangeWithAuthor[0],
