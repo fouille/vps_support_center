@@ -182,7 +182,18 @@ const ProductionTacheModal = ({ tache, onClose, onRefresh }) => {
   const downloadFile = (fichier) => {
     try {
       const link = document.createElement('a');
-      link.href = `data:${fichier.type_fichier || 'application/octet-stream'};base64,${fichier.contenu_base64}`;
+      
+      // Vérifier si le contenu_base64 contient déjà le préfixe data URI
+      let fileUrl;
+      if (fichier.contenu_base64.startsWith('data:')) {
+        // Le contenu contient déjà le préfixe data URI complet
+        fileUrl = fichier.contenu_base64;
+      } else {
+        // Ajouter le préfixe data URI
+        fileUrl = `data:${fichier.type_fichier || 'application/octet-stream'};base64,${fichier.contenu_base64}`;
+      }
+      
+      link.href = fileUrl;
       link.download = fichier.nom_fichier;
       document.body.appendChild(link);
       link.click();
