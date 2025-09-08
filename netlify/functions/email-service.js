@@ -380,10 +380,5 @@ const emailService = {
   }
 };
 
-// Export du service
-module.exports = {
-  emailService,
-  initializeBrevo,
-  sendEmail,
-  createEmailTemplate
-};
+// Export du service - Export direct des fonctions pour compatibilité
+module.exports = emailService;
