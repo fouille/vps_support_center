@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.9.7] - 2025-09-08
+### Fixed
+- 🔧 Ajout type_utilisateur et logs debugging pour données email commentaires
+
 ## [2.9.6] - 2025-09-08
 ### Fixed
 - 🔧 Correction template commentAdded - comment.contenu undefined
