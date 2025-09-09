@@ -152,11 +152,6 @@ const TicketDetail = () => {
       const response = await api.get(`/api/ticket-echanges?ticketId=${ticketId}`);
       console.log('TicketDetail: Exchanges received:', response.data);
       setExchanges(response.data || []);
-      
-      // Auto-scroll vers le bas après chargement des échanges
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
     } catch (error) {
       console.error('Erreur lors du chargement des échanges:', error);
     } finally {
