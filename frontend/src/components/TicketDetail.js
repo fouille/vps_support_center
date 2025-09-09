@@ -422,7 +422,7 @@ const TicketDetail = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Échéance</p>
                 <p className="text-orange-600 dark:text-orange-400">
-                  {format(new Date(ticket.date_fin_prevue), 'dd MMM yyyy', { locale: fr })}
+                  {formatDate(ticket.date_fin_prevue, 'dd MMM yyyy')}
                 </p>
               </div>
             </div>
