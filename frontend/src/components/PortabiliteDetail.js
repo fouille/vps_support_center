@@ -213,7 +213,7 @@ const PortabiliteDetail = () => {
       });
 
       const fileData = {
-        portabiliteId: portabilite.id,
+        portabiliteId: portabilite_uuid,
         nom_fichier: file.name,
         type_fichier: file.type,
         taille_fichier: file.size,
