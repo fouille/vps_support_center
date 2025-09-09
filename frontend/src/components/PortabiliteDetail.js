@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { 
+  ArrowLeft, 
+  Paperclip,
+  Download,
+  Trash2,
+  Send,
+  RefreshCw
+} from 'lucide-react';
+import { format, isValid, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const PortabiliteDetail = () => {
   const { portabilite_uuid } = useParams();
