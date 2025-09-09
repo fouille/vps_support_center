@@ -201,11 +201,6 @@ const TicketDetail = () => {
       setExchanges(prev => [...prev, response.data]);
       setNewComment('');
 
-      // Auto-scroll vers le bas après ajout d'un commentaire
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-
       // Si c'est un agent qui répond, mettre le ticket en "répondu"
       if (isAgent && ticket.status !== 'repondu') {
         await handleStatusChange(ticket.id, 'repondu');
