@@ -54,7 +54,25 @@ const ProductionsPage = () => {
     if (isAgent) {
       fetchDemandeurs();
     }
+    
+    // Si on a un UUID de production dans l'URL, ouvrir le modal
+    if (production_uuid) {
+      const foundProduction = productions.find(p => p.id === production_uuid);
+      if (foundProduction) {
+        openProductionDetails(foundProduction);
+      }
+    }
   }, []);
+  
+  // Effet pour gérer l'ouverture automatique de la production depuis l'URL
+  useEffect(() => {
+    if (production_uuid && productions.length > 0) {
+      const foundProduction = productions.find(p => p.id === production_uuid);
+      if (foundProduction) {
+        openProductionDetails(foundProduction);
+      }
+    }
+  }, [production_uuid, productions]);
 
   // Actualiser automatiquement lors du changement de filtres (sauf chargement initial)
   useEffect(() => {
