@@ -180,8 +180,7 @@ const PortabilitesPage = () => {
 
   // Fonction pour éditer une portabilité
   const editPortabilite = (portabiliteId) => {
-    onSelectPortabilite(portabiliteId);
-    onNavigate('portabilites-edit');
+    navigate(`/portabilites/${portabiliteId}/edit`);
   };
 
   // Fonction pour supprimer une portabilité depuis le tableau
