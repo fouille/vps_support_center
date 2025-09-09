@@ -1,6 +1,9 @@
 // Service email utilisant Brevo avec la nouvelle API @getbrevo/brevo
 console.log('email-service.js: Starting to load...');
 
+const { neon } = require('@netlify/neon');
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
+
 let TransactionalEmailsApi, SendSmtpEmail;
 try {
   const brevoImport = require('@getbrevo/brevo');
@@ -13,10 +16,32 @@ try {
   TransactionalEmailsApi = null;
   SendSmtpEmail = null;
 }
-// Fonction pour obtenir l'URL de base du frontend
-const getBaseUrl = () => {
-  // Utiliser la variable d'environnement ou une URL par défaut
-  return process.env.FRONTEND_URL || process.env.URL || 'https://ticketflow-37.preview.emergentagent.com';
+
+// Fonction pour obtenir l'URL de base du frontend basée sur la société du demandeur
+const getBaseUrl = async (demandeurId) => {
+  try {
+    if (!demandeurId) {
+      return 'https://support.voipservices.fr';
+    }
+
+    // Récupérer le domaine de la société du demandeur
+    const result = await sql`
+      SELECT ds.domaine
+      FROM demandeurs d
+      JOIN demandeurs_societe ds ON d.societe_id = ds.id
+      WHERE d.id = ${demandeurId}
+    `;
+
+    if (result.length > 0 && result[0].domaine) {
+      return `https://${result[0].domaine}`;
+    }
+
+    // Fallback si pas de domaine trouvé
+    return 'https://support.voipservices.fr';
+  } catch (error) {
+    console.error('Erreur lors de la récupération du domaine:', error);
+    return 'https://support.voipservices.fr';
+  }
 };
 
 let brevoClient = null;
