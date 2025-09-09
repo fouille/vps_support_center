@@ -409,7 +409,7 @@ const TicketDetail = () => {
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Créé le</p>
               <p className="text-gray-900 dark:text-dark-text">
-                {format(new Date(ticket.date_creation), 'dd MMM yyyy à HH:mm', { locale: fr })}
+                {formatDate(ticket.date_creation, 'dd MMM yyyy à HH:mm')}
               </p>
             </div>
           </div>
