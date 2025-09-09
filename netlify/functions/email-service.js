@@ -800,7 +800,7 @@ const emailService = {
 
   // Envoi d'email lors de la création d'une portabilité
   sendPortabiliteCreationEmail: async (portabiliteDetail) => {
-    const baseUrl = getBaseUrl();
+    const baseUrl = await getBaseUrl(portabiliteDetail?.demandeur_id);
     const template = createEmailTemplate.portabiliteCreated(
       portabiliteDetail, 
       { nom_societe: portabiliteDetail.nom_societe },
