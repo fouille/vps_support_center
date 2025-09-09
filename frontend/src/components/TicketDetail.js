@@ -474,23 +474,23 @@ const TicketDetail = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {exchange.auteur_prenom?.[0] || '?'}{exchange.auteur_nom?.[0] || ''}
+                          {exchange?.auteur_prenom?.[0] || '?'}{exchange?.auteur_nom?.[0] || ''}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
-                            {exchange.auteur_prenom} {exchange.auteur_nom}
+                            {exchange?.auteur_prenom || 'Utilisateur'} {exchange?.auteur_nom || ''}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {exchange.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
+                            {exchange?.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
                           </p>
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(exchange.date_creation, 'dd MMM à HH:mm')}
+                        {formatDate(exchange?.date_creation, 'dd MMM à HH:mm')}
                       </p>
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                      {exchange.message}
+                      {exchange?.message || 'Message non disponible'}
                     </p>
                   </div>
                 ))
