@@ -141,7 +141,7 @@ const TicketDetail = () => {
   };
 
   const fetchExchangesAfterPageLoad = async () => {
-    if (!ticket) return;
+    if (!ticket?.id) return;
     
     try {
       setLoadingExchanges(true);
@@ -151,7 +151,7 @@ const TicketDetail = () => {
       // Auto-scroll vers le bas après chargement des échanges
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 200);
+      }, 300);
     } catch (error) {
       // Pas de log console ici
     } finally {
