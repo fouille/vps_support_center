@@ -320,18 +320,6 @@ const PortabiliteDetail = () => {
     }
   };
 
-  // Fonction pour formater la date
-  const formatDate = (dateString) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   // Fonction pour vérifier si la date est aujourd'hui
   const isToday = (dateString) => {
     if (!dateString) return false;
