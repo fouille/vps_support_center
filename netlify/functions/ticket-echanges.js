@@ -145,7 +145,7 @@ exports.handler = async (event, context) => {
 
         const createdEchange = await sql`
           INSERT INTO ticket_echanges (id, ticket_id, auteur_id, auteur_type, message)
-          VALUES (${uuidv4()}, ${ticketId}, ${auteurType}, ${auteurId}, ${message.trim()})
+          VALUES (${uuidv4()}, ${ticketId}, ${auteurId}, ${auteurType}, ${message.trim()})
           RETURNING *
         `;
 
