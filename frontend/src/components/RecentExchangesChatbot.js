@@ -222,8 +222,17 @@ const RecentExchangesChatbot = () => {
                     </div>
 
                     {/* Titre */}
-                    <h4 className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-200">
+                    <h4 className={`font-medium text-sm mb-2 ${
+                      isClickable(exchange.type)
+                        ? 'text-gray-900 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}>
                       {truncateText(exchange.item_title, 60)}
+                      {exchange.type === 'production' && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 italic ml-2">
+                          (non cliquable)
+                        </span>
+                      )}
                     </h4>
 
                     {/* Dernier commentaire */}
