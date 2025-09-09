@@ -61,7 +61,10 @@ const TicketDetail = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
 
   useEffect(() => {
-    fetchTicketDetails();
+    if (ticket_uuid) {
+      console.log('TicketDetail: Loading ticket with UUID:', ticket_uuid);
+      fetchTicketDetails();
+    }
   }, [ticket_uuid]);
 
   const fetchTicketDetails = async () => {
