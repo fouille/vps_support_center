@@ -485,7 +485,9 @@ VoIP Services - Système de portabilité`
           .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
-          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #7c3aed; }
+          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #059669; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
