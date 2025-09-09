@@ -15,7 +15,7 @@ import {
   AlertCircle,
   RefreshCw
 } from 'lucide-react';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const TicketDetail = () => {
