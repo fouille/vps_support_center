@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-const RecentExchangesChatbot = ({ isDarkMode }) => {
+const RecentExchangesChatbot = () => {
   const { api } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
