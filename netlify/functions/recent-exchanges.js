@@ -147,30 +147,58 @@ exports.handler = async (event, context) => {
       }
 
       // Requête pour les commentaires de tâches de production
-      const productionExchanges = await sql`
-        SELECT 
-          'production' as type,
-          pr.id as item_id,
-          pr.numero_production as item_number,
-          (pr.titre || ' - ' || pt.nom_tache) as item_title,
-          ptc.contenu as last_comment,
-          ptc.date_creation as created_at,
-          COALESCE(a.nom, d.nom) as auteur_nom,
-          COALESCE(a.prenom, d.prenom) as auteur_prenom,
-          CASE 
-            WHEN a.id IS NOT NULL THEN 'agent'
-            WHEN d.id IS NOT NULL THEN 'demandeur'
-            ELSE 'inconnu'
-          END as auteur_type
-        FROM production_tache_commentaires ptc
-        JOIN production_taches pt ON ptc.production_tache_id = pt.id
-        JOIN productions pr ON pt.production_id = pr.id
-        LEFT JOIN agents a ON ptc.auteur_id = a.id
-        LEFT JOIN demandeurs d ON ptc.auteur_id = d.id
-        WHERE ${societeId ? sql`pr.societe_id = ${societeId}` : sql`pr.demandeur_id = ${decoded.id}`}
-        ORDER BY ptc.date_creation DESC
-        LIMIT 10
-      `;
+      let productionExchanges;
+      if (societeId) {
+        productionExchanges = await sql`
+          SELECT 
+            'production' as type,
+            pr.id as item_id,
+            pr.numero_production as item_number,
+            (pr.titre || ' - ' || pt.nom_tache) as item_title,
+            ptc.contenu as last_comment,
+            ptc.date_creation as created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            CASE 
+              WHEN a.id IS NOT NULL THEN 'agent'
+              WHEN d.id IS NOT NULL THEN 'demandeur'
+              ELSE 'inconnu'
+            END as auteur_type
+          FROM production_tache_commentaires ptc
+          JOIN production_taches pt ON ptc.production_tache_id = pt.id
+          JOIN productions pr ON pt.production_id = pr.id
+          LEFT JOIN agents a ON ptc.auteur_id = a.id
+          LEFT JOIN demandeurs d ON ptc.auteur_id = d.id
+          WHERE pr.societe_id = ${societeId}
+          ORDER BY ptc.date_creation DESC
+          LIMIT 10
+        `;
+      } else {
+        productionExchanges = await sql`
+          SELECT 
+            'production' as type,
+            pr.id as item_id,
+            pr.numero_production as item_number,
+            (pr.titre || ' - ' || pt.nom_tache) as item_title,
+            ptc.contenu as last_comment,
+            ptc.date_creation as created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            CASE 
+              WHEN a.id IS NOT NULL THEN 'agent'
+              WHEN d.id IS NOT NULL THEN 'demandeur'
+              ELSE 'inconnu'
+            END as auteur_type
+          FROM production_tache_commentaires ptc
+          JOIN production_taches pt ON ptc.production_tache_id = pt.id
+          JOIN productions pr ON pt.production_id = pr.id
+          LEFT JOIN agents a ON ptc.auteur_id = a.id
+          LEFT JOIN demandeurs d ON ptc.auteur_id = d.id
+          WHERE pr.demandeur_id = ${decoded.id}
+          ORDER BY ptc.date_creation DESC
+          LIMIT 10
+        `;
+      }
 
       exchanges = [...ticketExchanges, ...portabiliteExchanges, ...productionExchanges];
 
