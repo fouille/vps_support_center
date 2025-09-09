@@ -618,8 +618,8 @@ const TicketDetail = () => {
                   <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement...</span>
                 </div>
               ) : files.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                  Aucun fichier
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
+                  Aucun fichier joint pour le moment
                 </p>
               ) : (
                 files.map((file, index) => (
