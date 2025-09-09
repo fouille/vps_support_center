@@ -25,13 +25,18 @@ const TicketDetail = () => {
 
   // Fonction utilitaire pour formater les dates de façon sécurisée
   const formatDate = (dateString, formatString) => {
-    if (!dateString) return 'Date non disponible';
+    if (!dateString) return null; // Retourner null au lieu d'un message
     
     try {
       // Essayer de parser la date
       let date;
       if (typeof dateString === 'string') {
-        date = parseISO(dateString);
+        // Essayer différents formats
+        if (dateString.includes('T')) {
+          date = parseISO(dateString);
+        } else {
+          date = new Date(dateString);
+        }
       } else {
         date = new Date(dateString);
       }
@@ -39,13 +44,13 @@ const TicketDetail = () => {
       // Vérifier si la date est valide
       if (!isValid(date)) {
         console.warn('Date invalide:', dateString);
-        return 'Date invalide';
+        return null;
       }
       
       return format(date, formatString, { locale: fr });
     } catch (error) {
       console.error('Erreur de formatage de date:', error, dateString);
-      return 'Erreur de date';
+      return null;
     }
   };
   
