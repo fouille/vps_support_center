@@ -336,11 +336,16 @@ const PortabiliteDetail = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchPortabilite(), fetchCommentaires()]);
+      await Promise.all([fetchPortabilite(), fetchCommentaires(), fetchFiles()]);
       setLoading(false);
     };
     
     loadData();
+    
+    // Fermer le picker d'emojis si ouvert
+    return () => {
+      setShowEmojiPicker(false);
+    };
   }, [portabilite_uuid]);
 
   if (loading) {
