@@ -130,13 +130,6 @@ const TicketDetail = () => {
       }
     } finally {
       setLoading(false);
-      
-      // Charger les échanges après que la page soit affichée
-      if (ticket_uuid) {
-        setTimeout(() => {
-          fetchExchangesAfterPageLoad();
-        }, 100);
-      }
     }
   };
 
