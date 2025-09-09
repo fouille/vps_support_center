@@ -505,6 +505,13 @@ VoIP Services - Système de portabilité`
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                💬 Répondre à la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
