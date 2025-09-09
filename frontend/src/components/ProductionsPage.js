@@ -24,6 +24,7 @@ import {
 
 
 const ProductionsPage = () => {
+  const { production_uuid } = useParams();
   const { api, user, isAgent } = useAuth();
   const [productions, setProductions] = useState([]);
   const [clients, setClients] = useState([]);
