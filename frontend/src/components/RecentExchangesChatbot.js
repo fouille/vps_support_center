@@ -151,7 +151,7 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4 h-64">
+          <div className="flex-1 overflow-y-auto p-4" style={{ height: 'calc(100% - 64px)' }}>
             {loading && (
               <div className="flex items-center justify-center h-full">
                 <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
