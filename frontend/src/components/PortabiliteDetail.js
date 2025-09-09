@@ -283,7 +283,7 @@ const PortabiliteDetail = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?') || !portabilite) return;
 
     try {
-      await api.delete(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}&fileId=${fileId}`);
+      await api.delete(`/api/portabilite-fichiers?portabiliteId=${portabilite_uuid}&fileId=${fileId}`);
       fetchFiles();
     } catch (error) {
       setError('Erreur lors de la suppression du fichier');
