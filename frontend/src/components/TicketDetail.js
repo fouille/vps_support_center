@@ -568,32 +568,99 @@ const TicketDetail = () => {
             </div>
 
             {/* Formulaire d'ajout de commentaire */}
-            <form onSubmit={handleAddComment} className="mt-6">
-              <div className="flex space-x-3">
-                <div className="flex-1">
+            <div className="mt-6">
+              {/* Barre d'émojis */}
+              <div className="relative">
+                <div className="flex items-center justify-between mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex items-center space-x-1 disabled:opacity-50"
+                    disabled={sendingComment || !ticket}
+                  >
+                    <span className="text-lg">😊</span>
+                    <span>Émojis</span>
+                  </button>
+                </div>
+                
+                {/* Sélecteur d'émojis */}
+                {showEmojiPicker && (
+                  <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-xl z-10 w-full max-w-xs">
+                    <div className="grid grid-cols-8 gap-1">
+                      {popularEmojis.map((emoji, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => insertEmoji(emoji)}
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-lg"
+                          title={`Ajouter ${emoji}`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                      <button
+                        type="button"
+                        onClick={() => setShowEmojiPicker(false)}
+                        className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 w-full text-center py-1"
+                      >
+                        Fermer
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <form onSubmit={handleAddComment}>
+                <div className="space-y-3">
                   <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Ajouter un commentaire..."
-                    className="input resize-none"
-                    rows={3}
+                    placeholder="Tapez votre message..."
+                    className="input h-20 resize-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    required
+                    maxLength={1000}
                     disabled={sendingComment || !ticket}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey && !sendingComment) {
+                        e.preventDefault();
+                        handleAddComment(e);
+                      }
+                    }}
                   />
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      💡 Appuyez sur Entrée pour envoyer • Shift+Entrée pour saut de ligne
+                    </span>
+                    <div className="flex space-x-2">
+                      {showEmojiPicker && (
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(false)}
+                          className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1"
+                        >
+                          Fermer
+                        </button>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={!newComment.trim() || sendingComment || !ticket}
+                        className="btn-primary flex items-center"
+                      >
+                        {sendingComment ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        ) : (
+                          <Send className="h-4 w-4 mr-2" />
+                        )}
+                        Envoyer
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={!newComment.trim() || sendingComment || !ticket}
-                  className="btn-primary flex items-center self-end"
-                >
-                  {sendingComment ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Send className="h-4 w-4 mr-2" />
-                  )}
-                  Envoyer
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
 
