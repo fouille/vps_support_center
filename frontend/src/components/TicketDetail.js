@@ -81,6 +81,7 @@ const TicketDetail = () => {
         return;
       }
       
+      console.log('TicketDetail: Ticket data received:', ticketData);
       setTicket(ticketData);
       
       // Charger les échanges et les fichiers en parallèle
