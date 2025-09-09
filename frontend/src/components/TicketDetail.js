@@ -395,7 +395,7 @@ const TicketDetail = () => {
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Client</p>
               <p className="text-gray-900 dark:text-dark-text">
-                {ticket.client_nom || 'Non spécifié'}
+                {ticket?.client_nom || 'Non spécifié'}
               </p>
             </div>
           </div>
