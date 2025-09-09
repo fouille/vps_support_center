@@ -434,7 +434,7 @@ const TicketDetail = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Échéance</p>
                 <p className="text-orange-600 dark:text-orange-400">
-                  {formatDate(ticket.date_fin_prevue, 'dd MMM yyyy')}
+                  {formatDate(ticket.date_fin_prevue, 'dd MMM yyyy') || 'Date non définie'}
                 </p>
               </div>
             </div>
