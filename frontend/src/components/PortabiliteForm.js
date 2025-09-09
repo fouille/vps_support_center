@@ -944,7 +944,7 @@ const PortabiliteForm = () => {
               <div className="flex space-x-4">
                 <button
                   type="button"
-                  onClick={() => onNavigate('portabilites')}
+                  onClick={() => navigate('/portabilites')}
                   className="px-6 py-3 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
                 >
                   Annuler
