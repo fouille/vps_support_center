@@ -529,15 +529,7 @@ const TicketsPage = () => {
   };
 
   const handleView = (ticket) => {
-    setViewingTicket(ticket);
-    setShowViewModal(true);
-    fetchTicketEchanges(ticket.id);
-    fetchTicketFiles(ticket.id);
-    
-    // Si c'est un agent qui ouvre le ticket et que le statut est "nouveau", le passer en "en_cours"
-    if (isAgent && ticket.status === 'nouveau') {
-      handleStatusChange(ticket.id, 'en_cours', ticket);
-    }
+    navigate(`/tickets/${ticket.id}`);
   };
 
   // Émojis populaires pour les commentaires
