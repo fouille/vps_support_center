@@ -480,7 +480,7 @@ const TicketDetail = () => {
                 </div>
                 <button
                   type="submit"
-                  disabled={!newComment.trim() || sendingComment}
+                  disabled={!newComment.trim() || sendingComment || !ticket}
                   className="btn-primary flex items-center self-end"
                 >
                   {sendingComment ? (
