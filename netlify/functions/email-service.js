@@ -42,7 +42,7 @@ const initializeBrevo = () => {
 // Email templates
 const createEmailTemplate = {
   // Template pour la création d'un ticket
-  ticketCreated: (ticket, client, demandeur) => ({
+  ticketCreated: (ticket, client, demandeur, baseUrl = '') => ({
     subject: `Nouveau ticket #${ticket.numero_ticket} - ${ticket.titre}`,
     html: `
       <!DOCTYPE html>
@@ -56,6 +56,8 @@ const createEmailTemplate = {
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .ticket-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+          .button { background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #1d4ed8; }
         </style>
       </head>
       <body>
@@ -76,6 +78,13 @@ const createEmailTemplate = {
               <strong>Date :</strong> ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
             </div>
             ${ticket.description ? `<p><strong>Description :</strong><br>${ticket.description}</p>` : ''}
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/tickets/${ticket.id}" class="button">
+                📋 Voir le ticket
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
@@ -95,6 +104,8 @@ Statut : ${ticket.status}
 Date : ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
 
 ${ticket.description ? `Description : ${ticket.description}` : ''}
+
+${baseUrl ? `Voir le ticket : ${baseUrl}/tickets/${ticket.id}` : ''}
 
 VoIP Services - Système de gestion des tickets`
   }),
