@@ -24,6 +24,19 @@ const Login = () => {
 
   useEffect(() => {
     const initializePage = async () => {
+      // Appliquer le thème depuis localStorage
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme !== null) {
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } else {
+        // Par défaut dark mode
+        document.documentElement.classList.add('dark');
+      }
+
       // Détecter le domaine depuis l'URL
       const currentDomain = window.location.hostname;
       
