@@ -147,6 +147,7 @@ const TicketDetail = () => {
       
       setTicket(prev => ({ ...prev, status: newStatus }));
     } catch (error) {
+      setError('Erreur lors de la mise à jour du statut');
       console.error('Erreur lors de la mise à jour du statut:', error);
     }
   };
