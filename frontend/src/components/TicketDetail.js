@@ -583,6 +583,8 @@ const TicketDetail = () => {
                   );
                 })
               )}
+              {/* Élément pour l'auto-scroll */}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Formulaire d'ajout de commentaire */}
