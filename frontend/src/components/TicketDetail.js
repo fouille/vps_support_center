@@ -475,7 +475,7 @@ const TicketDetail = () => {
                     placeholder="Ajouter un commentaire..."
                     className="input resize-none"
                     rows={3}
-                    disabled={sendingComment}
+                    disabled={sendingComment || !ticket}
                   />
                 </div>
                 <button
