@@ -172,7 +172,7 @@ const PortabiliteDetail = () => {
           <div className="bg-white dark:bg-dark-surface rounded-lg shadow-md p-6">
             <p className="text-red-600">Portabilité non trouvée</p>
             <button
-              onClick={() => onNavigate('portabilites')}
+              onClick={() => navigate('/portabilites')}
               className="mt-4 text-purple-600 hover:text-purple-800"
             >
               ← Retour aux portabilités
