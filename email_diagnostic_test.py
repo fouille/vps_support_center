@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration - Use production URL from frontend/.env
-BACKEND_URL = "https://ticket-master-46.preview.emergentagent.com"
+BACKEND_URL = "https://ticketflow-37.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials

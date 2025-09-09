@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Configuration
-const BASE_URL = 'https://ticket-master-46.preview.emergentagent.com';
+const BASE_URL = 'https://ticketflow-37.preview.emergentagent.com';
 
 // Test user credentials (assuming we have a test agent)
 const testAgent = {
