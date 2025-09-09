@@ -1,6 +1,9 @@
 // Service email utilisant Brevo avec la nouvelle API @getbrevo/brevo
 console.log('email-service.js: Starting to load...');
 
+const { neon } = require('@netlify/neon');
+const sql = neon(); // automatically uses env NETLIFY_DATABASE_URL
+
 let TransactionalEmailsApi, SendSmtpEmail;
 try {
   const brevoImport = require('@getbrevo/brevo');
@@ -13,6 +16,33 @@ try {
   TransactionalEmailsApi = null;
   SendSmtpEmail = null;
 }
+
+// Fonction pour obtenir l'URL de base du frontend basée sur la société du demandeur
+const getBaseUrl = async (demandeurId) => {
+  try {
+    if (!demandeurId) {
+      return 'https://support.voipservices.fr';
+    }
+
+    // Récupérer le domaine de la société du demandeur
+    const result = await sql`
+      SELECT ds.domaine
+      FROM demandeurs d
+      JOIN demandeurs_societe ds ON d.societe_id = ds.id
+      WHERE d.id = ${demandeurId}
+    `;
+
+    if (result.length > 0 && result[0].domaine) {
+      return `https://${result[0].domaine}`;
+    }
+
+    // Fallback si pas de domaine trouvé
+    return 'https://support.voipservices.fr';
+  } catch (error) {
+    console.error('Erreur lors de la récupération du domaine:', error);
+    return 'https://support.voipservices.fr';
+  }
+};
 
 let brevoClient = null;
 
@@ -42,7 +72,7 @@ const initializeBrevo = () => {
 // Email templates
 const createEmailTemplate = {
   // Template pour la création d'un ticket
-  ticketCreated: (ticket, client, demandeur) => ({
+  ticketCreated: (ticket, client, demandeur, baseUrl = '') => ({
     subject: `Nouveau ticket #${ticket.numero_ticket} - ${ticket.titre}`,
     html: `
       <!DOCTYPE html>
@@ -56,6 +86,8 @@ const createEmailTemplate = {
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .ticket-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+          .button { background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #1d4ed8; }
         </style>
       </head>
       <body>
@@ -76,6 +108,13 @@ const createEmailTemplate = {
               <strong>Date :</strong> ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
             </div>
             ${ticket.description ? `<p><strong>Description :</strong><br>${ticket.description}</p>` : ''}
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/tickets/${ticket.id}" class="button">
+                📋 Voir le ticket
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
@@ -96,11 +135,13 @@ Date : ${new Date(ticket.date_creation).toLocaleDateString('fr-FR')}
 
 ${ticket.description ? `Description : ${ticket.description}` : ''}
 
+${baseUrl ? `Voir le ticket : ${baseUrl}/tickets/${ticket.id}` : ''}
+
 VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour l'ajout d'un commentaire
-  commentAdded: (ticket, comment, author, recipientEmail) => {
+  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '') => {
     console.log('commentAdded template called with:', {
       ticketId: ticket?.id,
       commentId: comment?.id,
@@ -124,6 +165,8 @@ VoIP Services - Système de gestion des tickets`
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #2563eb; }
+          .button { background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #1d4ed8; }
         </style>
       </head>
       <body>
@@ -141,6 +184,13 @@ VoIP Services - Système de gestion des tickets`
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/tickets/${ticket.id}" class="button">
+                💬 Répondre au ticket
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
@@ -180,6 +230,8 @@ VoIP Services - Système de gestion des tickets`
           .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
           .old-status { color: #dc2626; }
           .new-status { color: #16a34a; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -283,6 +335,8 @@ VoIP Services - Système de gestion des tickets`
           .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
           .old-status { color: #dc2626; }
           .new-status { color: #16a34a; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -320,7 +374,7 @@ VoIP Services - Système de production`
   }),
 
   // Template pour la création d'une portabilité
-  portabiliteCreated: (portabilite, client, demandeur) => ({
+  portabiliteCreated: (portabilite, client, demandeur, baseUrl = '') => ({
     subject: `Nouvelle portabilité #${portabilite.numero_portabilite} - ${portabilite.numeros_portes}`,
     html: `
       <!DOCTYPE html>
@@ -330,10 +384,12 @@ VoIP Services - Système de production`
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+          .header { background-color: #059669; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .portabilite-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -353,6 +409,13 @@ VoIP Services - Système de production`
               <strong>Statut :</strong> ${portabilite.status}<br>
               <strong>Date demandée :</strong> ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
             </div>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                📞 Voir la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
@@ -371,11 +434,13 @@ Email client : ${portabilite.email_client || 'N/A'}
 Statut : ${portabilite.status}
 Date demandée : ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
 
+${baseUrl ? `Voir la portabilité : ${baseUrl}/portabilites/${portabilite.id}` : ''}
+
 VoIP Services - Système de portabilité`
   }),
 
   // Template pour changement de statut de portabilité
-  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author) => ({
+  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '') => ({
     subject: `Portabilité #${portabilite.numero_portabilite} - Statut modifié`,
     html: `
       <!DOCTYPE html>
@@ -391,6 +456,8 @@ VoIP Services - Système de portabilité`
           .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
           .old-status { color: #dc2626; }
           .new-status { color: #16a34a; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -407,6 +474,13 @@ VoIP Services - Système de portabilité`
             </div>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
             <p><strong>Client :</strong> ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                📞 Voir la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
@@ -428,7 +502,7 @@ VoIP Services - Système de portabilité`
   }),
 
   // Template pour commentaire sur portabilité
-  portabiliteCommentAdded: (portabilite, comment, author) => ({
+  portabiliteCommentAdded: (portabilite, comment, author, baseUrl = '') => ({
     subject: `Commentaire ajouté - Portabilité #${portabilite.numero_portabilite}`,
     html: `
       <!DOCTYPE html>
@@ -441,7 +515,9 @@ VoIP Services - Système de portabilité`
           .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
-          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #7c3aed; }
+          .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #059669; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -459,6 +535,13 @@ VoIP Services - Système de portabilité`
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                💬 Répondre à la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
@@ -661,7 +744,8 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
 const emailService = {
   // Envoi d'email lors de la création d'un ticket
   sendTicketCreatedEmail: async (ticket, client, demandeur) => {
-    const template = createEmailTemplate.ticketCreated(ticket, client, demandeur);
+    const baseUrl = await getBaseUrl(demandeur?.id || ticket?.demandeur_id);
+    const template = createEmailTemplate.ticketCreated(ticket, client, demandeur, baseUrl);
     
     // Envoyer à contact@voipservices.fr et au demandeur
     const recipients = [
@@ -674,7 +758,8 @@ const emailService = {
 
   // Envoi d'email lors de l'ajout d'un commentaire
   sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName) => {
-    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail);
+    const baseUrl = await getBaseUrl(ticket?.demandeur_id);
+    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail, baseUrl);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
@@ -715,6 +800,7 @@ const emailService = {
 
   // Envoi d'email lors de la création d'une portabilité
   sendPortabiliteCreationEmail: async (portabiliteDetail) => {
+    const baseUrl = await getBaseUrl(portabiliteDetail?.demandeur_id);
     const template = createEmailTemplate.portabiliteCreated(
       portabiliteDetail, 
       { nom_societe: portabiliteDetail.nom_societe },
@@ -722,7 +808,8 @@ const emailService = {
         prenom: portabiliteDetail.demandeur_prenom, 
         nom: portabiliteDetail.demandeur_nom,
         email: portabiliteDetail.demandeur_email 
-      }
+      },
+      baseUrl
     );
     
     // Envoyer à contact@voipservices.fr et au demandeur
@@ -742,7 +829,8 @@ const emailService = {
 
   // Envoi d'email pour changement de statut de portabilité
   sendPortabiliteStatusChangeEmail: async (portabiliteDetail, oldStatus, newStatus) => {
-    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null);
+    const baseUrl = await getBaseUrl(portabiliteDetail?.demandeur_id);
+    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null, baseUrl);
     
     // Envoyer au demandeur si disponible
     if (portabiliteDetail.demandeur_email) {
@@ -758,7 +846,8 @@ const emailService = {
 
   // Envoi d'email pour commentaire sur portabilité
   sendPortabiliteCommentEmail: async (portabiliteInfo, commentDetail, userType) => {
-    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail);
+    const baseUrl = await getBaseUrl(portabiliteInfo?.demandeur_id);
+    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail, baseUrl);
     
     // Déterminer le destinataire selon le type d'utilisateur qui commente
     let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];

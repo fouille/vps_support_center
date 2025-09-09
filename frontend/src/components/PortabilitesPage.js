@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 import PortabiliteModal from './PortabiliteModal';
 
-const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
+const PortabilitesPage = () => {
+  const navigate = useNavigate();
   const [portabilites, setPortabilites] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -167,8 +169,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
 
   // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
-    setSelectedPortabiliteId(portabiliteId);
-    setShowModal(true);
+    navigate(`/portabilites/${portabiliteId}`);
   };
 
   // Fonction pour fermer le modal
@@ -179,8 +180,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
 
   // Fonction pour éditer une portabilité
   const editPortabilite = (portabiliteId) => {
-    onSelectPortabilite(portabiliteId);
-    onNavigate('portabilites-edit');
+    navigate(`/portabilites/${portabiliteId}/edit`);
   };
 
   // Fonction pour supprimer une portabilité depuis le tableau
@@ -212,7 +212,7 @@ const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
 
   // Fonction pour créer une nouvelle portabilité
   const createPortabilite = () => {
-    onNavigate('portabilites-nouvelle');
+    navigate('/portabilites/nouvelle');
   };
 
   useEffect(() => {

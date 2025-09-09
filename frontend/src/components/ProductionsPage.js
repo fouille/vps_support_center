@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ProductionModal from './ProductionModal';
 import ProductionForm from './ProductionForm';
@@ -23,6 +24,7 @@ import {
 
 
 const ProductionsPage = () => {
+  const { production_uuid } = useParams();
   const { api, user, isAgent } = useAuth();
   const [productions, setProductions] = useState([]);
   const [clients, setClients] = useState([]);
@@ -52,7 +54,25 @@ const ProductionsPage = () => {
     if (isAgent) {
       fetchDemandeurs();
     }
+    
+    // Si on a un UUID de production dans l'URL, ouvrir le modal
+    if (production_uuid) {
+      const foundProduction = productions.find(p => p.id === production_uuid);
+      if (foundProduction) {
+        openProductionDetails(foundProduction);
+      }
+    }
   }, []);
+  
+  // Effet pour gérer l'ouverture automatique de la production depuis l'URL
+  useEffect(() => {
+    if (production_uuid && productions.length > 0) {
+      const foundProduction = productions.find(p => p.id === production_uuid);
+      if (foundProduction) {
+        openProductionDetails(foundProduction);
+      }
+    }
+  }, [production_uuid, productions]);
 
   // Actualiser automatiquement lors du changement de filtres (sauf chargement initial)
   useEffect(() => {

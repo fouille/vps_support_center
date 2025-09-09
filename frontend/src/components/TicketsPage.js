@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 import { 
@@ -22,6 +23,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const TicketsPage = () => {
+  const navigate = useNavigate();
   const { isAgent, api, user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [clients, setClients] = useState([]); // Clients pour les filtres - maintenant avec recherche serveur aussi
@@ -527,15 +529,7 @@ const TicketsPage = () => {
   };
 
   const handleView = (ticket) => {
-    setViewingTicket(ticket);
-    setShowViewModal(true);
-    fetchTicketEchanges(ticket.id);
-    fetchTicketFiles(ticket.id);
-    
-    // Si c'est un agent qui ouvre le ticket et que le statut est "nouveau", le passer en "en_cours"
-    if (isAgent && ticket.status === 'nouveau') {
-      handleStatusChange(ticket.id, 'en_cours', ticket);
-    }
+    navigate(`/tickets/${ticket.id}`);
   };
 
   // Émojis populaires pour les commentaires

@@ -51,7 +51,71 @@ exports.handler = async (event, context) => {
 
     switch (event.httpMethod) {
       case 'GET':
-        console.log('Getting tickets...');
+        console.log('Getting tickets...', 'ticketId:', ticketId);
+        
+        // Check if this is a request for a specific ticket
+        if (ticketId && ticketId !== 'tickets') {
+          console.log('Getting specific ticket:', ticketId);
+          
+          // Get specific ticket by ID
+          const ticket = await sql`
+            SELECT t.*, c.nom_societe as client_nom, c.nom as client_nom_personne, c.prenom as client_prenom,
+                   d.nom as demandeur_nom, d.prenom as demandeur_prenom, d.societe as demandeur_societe,
+                   a.nom as agent_nom, a.prenom as agent_prenom
+            FROM tickets t 
+            JOIN clients c ON t.client_id = c.id 
+            JOIN demandeurs d ON t.demandeur_id = d.id 
+            LEFT JOIN agents a ON t.agent_id = a.id 
+            WHERE t.id = ${ticketId}
+          `;
+          
+          if (ticket.length === 0) {
+            return {
+              statusCode: 404,
+              headers,
+              body: JSON.stringify({ detail: 'Ticket non trouvé' })
+            };
+          }
+          
+          // Check if user has access to this ticket
+          if ((decoded.type_utilisateur || decoded.type) !== 'agent') {
+            // For demandeurs, check if they have access to this ticket
+            const demandeur = await sql`
+              SELECT societe_id FROM demandeurs WHERE id = ${decoded.id}
+            `;
+            
+            if (demandeur.length === 0) {
+              return {
+                statusCode: 404,
+                headers,
+                body: JSON.stringify({ detail: 'Utilisateur non trouvé' })
+              };
+            }
+            
+            // Check access - either own ticket or same company
+            // For same company check, we need to get the ticket's demandeur's societe_id
+            let hasAccess = ticket[0].demandeur_id === decoded.id;
+            
+            if (!hasAccess && demandeur[0].societe_id) {
+              const ticketDemandeur = await sql`
+                SELECT societe_id FROM demandeurs WHERE id = ${ticket[0].demandeur_id}
+              `;
+              hasAccess = ticketDemandeur.length > 0 && ticketDemandeur[0].societe_id === demandeur[0].societe_id;
+            }
+            
+            if (!hasAccess) {
+              return {
+                statusCode: 403,
+                headers,
+                body: JSON.stringify({ detail: 'Accès refusé' })
+              };
+            }
+          }
+          
+          return { statusCode: 200, headers, body: JSON.stringify(ticket[0]) };
+        }
+        
+        // If not a specific ticket request, proceed with listing tickets
         let ticketsQuery;
         
         // Parse query parameters for filtering

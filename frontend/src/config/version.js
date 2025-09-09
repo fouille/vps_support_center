@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 10,      // Version mineure - nouvelles fonctionnalités
-  patch: 6,      // Version patch - corrections de bugs
+  minor: 11,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-09-09", // Date de build automatique
 };
 
@@ -34,6 +34,18 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.11.0",
+    date: "2025-09-09",
+    type: "MINOR",
+    description: "Implémentation système de routing avec React Router - URLs dynamiques pour tickets, portabilités et productions"
+  },
+  {
+    version: "2.10.7",
+    date: "2025-09-09",
+    type: "PATCH",
+    description: "mineur Implémentation système de routing avec React Router - URLs dynamiques pour tickets, portabilités et productions"
+  },
+{
     version: "2.10.6",
     date: "2025-09-09",
     type: "PATCH",

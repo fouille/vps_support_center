@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const RecentExchangesChatbot = () => {
   const { api } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -70,6 +72,30 @@ const RecentExchangesChatbot = () => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  const handleExchangeClick = (exchange) => {
+    // Fermer le chatbot
+    setIsOpen(false);
+    
+    // Naviguer selon le type
+    switch (exchange.type) {
+      case 'ticket':
+        navigate(`/tickets/${exchange.item_id}`);
+        break;
+      case 'portabilite':
+        navigate(`/portabilites/${exchange.item_id}`);
+        break;
+      case 'production':
+        // Productions non cliquables pour le moment
+        break;
+      default:
+        break;
+    }
+  };
+
+  const isClickable = (type) => {
+    return type === 'ticket' || type === 'portabilite';
   };
 
   return (
@@ -170,19 +196,43 @@ const RecentExchangesChatbot = () => {
                 {exchanges.map((exchange, index) => (
                   <div
                     key={`${exchange.type}-${exchange.item_id}-${index}`}
-                    className="p-3 rounded-lg border transition-colors cursor-pointer bg-gray-50 border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
+                    onClick={() => handleExchangeClick(exchange)}
+                    className={`group p-3 rounded-lg border transition-all duration-200 ${
+                      isClickable(exchange.type)
+                        ? 'cursor-pointer hover:shadow-md bg-gray-50 border-gray-200 hover:bg-blue-50 hover:border-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-blue-500'
+                        : 'cursor-default bg-gray-50 border-gray-200 dark:bg-gray-700 dark:border-gray-600 opacity-75'
+                    }`}
                   >
                     {/* Type et numéro */}
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-lg">{getTypeIcon(exchange.type)}</span>
-                      <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                        {getTypeLabel(exchange.type)} #{exchange.item_number}
-                      </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">{getTypeIcon(exchange.type)}</span>
+                        <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                          {getTypeLabel(exchange.type)} #{exchange.item_number}
+                        </span>
+                      </div>
+                      {isClickable(exchange.type) && (
+                        <div className="flex items-center text-xs text-blue-600 dark:text-blue-400">
+                          <span className="mr-1">Cliquer pour ouvrir</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
 
                     {/* Titre */}
-                    <h4 className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-200">
+                    <h4 className={`font-medium text-sm mb-2 ${
+                      isClickable(exchange.type)
+                        ? 'text-gray-900 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400'
+                    }`}>
                       {truncateText(exchange.item_title, 60)}
+                      {exchange.type === 'production' && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 italic ml-2">
+                          (non cliquable)
+                        </span>
+                      )}
                     </h4>
 
                     {/* Dernier commentaire */}

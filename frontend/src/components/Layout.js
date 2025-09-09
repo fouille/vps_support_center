@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   UserCheck, 
@@ -17,8 +18,10 @@ import {
   Activity
 } from 'lucide-react';
 
-const Layout = ({ children, currentPage, onNavigate }) => {
+const Layout = ({ children }) => {
   const { user, logout, isAgent } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Initialiser le thème depuis localStorage ou par défaut dark
@@ -170,31 +173,31 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   };
 
   const navigation = [
-    { name: 'Dashboard', icon: BarChart3, key: 'dashboard' },
+    { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     ...(isAgent ? [
-      { name: 'Support', icon: Ticket, key: 'tickets' },
-      { name: 'Portabilités', icon: Phone, key: 'portabilites' },
-      { name: 'Productions', icon: Factory, key: 'productions' },
-      { name: 'Clients', icon: Users, key: 'clients' },
-      { name: 'Demandeurs', icon: UserCheck, key: 'demandeurs' },
-      { name: 'Agents', icon: Shield, key: 'agents' },
-      { name: 'Audit', icon: Activity, key: 'audit' },
+      { name: 'Support', icon: Ticket, path: '/tickets' },
+      { name: 'Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Productions', icon: Factory, path: '/productions' },
+      { name: 'Clients', icon: Users, path: '/clients' },
+      { name: 'Demandeurs', icon: UserCheck, path: '/demandeurs' },
+      { name: 'Agents', icon: Shield, path: '/agents' },
+      { name: 'Audit', icon: Activity, path: '/audit' },
     ] : [
-      { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
-      { name: 'Mes Portabilités', icon: Phone, key: 'portabilites' },
-      { name: 'Mes Productions', icon: Factory, key: 'productions' },
-      { name: 'Mes Clients', icon: Users, key: 'clients' },
-      { name: 'Mes Collaborateurs', icon: UserCheck, key: 'demandeurs' },
+      { name: 'Mes Tickets', icon: Ticket, path: '/tickets' },
+      { name: 'Mes Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Mes Productions', icon: Factory, path: '/productions' },
+      { name: 'Mes Clients', icon: Users, path: '/clients' },
+      { name: 'Mes Collaborateurs', icon: UserCheck, path: '/demandeurs' },
     ])
   ];
 
-  const handleNavigate = (key) => {
-    onNavigate(key);
+  const handleNavigate = (path) => {
+    navigate(path);
     setSidebarOpen(false);
   };
 
-  const isCurrentPage = (key) => {
-    return currentPage === key || currentPage.startsWith(key + '-');
+  const isCurrentPage = (path) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
   return (
@@ -239,10 +242,10 @@ const Layout = ({ children, currentPage, onNavigate }) => {
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
-                key={item.key}
-                onClick={() => handleNavigate(item.key)}
+                key={item.path}
+                onClick={() => handleNavigate(item.path)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
-                  isCurrentPage(item.key) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
+                  isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
               >
                 <item.icon className="h-5 w-5 mr-3" />

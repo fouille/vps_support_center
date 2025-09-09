@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 import { generateMandatPDF } from '../utils/mandatPDF';
 
-const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
-  const isEdit = Boolean(portabiliteId);
+const PortabiliteForm = () => {
+  const { portabilite_uuid } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(portabilite_uuid);
   const { user, api } = useContext(AuthContext);
   
   const [loading, setLoading] = useState(false);
@@ -165,7 +168,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     
     try {
       setLoading(true);
-      const response = await api.get(`/api/portabilites/${portabiliteId}`);
+      const response = await api.get(`/api/portabilites/${portabilite_uuid}`);
       
       const portabilite = response.data;
       setFormData({
@@ -318,14 +321,14 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
       }
       
       if (isEdit) {
-        await api.put(`/api/portabilites/${portabiliteId}`, dataToSend);
+        await api.put(`/api/portabilites/${portabilite_uuid}`, dataToSend);
       } else {
         await api.post(`/api/portabilites`, dataToSend);
       }
       
       setSuccess(true);
       setTimeout(() => {
-        onNavigate('portabilites');
+        navigate('/portabilites');
       }, 1500);
       
     } catch (err) {
@@ -352,7 +355,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
     };
     
     loadData();
-  }, [user, isEdit, portabiliteId]);
+  }, [user, isEdit, portabilite_uuid]);
 
   // Fonction de validation pour chaque étape
   const validateStep = (step) => {
@@ -467,7 +470,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
               {isEdit ? 'Modifier la portabilité' : 'Nouvelle portabilité'}
             </h1>
             <button
-              onClick={() => onNavigate('portabilites')}
+              onClick={() => navigate('/portabilites')}
               className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 flex items-center space-x-2"
             >
               <span>←</span>
@@ -941,7 +944,7 @@ const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
               <div className="flex space-x-4">
                 <button
                   type="button"
-                  onClick={() => onNavigate('portabilites')}
+                  onClick={() => navigate('/portabilites')}
                   className="px-6 py-3 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
                 >
                   Annuler
