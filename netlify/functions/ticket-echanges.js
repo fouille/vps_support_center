@@ -145,9 +145,18 @@ exports.handler = async (event, context) => {
 
         const createdEchange = await sql`
           INSERT INTO ticket_echanges (id, ticket_id, auteur_id, auteur_type, message)
-          VALUES (${uuidv4()}, ${ticketId}, ${auteurId}, ${auteurType}, ${message.trim()})
+          VALUES (${uuidv4()}, ${ticketId}, ${auteurType}, ${auteurId}, ${message.trim()})
           RETURNING *
         `;
+
+        // Si c'est un demandeur qui commente, changer le statut du ticket à "en_attente" sauf si c'est "nouveau"
+        if (auteurType === 'demandeur') {
+          await sql`
+            UPDATE tickets 
+            SET status = 'en_attente', updated_at = NOW()
+            WHERE id = ${ticketId} AND status != 'nouveau'
+          `;
+        }
         
         // Get the exchange with author name
         const echangeWithAuthor = await sql`
