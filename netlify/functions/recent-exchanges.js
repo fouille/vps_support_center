@@ -59,25 +59,48 @@ exports.handler = async (event, context) => {
       const societeId = demandeur[0].societe_id;
 
       // Requête pour les échanges de tickets
-      const ticketExchanges = await sql`
-        SELECT 
-          'ticket' as type,
-          t.id as item_id,
-          t.numero_ticket as item_number,
-          t.titre as item_title,
-          te.message as last_comment,
-          te.created_at,
-          COALESCE(a.nom, d.nom) as auteur_nom,
-          COALESCE(a.prenom, d.prenom) as auteur_prenom,
-          te.auteur_type
-        FROM ticket_echanges te
-        JOIN tickets t ON te.ticket_id = t.id
-        LEFT JOIN agents a ON te.auteur_id = a.id AND te.auteur_type = 'agent'
-        LEFT JOIN demandeurs d ON te.auteur_id = d.id AND te.auteur_type = 'demandeur'
-        WHERE ${societeId ? sql`t.demandeur_id IN (SELECT id FROM demandeurs WHERE societe_id = ${societeId})` : sql`t.demandeur_id = ${decoded.id}`}
-        ORDER BY te.created_at DESC
-        LIMIT 10
-      `;
+      let ticketExchanges;
+      if (societeId) {
+        ticketExchanges = await sql`
+          SELECT 
+            'ticket' as type,
+            t.id as item_id,
+            t.numero_ticket as item_number,
+            t.titre as item_title,
+            te.message as last_comment,
+            te.created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            te.auteur_type
+          FROM ticket_echanges te
+          JOIN tickets t ON te.ticket_id = t.id
+          LEFT JOIN agents a ON te.auteur_id = a.id AND te.auteur_type = 'agent'
+          LEFT JOIN demandeurs d ON te.auteur_id = d.id AND te.auteur_type = 'demandeur'
+          WHERE t.demandeur_id IN (SELECT id FROM demandeurs WHERE societe_id = ${societeId})
+          ORDER BY te.created_at DESC
+          LIMIT 10
+        `;
+      } else {
+        ticketExchanges = await sql`
+          SELECT 
+            'ticket' as type,
+            t.id as item_id,
+            t.numero_ticket as item_number,
+            t.titre as item_title,
+            te.message as last_comment,
+            te.created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            te.auteur_type
+          FROM ticket_echanges te
+          JOIN tickets t ON te.ticket_id = t.id
+          LEFT JOIN agents a ON te.auteur_id = a.id AND te.auteur_type = 'agent'
+          LEFT JOIN demandeurs d ON te.auteur_id = d.id AND te.auteur_type = 'demandeur'
+          WHERE t.demandeur_id = ${decoded.id}
+          ORDER BY te.created_at DESC
+          LIMIT 10
+        `;
+      }
 
       // Requête pour les échanges de portabilités
       const portabiliteExchanges = await sql`
