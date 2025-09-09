@@ -235,7 +235,7 @@ const TicketDetail = () => {
   };
 
   const handleFileDelete = async (fileId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?')) return;
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?') || !ticket) return;
 
     try {
       await api.delete(`/api/ticket-fichiers?ticketId=${ticket.id}&fileId=${fileId}`);
