@@ -213,13 +213,14 @@ const PortabiliteDetail = () => {
       });
 
       const fileData = {
+        portabiliteId: portabilite.id,
         nom_fichier: file.name,
         type_fichier: file.type,
         taille_fichier: file.size,
         contenu_base64: base64
       };
 
-      await api.post(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}`, fileData);
+      await api.post(`/api/portabilite-fichiers`, fileData);
       
       // Ajouter un commentaire automatique
       try {
