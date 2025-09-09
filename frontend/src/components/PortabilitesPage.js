@@ -169,8 +169,7 @@ const PortabilitesPage = () => {
 
   // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
-    setSelectedPortabiliteId(portabiliteId);
-    setShowModal(true);
+    navigate(`/portabilites/${portabiliteId}`);
   };
 
   // Fonction pour fermer le modal
