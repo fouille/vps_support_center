@@ -76,6 +76,9 @@ const TicketDetail = () => {
   const [sendingComment, setSendingComment] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  
+  // Ref pour l'auto-scroll
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (ticket_uuid) {
