@@ -804,7 +804,8 @@ const emailService = {
 
   // Envoi d'email pour changement de statut de portabilité
   sendPortabiliteStatusChangeEmail: async (portabiliteDetail, oldStatus, newStatus) => {
-    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null);
+    const baseUrl = getBaseUrl();
+    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null, baseUrl);
     
     // Envoyer au demandeur si disponible
     if (portabiliteDetail.demandeur_email) {
