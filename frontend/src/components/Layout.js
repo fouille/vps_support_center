@@ -17,7 +17,7 @@ import {
   Activity
 } from 'lucide-react';
 
-const Layout = ({ children, currentPage, onNavigate }) => {
+const Layout = ({ children }) => {
   const { user, logout, isAgent } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
