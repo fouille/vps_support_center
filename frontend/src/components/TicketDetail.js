@@ -509,7 +509,7 @@ const TicketDetail = () => {
                   );
                   
                   const isAgentAuthor = exchange.auteur_type === 'agent';
-                  const formattedDate = formatDate(exchange?.date_creation, 'dd MMM à HH:mm');
+                  const formattedDate = formatDate(exchange?.created_at, 'dd/MM/yyyy HH:mm');
                   
                   return (
                     <div 
