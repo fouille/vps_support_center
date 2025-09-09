@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const TicketsPage = () => {
+  const navigate = useNavigate();
   const { isAgent, api, user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [clients, setClients] = useState([]); // Clients pour les filtres - maintenant avec recherche serveur aussi
