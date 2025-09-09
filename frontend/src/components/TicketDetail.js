@@ -206,6 +206,8 @@ const TicketDetail = () => {
   };
 
   const downloadFile = async (file) => {
+    if (!ticket) return;
+    
     try {
       const response = await api.get(`/api/ticket-fichiers?ticketId=${ticket.id}&fileId=${file.id}`);
       const fileData = response.data;
