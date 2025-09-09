@@ -435,7 +435,7 @@ const TicketDetail = () => {
           </div>
         )}
 
-        {ticket.requete_initiale && (
+        {ticket?.requete_initiale && (
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-3">
               Demande initiale
