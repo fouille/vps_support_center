@@ -208,7 +208,7 @@ const TicketDetail = () => {
       // Auto-scroll vers le bas après ajout d'un commentaire
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, 200);
 
       // Si c'est un agent qui répond, mettre le ticket en "répondu"
       if (isAgent && ticket.status !== 'repondu') {
