@@ -35,7 +35,7 @@ const Footer = () => {
       </footer>
 
       {/* Chatbot des échanges récents - Uniquement si utilisateur connecté */}
-      {user && <RecentExchangesChatbot isDarkMode={isDarkMode} />}
+      {user && <RecentExchangesChatbot />}
     </>
   );
 };
