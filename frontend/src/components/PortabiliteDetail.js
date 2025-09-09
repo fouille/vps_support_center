@@ -313,6 +313,35 @@ const PortabiliteDetail = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  // Fonction pour demander l'annulation de la portabilité
+  const handleCancellationRequest = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir demander l\'annulation de cette portabilité ?')) {
+      return;
+    }
+
+    setSendingCancellation(true);
+    try {
+      // Ajouter un commentaire automatique
+      const response = await api.post(`/api/portabilite-echanges`, {
+        portabiliteId: portabilite_uuid,
+        message: 'Demande d\'annulation sans réserves'
+      });
+      
+      setCommentaires(prev => [...prev, response.data]);
+      
+      // Auto-scroll vers le bas
+      setTimeout(() => {
+        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+    } catch (error) {
+      setError('Erreur lors de la demande d\'annulation');
+      console.error('Erreur:', error);
+    } finally {
+      setSendingCancellation(false);
+    }
+  };
+
   // Fonction pour supprimer la portabilité
   const handleDelete = async () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette portabilité ?')) return;
