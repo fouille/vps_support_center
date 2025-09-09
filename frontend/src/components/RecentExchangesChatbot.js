@@ -77,11 +77,7 @@ const RecentExchangesChatbot = () => {
       {/* Bouton flottant */}
       <button
         onClick={toggleChatbot}
-        className={`fixed bottom-4 right-4 z-40 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 ${
-          isDarkMode
-            ? 'bg-gray-700 hover:bg-gray-600 text-white'
-            : 'bg-white hover:bg-blue-50 text-blue-600 border border-gray-200'
-        }`}
+        className="fixed bottom-4 right-4 z-40 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white hover:bg-blue-50 text-blue-600 border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white dark:border-gray-600"
         title="Échanges récents"
       >
         <svg 
