@@ -321,14 +321,14 @@ const PortabiliteForm = () => {
       }
       
       if (isEdit) {
-        await api.put(`/api/portabilites/${portabiliteId}`, dataToSend);
+        await api.put(`/api/portabilites/${portabilite_uuid}`, dataToSend);
       } else {
         await api.post(`/api/portabilites`, dataToSend);
       }
       
       setSuccess(true);
       setTimeout(() => {
-        onNavigate('portabilites');
+        navigate('/portabilites');
       }, 1500);
       
     } catch (err) {
