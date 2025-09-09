@@ -312,7 +312,6 @@ const TicketDetail = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Download error:', error);
       setError('Erreur lors du téléchargement du fichier');
     }
   };
