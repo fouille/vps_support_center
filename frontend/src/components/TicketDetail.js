@@ -79,6 +79,7 @@ const TicketDetail = () => {
   
   // Ref pour l'auto-scroll
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
   useEffect(() => {
     if (ticket_uuid) {
