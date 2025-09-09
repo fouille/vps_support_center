@@ -478,42 +478,77 @@ const TicketDetail = () => {
               Échanges ({exchanges.length})
             </h3>
             
-            <div className="space-y-4 max-h-96 overflow-y-auto">
+            <div className="space-y-3 max-h-96 overflow-y-auto">
               {loadingExchanges ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
                   <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement...</span>
                 </div>
               ) : exchanges.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                  Aucun échange pour le moment
-                </p>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Aucune conversation pour ce ticket
+                  </p>
+                  <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
+                    Commencez la discussion en envoyant le premier message
+                  </p>
+                </div>
               ) : (
-                exchanges.map((exchange, index) => (
-                  <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {exchange?.auteur_prenom?.[0] || '?'}{exchange?.auteur_nom?.[0] || ''}
+                exchanges.map((exchange, index) => {
+                  const isMyMessage = user && (
+                    (isAgent && exchange.auteur_type === 'agent') ||
+                    (!isAgent && exchange.auteur_type === 'demandeur')
+                  );
+                  
+                  const isAgentAuthor = exchange.auteur_type === 'agent';
+                  const formattedDate = formatDate(exchange?.date_creation, 'dd MMM à HH:mm');
+                  
+                  return (
+                    <div 
+                      key={exchange.id || index} 
+                      className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} ${
+                        index === exchanges.length - 1 ? 'animate-fade-in' : ''
+                      }`}
+                    >
+                      <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-2' : 'order-1'}`}>
+                        {/* Message bubble */}
+                        <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                          isMyMessage 
+                            ? 'bg-primary-500 text-white rounded-br-md' 
+                            : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md border border-gray-200 dark:border-gray-600'
+                        }`}>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                            {exchange?.message || 'Message non disponible'}
+                          </p>
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
-                            {exchange?.auteur_prenom || 'Utilisateur'} {exchange?.auteur_nom || ''}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {exchange?.auteur_type === 'agent' ? 'Agent' : 'Demandeur'}
-                          </p>
+                        
+                        {/* Metadata */}
+                        <div className={`flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400 ${
+                          isMyMessage ? 'justify-end' : 'justify-start'
+                        }`}>
+                          <div className={`flex items-center space-x-2 ${isMyMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white ${
+                              isAgentAuthor ? 'bg-primary-600' : 'bg-green-500'
+                            }`}>
+                              {((exchange?.auteur_prenom || '') + ' ' + (exchange?.auteur_nom || '')).trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '??'}
+                            </div>
+                            <span className="font-medium">
+                              {isMyMessage ? 'Moi' : `${exchange?.auteur_prenom || 'Utilisateur'} ${exchange?.auteur_nom || ''}`.trim()}
+                            </span>
+                            <span className="text-gray-400 dark:text-gray-500">
+                              {formattedDate || 'Date inconnue'}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(exchange?.date_creation, 'dd MMM à HH:mm')}
-                      </p>
                     </div>
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                      {exchange?.message || 'Message non disponible'}
-                    </p>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
