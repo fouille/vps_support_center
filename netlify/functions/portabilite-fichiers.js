@@ -61,6 +61,7 @@ exports.handler = async (event, context) => {
     if (method === 'GET') {
       // Récupération des fichiers d'une portabilité
       const portabiliteId = queryStringParameters?.portabiliteId;
+      const fileId = queryStringParameters?.fileId;
       
       if (!portabiliteId) {
         return {
