@@ -365,13 +365,13 @@ const TicketDetail = () => {
             <Ticket className="h-6 w-6 text-primary-600" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-dark-text">
-                {ticket.titre}
+                {ticket?.titre || 'Titre non disponible'}
               </h1>
               <div className="flex items-center space-x-3 mt-1">
                 <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                  #{ticket.numero_ticket}
+                  #{ticket?.numero_ticket || 'N/A'}
                 </span>
-                {getStatusBadge(ticket.status)}
+                {ticket?.status && getStatusBadge(ticket.status)}
               </div>
             </div>
           </div>
