@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import api from '../api';
+import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const RecentExchangesChatbot = ({ isDarkMode }) => {
+  const { api } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(false);
