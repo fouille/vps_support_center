@@ -103,25 +103,48 @@ exports.handler = async (event, context) => {
       }
 
       // Requête pour les échanges de portabilités
-      const portabiliteExchanges = await sql`
-        SELECT 
-          'portabilite' as type,
-          p.id as item_id,
-          p.numero_portabilite as item_number,
-          ('Portabilité ' || p.numeros_portes) as item_title,
-          pe.message as last_comment,
-          pe.created_at,
-          COALESCE(a.nom, d.nom) as auteur_nom,
-          COALESCE(a.prenom, d.prenom) as auteur_prenom,
-          pe.auteur_type
-        FROM portabilite_echanges pe
-        JOIN portabilites p ON pe.portabilite_id = p.id
-        LEFT JOIN agents a ON pe.auteur_id = a.id AND pe.auteur_type = 'agent'
-        LEFT JOIN demandeurs d ON pe.auteur_id = d.id AND pe.auteur_type = 'demandeur'
-        WHERE ${societeId ? sql`p.demandeur_id IN (SELECT id FROM demandeurs WHERE societe_id = ${societeId})` : sql`p.demandeur_id = ${decoded.id}`}
-        ORDER BY pe.created_at DESC
-        LIMIT 10
-      `;
+      let portabiliteExchanges;
+      if (societeId) {
+        portabiliteExchanges = await sql`
+          SELECT 
+            'portabilite' as type,
+            p.id as item_id,
+            p.numero_portabilite as item_number,
+            ('Portabilité ' || p.numeros_portes) as item_title,
+            pe.message as last_comment,
+            pe.created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            pe.auteur_type
+          FROM portabilite_echanges pe
+          JOIN portabilites p ON pe.portabilite_id = p.id
+          LEFT JOIN agents a ON pe.auteur_id = a.id AND pe.auteur_type = 'agent'
+          LEFT JOIN demandeurs d ON pe.auteur_id = d.id AND pe.auteur_type = 'demandeur'
+          WHERE p.demandeur_id IN (SELECT id FROM demandeurs WHERE societe_id = ${societeId})
+          ORDER BY pe.created_at DESC
+          LIMIT 10
+        `;
+      } else {
+        portabiliteExchanges = await sql`
+          SELECT 
+            'portabilite' as type,
+            p.id as item_id,
+            p.numero_portabilite as item_number,
+            ('Portabilité ' || p.numeros_portes) as item_title,
+            pe.message as last_comment,
+            pe.created_at,
+            COALESCE(a.nom, d.nom) as auteur_nom,
+            COALESCE(a.prenom, d.prenom) as auteur_prenom,
+            pe.auteur_type
+          FROM portabilite_echanges pe
+          JOIN portabilites p ON pe.portabilite_id = p.id
+          LEFT JOIN agents a ON pe.auteur_id = a.id AND pe.auteur_type = 'agent'
+          LEFT JOIN demandeurs d ON pe.auteur_id = d.id AND pe.auteur_type = 'demandeur'
+          WHERE p.demandeur_id = ${decoded.id}
+          ORDER BY pe.created_at DESC
+          LIMIT 10
+        `;
+      }
 
       // Requête pour les commentaires de tâches de production
       const productionExchanges = await sql`
