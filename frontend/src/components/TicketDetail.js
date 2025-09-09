@@ -97,7 +97,7 @@ const TicketDetail = () => {
       
       // Si c'est un agent qui ouvre le ticket et que le statut est "nouveau", le passer en "en_cours"
       if (isAgent && ticketData.status === 'nouveau') {
-        await handleStatusChange(ticketData.id, 'en_cours');
+        await handleStatusChange(ticketData.id, 'en_cours', ticketData);
       }
       
     } catch (error) {
