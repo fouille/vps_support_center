@@ -196,7 +196,12 @@ const RecentExchangesChatbot = () => {
                 {exchanges.map((exchange, index) => (
                   <div
                     key={`${exchange.type}-${exchange.item_id}-${index}`}
-                    className="p-3 rounded-lg border transition-colors cursor-pointer bg-gray-50 border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
+                    onClick={() => handleExchangeClick(exchange)}
+                    className={`p-3 rounded-lg border transition-colors ${
+                      isClickable(exchange.type)
+                        ? 'cursor-pointer hover:shadow-md bg-gray-50 border-gray-200 hover:bg-blue-50 hover:border-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:border-blue-500'
+                        : 'cursor-default bg-gray-50 border-gray-200 dark:bg-gray-700 dark:border-gray-600'
+                    }`}
                   >
                     {/* Type et numéro */}
                     <div className="flex items-center space-x-2 mb-2">
