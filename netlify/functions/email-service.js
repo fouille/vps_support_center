@@ -775,6 +775,7 @@ const emailService = {
 
   // Envoi d'email lors de la création d'une portabilité
   sendPortabiliteCreationEmail: async (portabiliteDetail) => {
+    const baseUrl = getBaseUrl();
     const template = createEmailTemplate.portabiliteCreated(
       portabiliteDetail, 
       { nom_societe: portabiliteDetail.nom_societe },
@@ -782,7 +783,8 @@ const emailService = {
         prenom: portabiliteDetail.demandeur_prenom, 
         nom: portabiliteDetail.demandeur_nom,
         email: portabiliteDetail.demandeur_email 
-      }
+      },
+      baseUrl
     );
     
     // Envoyer à contact@voipservices.fr et au demandeur
