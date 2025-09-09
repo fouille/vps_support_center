@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 import { generateMandatPDF } from '../utils/mandatPDF';
 
-const PortabiliteForm = ({ onNavigate, portabiliteId }) => {
-  const isEdit = Boolean(portabiliteId);
+const PortabiliteForm = () => {
+  const { portabilite_uuid } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(portabilite_uuid);
   const { user, api } = useContext(AuthContext);
   
   const [loading, setLoading] = useState(false);
