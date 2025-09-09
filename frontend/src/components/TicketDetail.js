@@ -138,10 +138,13 @@ const TicketDetail = () => {
     }
   };
 
-  const handleStatusChange = async (ticketId, newStatus) => {
+  const handleStatusChange = async (ticketId, newStatus, ticketData = null) => {
     try {
+      // Utiliser ticketData si fourni, sinon ticket
+      const currentTicket = ticketData || ticket;
+      
       await api.put(`/api/tickets/${ticketId}`, {
-        ...ticket,
+        ...currentTicket,
         status: newStatus
       });
       
