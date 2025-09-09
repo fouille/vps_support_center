@@ -140,7 +140,7 @@ const TicketDetail = () => {
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
-    if (!file) return;
+    if (!file || !ticket) return;
 
     // Vérifications côté client
     const maxSize = 10 * 1024 * 1024; // 10MB
