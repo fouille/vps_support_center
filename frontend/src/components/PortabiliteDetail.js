@@ -25,6 +25,10 @@ const PortabiliteDetail = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [statusLoading, setStatusLoading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [files, setFiles] = useState([]);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   
   const commentsEndRef = useRef(null);
   const backendUrl = '';
