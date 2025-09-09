@@ -455,6 +455,24 @@ const PortabiliteDetail = () => {
                   </button>
                 </>
               )}
+              
+              {/* Boutons pour les demandeurs */}
+              {user.type_utilisateur === 'demandeur' && (
+                <button
+                  onClick={handleCancellationRequest}
+                  disabled={sendingCancellation}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Demander l'annulation de cette portabilité"
+                >
+                  {sendingCancellation ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  ) : (
+                    <span className="mr-2">/!\</span>
+                  )}
+                  Annulation
+                </button>
+              )}
+              
               <button
                 onClick={() => navigate('/portabilites')}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
