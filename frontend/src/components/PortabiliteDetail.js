@@ -33,6 +33,45 @@ const PortabiliteDetail = () => {
   const commentsEndRef = useRef(null);
   const backendUrl = '';
 
+  // Émojis populaires pour les commentaires
+  const popularEmojis = [
+    '😊', '👍', '👎', '❤️', '😢', '😂', '🔥', '💡', 
+    '✅', '❌', '⚠️', '🤔', '👌', '🙏', '💪', '🎉'
+  ];
+
+  const insertEmoji = (emoji) => {
+    setNewComment(newComment + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Fonction utilitaire pour formater les dates de façon sécurisée
+  const formatDate = (dateString, formatString = 'dd/MM/yyyy HH:mm') => {
+    if (!dateString) return null;
+    
+    try {
+      let date;
+      if (typeof dateString === 'string') {
+        if (dateString.includes('T')) {
+          date = parseISO(dateString);
+        } else {
+          date = new Date(dateString);
+        }
+      } else {
+        date = new Date(dateString);
+      }
+      
+      if (!isValid(date)) {
+        console.warn('Date invalide:', dateString);
+        return null;
+      }
+      
+      return format(date, formatString, { locale: fr });
+    } catch (error) {
+      console.error('Erreur de formatage de date:', error, dateString);
+      return null;
+    }
+  };
+
   const statusLabels = {
     'nouveau': 'Nouveau',
     'bloque': 'Bloqué',
