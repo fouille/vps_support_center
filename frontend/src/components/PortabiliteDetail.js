@@ -148,7 +148,7 @@ const PortabiliteDetail = () => {
       setCommentaires([...commentaires, response.data]);
       setNewComment('');
       
-      // Scroll vers le bas
+      // Auto-scroll vers le bas après ajout d'un commentaire
       setTimeout(() => {
         commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
