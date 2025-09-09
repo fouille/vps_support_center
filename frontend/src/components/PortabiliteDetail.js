@@ -42,7 +42,7 @@ const PortabiliteDetail = () => {
   // Fonction pour récupérer les détails de la portabilité
   const fetchPortabilite = async () => {
     try {
-      const response = await api.get(`/api/portabilites/${portabiliteId}`);
+      const response = await api.get(`/api/portabilites/${portabilite_uuid}`);
       setPortabilite(response.data);
     } catch (err) {
       setError('Erreur lors du chargement de la portabilité');
@@ -53,7 +53,7 @@ const PortabiliteDetail = () => {
   // Fonction pour récupérer les commentaires
   const fetchCommentaires = async () => {
     try {
-      const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabiliteId}`);
+      const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabilite_uuid}`);
       setCommentaires(response.data);
     } catch (err) {
       console.error('Erreur lors du chargement des commentaires:', err);
