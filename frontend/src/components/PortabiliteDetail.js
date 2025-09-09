@@ -253,7 +253,7 @@ const PortabiliteDetail = () => {
     if (!portabilite) return;
     
     try {
-      const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}&fileId=${file.id}`);
+      const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite_uuid}&fileId=${file.id}`);
       const fileData = response.data;
       
       const byteCharacters = atob(fileData.contenu_base64); // eslint-disable-line no-undef
