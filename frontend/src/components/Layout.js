@@ -155,8 +155,18 @@ const Layout = ({ children, currentPage, onNavigate }) => {
   };
 
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('dark');
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    
+    // Sauvegarder dans localStorage
+    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+    
+    // Appliquer la classe CSS
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   const navigation = [
