@@ -92,6 +92,19 @@ const TicketDetail = () => {
     };
   }, [ticket_uuid]);
 
+  // Auto-scroll quand les échanges changent
+  useEffect(() => {
+    if (exchanges.length > 0) {
+      // Délai plus long pour s'assurer que le DOM est mis à jour
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'end'
+        });
+      }, 300);
+    }
+  }, [exchanges]);
+
   const fetchTicketDetails = async () => {
     try {
       setLoading(true);
