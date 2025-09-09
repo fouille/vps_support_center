@@ -377,7 +377,21 @@ const TicketDetail = () => {
                 <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                   #{ticket?.numero_ticket || 'N/A'}
                 </span>
-                {ticket?.status && getStatusBadge(ticket.status)}
+                {ticket?.status && !isAgent && getStatusBadge(ticket.status)}
+                {isAgent && ticket?.status && (
+                  <select
+                    value={ticket.status}
+                    onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                    className="text-xs px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="nouveau">Nouveau</option>
+                    <option value="en_cours">En cours</option>
+                    <option value="en_attente">En attente</option>
+                    <option value="repondu">Répondu</option>
+                    <option value="resolu">Résolu</option>
+                    <option value="ferme">Fermé</option>
+                  </select>
+                )}
               </div>
             </div>
           </div>
