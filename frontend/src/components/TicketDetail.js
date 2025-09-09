@@ -91,6 +91,13 @@ const TicketDetail = () => {
     };
   }, [ticket_uuid]);
 
+  // Charger les échanges une fois que le ticket est chargé
+  useEffect(() => {
+    if (ticket && !loading) {
+      fetchExchangesAfterPageLoad();
+    }
+  }, [ticket, loading]);
+
   const fetchTicketDetails = async () => {
     try {
       setLoading(true);
