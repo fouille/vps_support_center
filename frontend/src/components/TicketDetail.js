@@ -111,14 +111,10 @@ const TicketDetail = () => {
         return;
       }
       
-      console.log('TicketDetail: Ticket data received:', ticketData);
       setTicket(ticketData);
       
-      // Charger les échanges et les fichiers en parallèle
-      await Promise.all([
-        fetchExchanges(ticketData.id),
-        fetchFiles(ticketData.id)
-      ]);
+      // Charger seulement les fichiers en parallèle avec le ticket
+      await fetchFiles(ticketData.id);
       
       // Si c'est un agent qui ouvre le ticket et que le statut est "nouveau", le passer en "en_cours"
       if (isAgent && ticketData.status === 'nouveau') {
@@ -126,7 +122,6 @@ const TicketDetail = () => {
       }
       
     } catch (error) {
-      console.error('Erreur lors du chargement du ticket:', error);
       if (error.response?.status === 404) {
         setError('Ticket non trouvé');
       } else {
@@ -134,6 +129,32 @@ const TicketDetail = () => {
       }
     } finally {
       setLoading(false);
+      
+      // Charger les échanges après que la page soit affichée
+      if (ticket_uuid) {
+        setTimeout(() => {
+          fetchExchangesAfterPageLoad();
+        }, 100);
+      }
+    }
+  };
+
+  const fetchExchangesAfterPageLoad = async () => {
+    if (!ticket) return;
+    
+    try {
+      setLoadingExchanges(true);
+      const response = await api.get(`/api/ticket-echanges?ticketId=${ticket.id}`);
+      setExchanges(response.data || []);
+      
+      // Auto-scroll vers le bas après chargement des échanges
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
+    } catch (error) {
+      // Pas de log console ici
+    } finally {
+      setLoadingExchanges(false);
     }
   };
 
