@@ -29,6 +29,7 @@ const PortabiliteDetail = () => {
   const [files, setFiles] = useState([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [sendingCancellation, setSendingCancellation] = useState(false);
   
   const commentsEndRef = useRef(null);
   const backendUrl = '';
