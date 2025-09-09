@@ -93,8 +93,15 @@ exports.handler = async (event, context) => {
             }
             
             // Check access - either own ticket or same company
-            const hasAccess = ticket[0].demandeur_id === decoded.id || 
-                             (demandeur[0].societe_id && ticket[0].demandeur_societe_id === demandeur[0].societe_id);
+            // For same company check, we need to get the ticket's demandeur's societe_id
+            let hasAccess = ticket[0].demandeur_id === decoded.id;
+            
+            if (!hasAccess && demandeur[0].societe_id) {
+              const ticketDemandeur = await sql`
+                SELECT societe_id FROM demandeurs WHERE id = ${ticket[0].demandeur_id}
+              `;
+              hasAccess = ticketDemandeur.length > 0 && ticketDemandeur[0].societe_id === demandeur[0].societe_id;
+            }
             
             if (!hasAccess) {
               return {
