@@ -97,7 +97,47 @@ exports.handler = async (event, context) => {
 
       const portabiliteInfo = accessResult[0];
 
-      // Récupération des fichiers avec les informations de l'utilisateur
+      // Si un fileId est spécifié, récupérer le fichier avec son contenu base64
+      if (fileId) {
+        const fileQuery = `
+          SELECT 
+            pf.id,
+            pf.nom_fichier,
+            pf.type_fichier,
+            pf.taille_fichier,
+            pf.contenu_base64,
+            pf.uploaded_by,
+            pf.uploaded_at,
+            COALESCE(a.nom || ' ' || a.prenom, d.nom || ' ' || d.prenom, 'Utilisateur') as uploaded_by_name,
+            CASE 
+              WHEN a.id IS NOT NULL THEN 'agent'
+              WHEN d.id IS NOT NULL THEN 'demandeur'
+              ELSE 'unknown'
+            END as uploaded_by_type
+          FROM portabilite_fichiers pf
+          LEFT JOIN agents a ON pf.uploaded_by = a.id
+          LEFT JOIN demandeurs d ON pf.uploaded_by = d.id
+          WHERE pf.portabilite_id = $1 AND pf.id = $2
+        `;
+
+        const fileResult = await sql(fileQuery, [portabiliteId, fileId]);
+
+        if (fileResult.length === 0) {
+          return {
+            statusCode: 404,
+            headers,
+            body: JSON.stringify({ error: 'Fichier non trouvé' })
+          };
+        }
+
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify(fileResult[0])
+        };
+      }
+
+      // Récupération des fichiers avec les informations de l'utilisateur (sans contenu base64)
       const filesQuery = `
         SELECT 
           pf.id,
