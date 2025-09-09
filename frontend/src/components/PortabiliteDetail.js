@@ -93,7 +93,7 @@ const PortabiliteDetail = () => {
 
     setStatusLoading(true);
     try {
-      const response = await api.put(`/api/portabilites/${portabiliteId}`, {
+      const response = await api.put(`/api/portabilites/${portabilite_uuid}`, {
         status: newStatus
       });
 
