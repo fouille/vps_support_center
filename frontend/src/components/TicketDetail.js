@@ -82,7 +82,6 @@ const TicketDetail = () => {
 
   useEffect(() => {
     if (ticket_uuid) {
-      console.log('TicketDetail: Loading ticket with UUID:', ticket_uuid);
       fetchTicketDetails();
     }
     
@@ -91,11 +90,6 @@ const TicketDetail = () => {
       setShowEmojiPicker(false);
     };
   }, [ticket_uuid]);
-
-  // Scroll automatique vers le bas quand de nouveaux échanges arrivent
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [exchanges]);
 
   const fetchTicketDetails = async () => {
     try {
