@@ -508,7 +508,7 @@ const TicketDetail = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"
-                  disabled={uploadingFile}
+                  disabled={uploadingFile || !ticket}
                 />
                 <label
                   htmlFor="file-upload"
