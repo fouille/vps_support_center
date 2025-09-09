@@ -515,7 +515,7 @@ const TicketDetail = () => {
               Échanges ({exchanges.length})
             </h3>
             
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div ref={messagesContainerRef} className="space-y-3 max-h-96 overflow-y-auto">
               {loadingExchanges ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
