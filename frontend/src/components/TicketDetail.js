@@ -116,7 +116,7 @@ const TicketDetail = () => {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!newComment.trim() || sendingComment) return;
+    if (!newComment.trim() || sendingComment || !ticket) return;
 
     setSendingComment(true);
     try {
