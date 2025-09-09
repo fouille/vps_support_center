@@ -255,13 +255,13 @@ const PortabiliteDetail = () => {
       const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}&fileId=${file.id}`);
       const fileData = response.data;
       
-      const byteCharacters = atob(fileData.contenu_base64);
+      const byteCharacters = atob(fileData.contenu_base64); // eslint-disable-line no-undef
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
       const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: fileData.type_fichier });
+      const blob = new Blob([byteArray], { type: fileData.type_fichier }); // eslint-disable-line no-undef
       
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
