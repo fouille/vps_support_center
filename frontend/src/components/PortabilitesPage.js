@@ -212,7 +212,7 @@ const PortabilitesPage = () => {
 
   // Fonction pour créer une nouvelle portabilité
   const createPortabilite = () => {
-    onNavigate('portabilites-nouvelle');
+    navigate('/portabilites/nouvelle');
   };
 
   useEffect(() => {
