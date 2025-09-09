@@ -20,9 +20,27 @@ import {
 const Layout = ({ children, currentPage, onNavigate }) => {
   const { user, logout, isAgent } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  
+  // Initialiser le thème depuis localStorage ou par défaut dark
+  const [darkMode, setDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme !== null) {
+      return savedTheme === 'dark';
+    }
+    return true; // Par défaut dark mode
+  });
+  
   const [appName, setAppName] = useState('Support & Production');
   const [logoBase64, setLogoBase64] = useState(null);
+
+  // Appliquer le thème au chargement du composant
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   // Récupérer le nom d'application basé sur la société de l'utilisateur
   useEffect(() => {
