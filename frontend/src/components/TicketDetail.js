@@ -196,7 +196,7 @@ const TicketDetail = () => {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC');
+      setError('Type de fichier non autorisé. Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC)');
       return;
     }
 
