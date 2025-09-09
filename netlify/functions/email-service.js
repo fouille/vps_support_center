@@ -406,7 +406,7 @@ VoIP Services - Système de portabilité`
   }),
 
   // Template pour changement de statut de portabilité
-  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author) => ({
+  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '') => ({
     subject: `Portabilité #${portabilite.numero_portabilite} - Statut modifié`,
     html: `
       <!DOCTYPE html>
