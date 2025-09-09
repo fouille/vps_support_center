@@ -5,7 +5,7 @@ import RecentExchangesChatbot from './RecentExchangesChatbot';
 
 const Footer = () => {
   const { version, year } = getVersionInfo();
-  const { isDarkMode } = useContext(AuthContext);
+  const { isDarkMode, user } = useContext(AuthContext);
 
   return (
     <>
@@ -34,8 +34,8 @@ const Footer = () => {
         </div>
       </footer>
 
-      {/* Chatbot des échanges récents */}
-      <RecentExchangesChatbot isDarkMode={isDarkMode} />
+      {/* Chatbot des échanges récents - Uniquement si utilisateur connecté */}
+      {user && <RecentExchangesChatbot isDarkMode={isDarkMode} />}
     </>
   );
 };
