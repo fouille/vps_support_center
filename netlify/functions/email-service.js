@@ -200,6 +200,8 @@ VoIP Services - Système de gestion des tickets`
           .status-change { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; text-align: center; }
           .old-status { color: #dc2626; }
           .new-status { color: #16a34a; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
