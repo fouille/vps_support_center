@@ -340,7 +340,7 @@ VoIP Services - Système de production`
   }),
 
   // Template pour la création d'une portabilité
-  portabiliteCreated: (portabilite, client, demandeur) => ({
+  portabiliteCreated: (portabilite, client, demandeur, baseUrl = '') => ({
     subject: `Nouvelle portabilité #${portabilite.numero_portabilite} - ${portabilite.numeros_portes}`,
     html: `
       <!DOCTYPE html>
@@ -350,10 +350,12 @@ VoIP Services - Système de production`
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background-color: #7c3aed; color: white; padding: 20px; text-align: center; }
+          .header { background-color: #059669; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .portabilite-info { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; }
+          .button { background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #047857; }
         </style>
       </head>
       <body>
@@ -373,6 +375,13 @@ VoIP Services - Système de production`
               <strong>Statut :</strong> ${portabilite.status}<br>
               <strong>Date demandée :</strong> ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
             </div>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                📞 Voir la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
@@ -390,6 +399,8 @@ Demandeur : ${demandeur?.prenom || ''} ${demandeur?.nom || 'N/A'}
 Email client : ${portabilite.email_client || 'N/A'}
 Statut : ${portabilite.status}
 Date demandée : ${portabilite.date_portabilite_demandee ? new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 'N/A'}
+
+${baseUrl ? `Voir la portabilité : ${baseUrl}/portabilites/${portabilite.id}` : ''}
 
 VoIP Services - Système de portabilité`
   }),
