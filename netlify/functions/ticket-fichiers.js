@@ -195,6 +195,15 @@ exports.handler = async (event, context) => {
           VALUES (${uuidv4()}, ${ticketId}, ${nom_fichier}, ${type_fichier}, ${taille_fichier}, ${contenu_base64}, ${uploadedBy})
           RETURNING *
         `;
+
+        // Si c'est un demandeur qui ajoute une pièce jointe, changer le statut du ticket à "en_attente" sauf si c'est "nouveau"
+        if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
+          await sql`
+            UPDATE tickets 
+            SET status = 'en_attente', updated_at = NOW()
+            WHERE id = ${ticketId} AND status != 'nouveau'
+          `;
+        }
         
         console.log('File created:', createdFile[0].nom_fichier);
         return { statusCode: 201, headers, body: JSON.stringify(createdFile[0]) };
