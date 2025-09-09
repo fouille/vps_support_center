@@ -168,7 +168,7 @@ const PortabiliteForm = () => {
     
     try {
       setLoading(true);
-      const response = await api.get(`/api/portabilites/${portabiliteId}`);
+      const response = await api.get(`/api/portabilites/${portabilite_uuid}`);
       
       const portabilite = response.data;
       setFormData({
