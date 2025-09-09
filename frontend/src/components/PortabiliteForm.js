@@ -355,7 +355,7 @@ const PortabiliteForm = () => {
     };
     
     loadData();
-  }, [user, isEdit, portabiliteId]);
+  }, [user, isEdit, portabilite_uuid]);
 
   // Fonction de validation pour chaque étape
   const validateStep = (step) => {
