@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 10,      // Version mineure - nouvelles fonctionnalités
-  patch: 7,      // Version patch - corrections de bugs
+  minor: 11,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-09-09", // Date de build automatique
 };
 
