@@ -101,12 +101,18 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
       {/* Panel du chatbot */}
       {isOpen && (
         <div 
-          className={`fixed bottom-20 right-4 z-50 w-96 h-80 rounded-lg shadow-xl transition-all duration-300 ${
+          className={`fixed bottom-20 right-4 z-50 rounded-lg shadow-xl transition-all duration-300 ${
             isDarkMode
               ? 'bg-dark-surface border border-gray-600'
               : 'bg-white border border-gray-200'
           }`}
           style={{
+            width: '33vw',
+            height: '50vh',
+            minWidth: '350px',
+            minHeight: '400px',
+            maxWidth: '500px',
+            maxHeight: '600px',
             animation: 'fadeIn 0.3s ease-out'
           }}
         >
