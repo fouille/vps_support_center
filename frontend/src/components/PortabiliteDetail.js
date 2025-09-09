@@ -511,90 +511,266 @@ const PortabiliteDetail = () => {
             </div>
           </div>
 
-          {/* Système de commentaires */}
-          <div className="bg-white dark:bg-dark-surface rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Commentaires ({commentaires.length})
-            </h2>
-            
-            {/* Liste des commentaires */}
-            <div className="h-80 overflow-y-auto mb-4 space-y-3 border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-              {commentaires.length === 0 ? (
-                <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                  Aucun commentaire pour le moment
-                </p>
-              ) : (
-                commentaires.map((commentaire) => (
-                  <div
-                    key={commentaire.id}
-                    className={`p-3 rounded-lg border-l-4 ${
-                      commentaire.auteur_type === 'agent' 
-                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' 
-                        : 'bg-green-50 dark:bg-green-900/20 border-green-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                          commentaire.auteur_type === 'agent' ? 'bg-blue-500' : 'bg-green-500'
-                        }`}>
-                          {commentaire.auteur_nom ? commentaire.auteur_nom.split(' ').map(n => n[0]).join('') : 'A'}
-                        </div>
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          {commentaire.auteur_nom || 'Utilisateur'}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(commentaire.created_at)}
-                      </span>
+          {/* Section des échanges */}
+          <div className="lg:col-span-2">
+            <div className="card p-6">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                Échanges ({commentaires.length})
+              </h3>
+              
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {commentLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                    <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement...</span>
+                  </div>
+                ) : commentaires.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                      <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
                     </div>
-                    <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                      {commentaire.message}
+                    <p className="text-gray-500 dark:text-gray-400">
+                      Aucune conversation pour cette portabilité
+                    </p>
+                    <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
+                      Commencez la discussion en envoyant le premier message
                     </p>
                   </div>
-                ))
-              )}
-              <div ref={commentsEndRef} />
-            </div>
+                ) : (
+                  commentaires.map((commentaire, index) => {
+                    const isMyMessage = user && (
+                      (user.type_utilisateur === 'agent' && commentaire.auteur_type === 'agent') ||
+                      (user.type_utilisateur === 'demandeur' && commentaire.auteur_type === 'demandeur')
+                    );
+                    
+                    const isAgentAuthor = commentaire.auteur_type === 'agent';
+                    const formattedDate = formatDate(commentaire?.created_at, 'dd/MM/yyyy HH:mm');
+                    
+                    return (
+                      <div 
+                        key={commentaire.id || index} 
+                        className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'} ${
+                          index === commentaires.length - 1 ? 'animate-fade-in' : ''
+                        }`}
+                      >
+                        <div className={`max-w-xs lg:max-w-md ${isMyMessage ? 'order-2' : 'order-1'}`}>
+                          {/* Message bubble */}
+                          <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                            isMyMessage 
+                              ? 'bg-primary-500 text-white rounded-br-md' 
+                              : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-md border border-gray-200 dark:border-gray-600'
+                          }`}>
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                              {commentaire?.message || 'Message non disponible'}
+                            </p>
+                          </div>
+                          
+                          {/* Metadata */}
+                          <div className={`flex items-center mt-1 text-xs text-gray-500 dark:text-gray-400 ${
+                            isMyMessage ? 'justify-end' : 'justify-start'
+                          }`}>
+                            <div className={`flex items-center space-x-2 ${isMyMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium text-white ${
+                                isAgentAuthor ? 'bg-primary-600' : 'bg-green-500'
+                              }`}>
+                                {((commentaire?.auteur_nom || '')).trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '??'}
+                              </div>
+                              <span className="font-medium">
+                                {isMyMessage ? 'Moi' : `${commentaire?.auteur_nom || 'Utilisateur'}`.trim()}
+                              </span>
+                              <span className="text-gray-400 dark:text-gray-500">
+                                {formattedDate || 'Date inconnue'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+                {/* Élément pour l'auto-scroll */}
+                <div ref={commentsEndRef} />
+              </div>
 
-            {/* Formulaire de commentaire */}
-            <form onSubmit={handleSubmitComment} className="space-y-3">
-              <div>
-                <textarea
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Ajouter un commentaire..."
-                  rows="3"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
-                  disabled={commentLoading}
-                />
-                <div className="flex justify-between items-center mt-2">
-                  <span className={`text-sm ${
-                    newComment.length > 800 ? 'text-red-500' : 
-                    newComment.length > 700 ? 'text-yellow-500' : 'text-gray-500'
-                  }`}>
-                    {newComment.length}/1000 caractères
-                  </span>
+              {/* Formulaire d'ajout de commentaire */}
+              <div className="mt-6">
+                {/* Barre d'émojis */}
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 flex items-center space-x-1 disabled:opacity-50"
+                      disabled={commentLoading || !portabilite}
+                    >
+                      <span className="text-lg">😊</span>
+                      <span>Émojis</span>
+                    </button>
+                  </div>
+                  
+                  {/* Sélecteur d'émojis */}
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-xl z-10 w-full max-w-xs">
+                      <div className="grid grid-cols-8 gap-1">
+                        {popularEmojis.map((emoji, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => insertEmoji(emoji)}
+                            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-lg"
+                            title={`Ajouter ${emoji}`}
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
+                        <button
+                          type="button"
+                          onClick={() => setShowEmojiPicker(false)}
+                          className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 w-full text-center py-1"
+                        >
+                          Fermer
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <form onSubmit={handleSubmitComment}>
+                  <div className="space-y-3">
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Tapez votre message..."
+                      className="input h-20 resize-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      required
+                      maxLength={1000}
+                      disabled={commentLoading || !portabilite}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey && !commentLoading) {
+                          e.preventDefault();
+                          handleSubmitComment(e);
+                        }
+                      }}
+                    />
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        💡 Appuyez sur Entrée pour envoyer • Shift+Entrée pour saut de ligne
+                      </span>
+                      <div className="flex space-x-2">
+                        {showEmojiPicker && (
+                          <button
+                            type="button"
+                            onClick={() => setShowEmojiPicker(false)}
+                            className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-2 py-1"
+                          >
+                            Fermer
+                          </button>
+                        )}
+                        <button
+                          type="submit"
+                          disabled={!newComment.trim() || commentLoading || !portabilite}
+                          className="btn-primary flex items-center"
+                        >
+                          {commentLoading ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          ) : (
+                            <Send className="h-4 w-4 mr-2" />
+                          )}
+                          Envoyer
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* Fichiers */}
+          <div>
+            <div className="card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  Fichiers ({files.length})
+                </h3>
+                <div className="relative">
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="file-upload-portabilite"
+                    disabled={uploadingFile || !portabilite}
+                  />
+                  <label
+                    htmlFor="file-upload-portabilite"
+                    className={`btn-secondary flex items-center cursor-pointer ${uploadingFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {uploadingFile ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600 mr-2"></div>
+                    ) : (
+                      <Paperclip className="h-4 w-4 mr-2" />
+                    )}
+                    Ajouter
+                  </label>
                 </div>
               </div>
-              <button
-                type="submit"
-                disabled={commentLoading || !newComment.trim() || newComment.length > 1000}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
-                {commentLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Envoi...</span>
-                  </>
+
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {loadingFiles ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                    <span className="ml-3 text-gray-600 dark:text-gray-400">Chargement...</span>
+                  </div>
+                ) : files.length === 0 ? (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
+                    Aucun fichier joint pour le moment
+                  </p>
                 ) : (
-                  <>
-                    <span>Envoyer</span>
-                    <span>📩</span>
-                  </>
+                  files.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <span className="text-lg">{getFileIcon(file.type_fichier)}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {file.nom_fichier}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {formatFileSize(file.taille_fichier)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => downloadFile(file)}
+                          className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          title="Télécharger"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                        {user?.type_utilisateur === 'agent' && (
+                          <button
+                            onClick={() => handleFileDelete(file.id)}
+                            className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
                 )}
-              </button>
-            </form>
+                
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                  Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC) • Taille max: 10MB
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
