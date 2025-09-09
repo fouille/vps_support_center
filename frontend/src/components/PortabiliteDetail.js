@@ -256,6 +256,11 @@ const PortabiliteDetail = () => {
       const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite_uuid}&fileId=${file.id}`);
       const fileData = response.data;
       
+      if (!fileData.contenu_base64) {
+        setError('Contenu du fichier non disponible');
+        return;
+      }
+      
       const byteCharacters = atob(fileData.contenu_base64); // eslint-disable-line no-undef
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
