@@ -74,6 +74,30 @@ const RecentExchangesChatbot = () => {
     return text.substring(0, maxLength) + '...';
   };
 
+  const handleExchangeClick = (exchange) => {
+    // Fermer le chatbot
+    setIsOpen(false);
+    
+    // Naviguer selon le type
+    switch (exchange.type) {
+      case 'ticket':
+        navigate(`/tickets/${exchange.item_id}`);
+        break;
+      case 'portabilite':
+        navigate(`/portabilites/${exchange.item_id}`);
+        break;
+      case 'production':
+        // Productions non cliquables pour le moment
+        break;
+      default:
+        break;
+    }
+  };
+
+  const isClickable = (type) => {
+    return type === 'ticket' || type === 'portabilite';
+  };
+
   return (
     <>
       {/* Bouton flottant */}
