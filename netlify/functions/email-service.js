@@ -13,6 +13,11 @@ try {
   TransactionalEmailsApi = null;
   SendSmtpEmail = null;
 }
+// Fonction pour obtenir l'URL de base du frontend
+const getBaseUrl = () => {
+  // Utiliser la variable d'environnement ou une URL par défaut
+  return process.env.FRONTEND_URL || process.env.URL || 'https://ticketflow-37.preview.emergentagent.com';
+};
 
 let brevoClient = null;
 
