@@ -430,9 +430,11 @@ const PortabiliteDetail = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Informations de la portabilité */}
-          <div className="bg-white dark:bg-dark-surface rounded-lg shadow-md p-6">
+        {/* Informations de la portabilité - sur toute la largeur */}
+        <div className="bg-white dark:bg-dark-surface rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Informations générales
+          </h2>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Informations générales
             </h2>
