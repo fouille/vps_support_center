@@ -173,31 +173,31 @@ const Layout = ({ children }) => {
   };
 
   const navigation = [
-    { name: 'Dashboard', icon: BarChart3, key: 'dashboard' },
+    { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     ...(isAgent ? [
-      { name: 'Support', icon: Ticket, key: 'tickets' },
-      { name: 'Portabilités', icon: Phone, key: 'portabilites' },
-      { name: 'Productions', icon: Factory, key: 'productions' },
-      { name: 'Clients', icon: Users, key: 'clients' },
-      { name: 'Demandeurs', icon: UserCheck, key: 'demandeurs' },
-      { name: 'Agents', icon: Shield, key: 'agents' },
-      { name: 'Audit', icon: Activity, key: 'audit' },
+      { name: 'Support', icon: Ticket, path: '/tickets' },
+      { name: 'Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Productions', icon: Factory, path: '/productions' },
+      { name: 'Clients', icon: Users, path: '/clients' },
+      { name: 'Demandeurs', icon: UserCheck, path: '/demandeurs' },
+      { name: 'Agents', icon: Shield, path: '/agents' },
+      { name: 'Audit', icon: Activity, path: '/audit' },
     ] : [
-      { name: 'Mes Tickets', icon: Ticket, key: 'tickets' },
-      { name: 'Mes Portabilités', icon: Phone, key: 'portabilites' },
-      { name: 'Mes Productions', icon: Factory, key: 'productions' },
-      { name: 'Mes Clients', icon: Users, key: 'clients' },
-      { name: 'Mes Collaborateurs', icon: UserCheck, key: 'demandeurs' },
+      { name: 'Mes Tickets', icon: Ticket, path: '/tickets' },
+      { name: 'Mes Portabilités', icon: Phone, path: '/portabilites' },
+      { name: 'Mes Productions', icon: Factory, path: '/productions' },
+      { name: 'Mes Clients', icon: Users, path: '/clients' },
+      { name: 'Mes Collaborateurs', icon: UserCheck, path: '/demandeurs' },
     ])
   ];
 
-  const handleNavigate = (key) => {
-    onNavigate(key);
+  const handleNavigate = (path) => {
+    navigate(path);
     setSidebarOpen(false);
   };
 
-  const isCurrentPage = (key) => {
-    return currentPage === key || currentPage.startsWith(key + '-');
+  const isCurrentPage = (path) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
   return (
