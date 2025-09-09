@@ -444,6 +444,13 @@ VoIP Services - Système de portabilité`
             </div>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
             <p><strong>Client :</strong> ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
+                📞 Voir la portabilité
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de portabilité</p>
