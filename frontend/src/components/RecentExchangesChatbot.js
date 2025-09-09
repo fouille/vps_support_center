@@ -6,6 +6,7 @@ import { fr } from 'date-fns/locale';
 
 const RecentExchangesChatbot = () => {
   const { api } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(false);
