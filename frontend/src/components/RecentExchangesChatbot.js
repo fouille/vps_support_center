@@ -102,10 +102,10 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
       {/* Panel du chatbot */}
       {isOpen && (
         <div 
-          className={`fixed bottom-20 right-4 z-50 rounded-lg shadow-xl transition-all duration-300 ${
+          className={`fixed bottom-20 right-4 z-50 rounded-lg shadow-xl transition-all duration-300 border ${
             isDarkMode
-              ? 'bg-dark-surface border border-gray-600'
-              : 'bg-white border border-gray-200'
+              ? 'bg-gray-800 border-gray-600'
+              : 'bg-white border-gray-200'
           }`}
           style={{
             width: '33vw',
@@ -123,7 +123,7 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
           }`}>
             <div className="flex items-center space-x-2">
               <svg 
-                className={`w-5 h-5 ${isDarkMode ? 'text-dark-text' : 'text-gray-600'}`}
+                className={`w-5 h-5 ${isDarkMode ? 'text-gray-200' : 'text-gray-600'}`}
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -135,14 +135,14 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" 
                 />
               </svg>
-              <h3 className={`font-semibold ${isDarkMode ? 'text-dark-text' : 'text-gray-900'}`}>
+              <h3 className={`font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
                 Échanges récents
               </h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className={`p-1 rounded hover:bg-opacity-10 hover:bg-gray-500 ${
-                isDarkMode ? 'text-dark-muted hover:text-dark-text' : 'text-gray-400 hover:text-gray-600'
+              className={`p-1 rounded transition-colors ${
+                isDarkMode ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
             {loading && (
               <div className="flex items-center justify-center h-full">
                 <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-                  isDarkMode ? 'border-primary-400' : 'border-primary-600'
+                  isDarkMode ? 'border-blue-400' : 'border-blue-600'
                 }`}></div>
               </div>
             )}
@@ -166,10 +166,10 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
                 <p>{error}</p>
                 <button
                   onClick={fetchRecentExchanges}
-                  className={`mt-2 px-4 py-2 rounded text-sm ${
+                  className={`mt-2 px-4 py-2 rounded text-sm transition-colors ${
                     isDarkMode
-                      ? 'bg-primary-600 hover:bg-primary-700 text-white'
-                      : 'bg-primary-500 hover:bg-primary-600 text-white'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
                   }`}
                 >
                   Réessayer
@@ -178,7 +178,7 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
             )}
 
             {!loading && !error && exchanges.length === 0 && (
-              <div className={`text-center py-8 ${isDarkMode ? 'text-dark-muted' : 'text-gray-500'}`}>
+              <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 <p>Aucun échange récent</p>
               </div>
             )}
@@ -188,19 +188,19 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
                 {exchanges.map((exchange, index) => (
                   <div
                     key={`${exchange.type}-${exchange.item_id}-${index}`}
-                    className={`p-3 rounded-lg border ${
+                    className={`p-3 rounded-lg border transition-colors cursor-pointer ${
                       isDarkMode
-                        ? 'bg-dark-card border-gray-600 hover:bg-gray-700'
+                        ? 'bg-gray-700 border-gray-600 hover:bg-gray-600'
                         : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                    } transition-colors cursor-pointer`}
+                    }`}
                   >
                     {/* Type et numéro */}
                     <div className="flex items-center space-x-2 mb-2">
                       <span className="text-lg">{getTypeIcon(exchange.type)}</span>
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         isDarkMode
-                          ? 'bg-primary-900 text-primary-300'
-                          : 'bg-primary-100 text-primary-800'
+                          ? 'bg-blue-900 text-blue-300'
+                          : 'bg-blue-100 text-blue-800'
                       }`}>
                         {getTypeLabel(exchange.type)} #{exchange.item_number}
                       </span>
@@ -208,21 +208,21 @@ const RecentExchangesChatbot = ({ isDarkMode }) => {
 
                     {/* Titre */}
                     <h4 className={`font-medium text-sm mb-2 ${
-                      isDarkMode ? 'text-dark-text' : 'text-gray-900'
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
                       {truncateText(exchange.item_title, 60)}
                     </h4>
 
                     {/* Dernier commentaire */}
                     <p className={`text-sm mb-2 ${
-                      isDarkMode ? 'text-dark-muted' : 'text-gray-600'
+                      isDarkMode ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       {truncateText(exchange.last_comment, 80)}
                     </p>
 
                     {/* Auteur et date */}
                     <div className={`flex items-center justify-between text-xs ${
-                      isDarkMode ? 'text-dark-muted' : 'text-gray-500'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
                       <span>
                         {exchange.auteur_prenom} {exchange.auteur_nom}
