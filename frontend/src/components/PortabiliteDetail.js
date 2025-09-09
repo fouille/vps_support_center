@@ -155,7 +155,7 @@ const PortabiliteDetail = () => {
     };
     
     loadData();
-  }, [portabiliteId]);
+  }, [portabilite_uuid]);
 
   if (loading) {
     return (
