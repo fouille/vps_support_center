@@ -480,7 +480,7 @@ const TicketDetail = () => {
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {format(new Date(exchange.date_creation), 'dd MMM à HH:mm', { locale: fr })}
+                        {formatDate(exchange.date_creation, 'dd MMM à HH:mm')}
                       </p>
                     </div>
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
