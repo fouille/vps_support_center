@@ -176,7 +176,7 @@ const TicketDetail = () => {
       const response = await api.get(`/api/ticket-fichiers?ticketId=${ticketId}`);
       setFiles(response.data || []);
     } catch (error) {
-      console.error('Erreur lors du chargement des fichiers:', error);
+      // Pas de log console ici
     } finally {
       setLoadingFiles(false);
     }
