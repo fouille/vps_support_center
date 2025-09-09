@@ -82,6 +82,11 @@ const TicketDetail = () => {
       console.log('TicketDetail: Loading ticket with UUID:', ticket_uuid);
       fetchTicketDetails();
     }
+    
+    // Fermer le picker d'emojis si ouvert
+    return () => {
+      setShowEmojiPicker(false);
+    };
   }, [ticket_uuid]);
 
   const fetchTicketDetails = async () => {
