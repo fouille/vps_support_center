@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import SearchableSelect from './SearchableSelect';
 import PortabiliteModal from './PortabiliteModal';
 
-const PortabilitesPage = ({ onNavigate, onSelectPortabilite }) => {
+const PortabilitesPage = () => {
+  const navigate = useNavigate();
   const [portabilites, setPortabilites] = useState([]);
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
