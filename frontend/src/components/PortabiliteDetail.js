@@ -162,23 +162,148 @@ const PortabiliteDetail = () => {
 
   // Fonction pour changer le statut
   const handleStatusChange = async () => {
-    if (!newStatus) return;
-
     setStatusLoading(true);
     try {
-      const response = await api.put(`/api/portabilites/${portabilite_uuid}`, {
+      await api.put(`/api/portabilites/${portabilite_uuid}`, {
         status: newStatus
       });
-
-      setPortabilite(response.data);
+      
+      setPortabilite({ ...portabilite, status: newStatus });
       setShowEditModal(false);
-      setNewStatus('');
     } catch (err) {
-      setError('Erreur lors du changement de statut');
+      setError('Erreur lors de la mise à jour du statut');
       console.error('Erreur:', err);
     } finally {
       setStatusLoading(false);
     }
+  };
+
+  // Gestion de l'upload de fichiers
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file || !portabilite) return;
+
+    // Vérifications côté client
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError('Fichier trop volumineux (limite: 10MB)');
+      return;
+    }
+
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'audio/wav', 'audio/wave', 'audio/x-wav',
+      'text/plain', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Type de fichier non autorisé. Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC)');
+      return;
+    }
+
+    setUploadingFile(true);
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const fileData = {
+        nom_fichier: file.name,
+        type_fichier: file.type,
+        taille_fichier: file.size,
+        contenu_base64: base64
+      };
+
+      await api.post(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}`, fileData);
+      
+      // Ajouter un commentaire automatique
+      try {
+        const commentResponse = await api.post(`/api/portabilite-echanges`, {
+          portabiliteId: portabilite_uuid,
+          message: `A ajouté une pièce jointe ${file.name}`
+        });
+        
+        setCommentaires(prev => [...prev, commentResponse.data]);
+        
+        // Auto-scroll vers le bas
+        setTimeout(() => {
+          commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } catch (commentError) {
+        console.error('Erreur lors de l\'ajout du commentaire automatique:', commentError);
+      }
+      
+      fetchFiles();
+      event.target.value = '';
+    } catch (error) {
+      setError('Erreur lors de l\'upload du fichier');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  // Téléchargement de fichier
+  const downloadFile = async (file) => {
+    if (!portabilite) return;
+    
+    try {
+      const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}&fileId=${file.id}`);
+      const fileData = response.data;
+      
+      const byteCharacters = atob(fileData.contenu_base64);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: fileData.type_fichier });
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileData.nom_fichier;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      setError('Erreur lors du téléchargement du fichier');
+    }
+  };
+
+  // Suppression de fichier
+  const handleFileDelete = async (fileId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce fichier ?') || !portabilite) return;
+
+    try {
+      await api.delete(`/api/portabilite-fichiers?portabiliteId=${portabilite.id}&fileId=${fileId}`);
+      fetchFiles();
+    } catch (error) {
+      setError('Erreur lors de la suppression du fichier');
+    }
+  };
+
+  // Utilitaires pour les fichiers
+  const getFileIcon = (mimeType) => {
+    if (mimeType?.startsWith('image/')) return '🖼️';
+    if (mimeType === 'application/pdf') return '📄';
+    if (mimeType?.startsWith('audio/')) return '🎵';
+    if (mimeType?.includes('word')) return '📝';
+    return '📎';
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   // Fonction pour supprimer la portabilité
