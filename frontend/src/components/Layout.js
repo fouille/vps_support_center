@@ -20,6 +20,8 @@ import {
 
 const Layout = ({ children }) => {
   const { user, logout, isAgent } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Initialiser le thème depuis localStorage ou par défaut dark
