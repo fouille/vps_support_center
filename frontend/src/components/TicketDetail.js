@@ -22,6 +22,32 @@ const TicketDetail = () => {
   const { ticket_uuid } = useParams();
   const navigate = useNavigate();
   const { isAgent, api, user } = useAuth();
+
+  // Fonction utilitaire pour formater les dates de façon sécurisée
+  const formatDate = (dateString, formatString) => {
+    if (!dateString) return 'Date non disponible';
+    
+    try {
+      // Essayer de parser la date
+      let date;
+      if (typeof dateString === 'string') {
+        date = parseISO(dateString);
+      } else {
+        date = new Date(dateString);
+      }
+      
+      // Vérifier si la date est valide
+      if (!isValid(date)) {
+        console.warn('Date invalide:', dateString);
+        return 'Date invalide';
+      }
+      
+      return format(date, formatString, { locale: fr });
+    } catch (error) {
+      console.error('Erreur de formatage de date:', error, dateString);
+      return 'Erreur de date';
+    }
+  };
   
   const [ticket, setTicket] = useState(null);
   const [exchanges, setExchanges] = useState([]);
