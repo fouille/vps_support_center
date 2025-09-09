@@ -111,7 +111,7 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour l'ajout d'un commentaire
-  commentAdded: (ticket, comment, author, recipientEmail) => {
+  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '') => {
     console.log('commentAdded template called with:', {
       ticketId: ticket?.id,
       commentId: comment?.id,
@@ -135,6 +135,8 @@ VoIP Services - Système de gestion des tickets`
           .content { padding: 20px; background-color: #f9fafb; }
           .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
           .comment { background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #2563eb; }
+          .button { background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0; }
+          .button:hover { background-color: #1d4ed8; }
         </style>
       </head>
       <body>
@@ -152,6 +154,13 @@ VoIP Services - Système de gestion des tickets`
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
+            ${baseUrl ? `
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${baseUrl}/tickets/${ticket.id}" class="button">
+                💬 Répondre au ticket
+              </a>
+            </div>
+            ` : ''}
           </div>
           <div class="footer">
             <p>VoIP Services - Système de gestion des tickets</p>
