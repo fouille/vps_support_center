@@ -104,17 +104,19 @@ const AppContent = () => {
             </ProtectedRoute>
           } />
           
-          {/* Routes administratives (agents uniquement) */}
+          {/* Routes communes */}
           <Route path="/clients" element={
-            <ProtectedRoute requireAgent={true}>
+            <ProtectedRoute>
               <ClientsPage />
             </ProtectedRoute>
           } />
           <Route path="/demandeurs" element={
-            <ProtectedRoute requireAgent={true}>
+            <ProtectedRoute>
               <DemandeursPage />
             </ProtectedRoute>
           } />
+          
+          {/* Routes administratives (agents uniquement) */}
           <Route path="/agents" element={
             <ProtectedRoute requireAgent={true}>
               <AgentsPage />
