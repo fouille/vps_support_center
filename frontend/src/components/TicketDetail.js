@@ -110,7 +110,9 @@ const TicketDetail = () => {
   const fetchExchanges = async (ticketId) => {
     try {
       setLoadingExchanges(true);
+      console.log('TicketDetail: Fetching exchanges for ticket:', ticketId);
       const response = await api.get(`/api/ticket-echanges?ticketId=${ticketId}`);
+      console.log('TicketDetail: Exchanges received:', response.data);
       setExchanges(response.data || []);
     } catch (error) {
       console.error('Erreur lors du chargement des échanges:', error);
