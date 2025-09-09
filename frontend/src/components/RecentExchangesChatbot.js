@@ -204,11 +204,21 @@ const RecentExchangesChatbot = () => {
                     }`}
                   >
                     {/* Type et numéro */}
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-lg">{getTypeIcon(exchange.type)}</span>
-                      <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                        {getTypeLabel(exchange.type)} #{exchange.item_number}
-                      </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">{getTypeIcon(exchange.type)}</span>
+                        <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                          {getTypeLabel(exchange.type)} #{exchange.item_number}
+                        </span>
+                      </div>
+                      {isClickable(exchange.type) && (
+                        <div className="flex items-center text-xs text-blue-600 dark:text-blue-400">
+                          <span className="mr-1">Cliquer pour ouvrir</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
 
                     {/* Titre */}
