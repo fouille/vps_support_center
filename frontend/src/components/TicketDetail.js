@@ -95,14 +95,14 @@ const TicketDetail = () => {
 
   // Auto-scroll quand les échanges changent
   useEffect(() => {
-    if (exchanges.length > 0) {
-      // Délai plus long pour s'assurer que le DOM est mis à jour
+    if (exchanges.length > 0 && messagesContainerRef.current) {
+      // Délai pour s'assurer que le DOM est mis à jour
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'end'
-        });
-      }, 300);
+        const container = messagesContainerRef.current;
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      }, 200);
     }
   }, [exchanges]);
 
