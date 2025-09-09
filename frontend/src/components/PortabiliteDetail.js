@@ -113,9 +113,9 @@ const PortabiliteDetail = () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette portabilité ?')) return;
 
     try {
-      await api.delete(`/api/portabilites/${portabiliteId}`);
+      await api.delete(`/api/portabilites/${portabilite_uuid}`);
 
-      onNavigate('portabilites');
+      navigate('/portabilites');
     } catch (err) {
       setError('Erreur lors de la suppression');
       console.error('Erreur:', err);
