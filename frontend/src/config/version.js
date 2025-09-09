@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.11.0",
+    date: "2025-09-09",
+    type: "MINOR",
+    description: "Implémentation système de routing avec React Router - URLs dynamiques pour tickets, portabilités et productions"
+  },
+  {
     version: "2.10.7",
     date: "2025-09-09",
     type: "PATCH",
