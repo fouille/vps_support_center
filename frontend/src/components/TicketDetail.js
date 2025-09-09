@@ -23,6 +23,17 @@ const TicketDetail = () => {
   const navigate = useNavigate();
   const { isAgent, api, user } = useAuth();
 
+  // Émojis populaires pour les commentaires
+  const popularEmojis = [
+    '😊', '👍', '👎', '❤️', '😢', '😂', '🔥', '💡', 
+    '✅', '❌', '⚠️', '🤔', '👌', '🙏', '💪', '🎉'
+  ];
+
+  const insertEmoji = (emoji) => {
+    setNewComment(newComment + emoji);
+    setShowEmojiPicker(false);
+  };
+
   // Fonction utilitaire pour formater les dates de façon sécurisée
   const formatDate = (dateString, formatString) => {
     if (!dateString) return null; // Retourner null au lieu d'un message
