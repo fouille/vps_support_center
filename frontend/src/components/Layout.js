@@ -242,10 +242,10 @@ const Layout = ({ children }) => {
           <div className="space-y-1">
             {navigation.map((item) => (
               <button
-                key={item.key}
-                onClick={() => handleNavigate(item.key)}
+                key={item.path}
+                onClick={() => handleNavigate(item.path)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
-                  isCurrentPage(item.key) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
+                  isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
                 }`}
               >
                 <item.icon className="h-5 w-5 mr-3" />
