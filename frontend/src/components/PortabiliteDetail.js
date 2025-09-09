@@ -437,81 +437,91 @@ const PortabiliteDetail = () => {
 
         {/* Informations de la portabilité - sur toute la largeur */}
         <div className="bg-white dark:bg-dark-surface rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
             Informations générales
           </h2>
             
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Client</p>
-                <p className="text-gray-900 dark:text-white">{portabilite.nom_societe}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Demandeur</p>
-                <p className="text-gray-900 dark:text-white">
-                  {portabilite.demandeur_prenom} {portabilite.demandeur_nom}
-                </p>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date de création</p>
-                <p className="text-gray-900 dark:text-white">{formatDate(portabilite.date_creation)}</p>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date souhaitée</p>
-                <p className="text-gray-900 dark:text-white">
-                  {portabilite.date_portabilite_demandee ? 
-                    new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 
-                    '-'
-                  }
-                </p>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Date effective</p>
-                <p className="text-gray-900 dark:text-white">
-                  {portabilite.date_portabilite_effective ? 
-                    new Date(portabilite.date_portabilite_effective).toLocaleDateString('fr-FR') : 
-                    '-'
-                  }
-                </p>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Numéros à porter</p>
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
-                  <pre className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                    {portabilite.numeros_portes}
-                  </pre>
-                </div>
-              </div>
-              
-              {portabilite.adresse && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Colonne 1 */}
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Adresse</p>
-                  <p className="text-gray-900 dark:text-white">
-                    {portabilite.adresse}
-                    {portabilite.code_postal && `, ${portabilite.code_postal}`}
-                    {portabilite.ville && ` ${portabilite.ville}`}
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Client</p>
+                  <p className="text-gray-900 dark:text-white font-medium">{portabilite.nom_societe}</p>
+                </div>
+                
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Demandeur</p>
+                  <p className="text-gray-900 dark:text-white font-medium">
+                    {portabilite.demandeur_prenom} {portabilite.demandeur_nom}
                   </p>
                 </div>
-              )}
-              
-              <div className="flex space-x-6">
+                
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Fiabilisation</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Date de création</p>
+                  <p className="text-gray-900 dark:text-white">{formatDate(portabilite.date_creation, 'dd MMM yyyy')}</p>
+                </div>
+              </div>
+
+              {/* Colonne 2 */}
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Date souhaitée</p>
                   <p className="text-gray-900 dark:text-white">
-                    {portabilite.fiabilisation_demandee ? '✅ Oui' : '❌ Non'}
+                    {portabilite.date_portabilite_demandee ? 
+                      new Date(portabilite.date_portabilite_demandee).toLocaleDateString('fr-FR') : 
+                      '-'
+                    }
                   </p>
                 </div>
+                
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Demande signée</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Date effective</p>
                   <p className="text-gray-900 dark:text-white">
-                    {portabilite.demande_signee ? '✅ Oui' : '❌ Non'}
+                    {portabilite.date_portabilite_effective ? 
+                      new Date(portabilite.date_portabilite_effective).toLocaleDateString('fr-FR') : 
+                      '-'
+                    }
                   </p>
                 </div>
+
+                {portabilite.adresse && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Adresse</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {portabilite.adresse}
+                      {portabilite.code_postal && `, ${portabilite.code_postal}`}
+                      {portabilite.ville && ` ${portabilite.ville}`}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Colonne 3 */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Fiabilisation</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {portabilite.fiabilisation_demandee ? '✅ Oui' : '❌ Non'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Demande signée</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {portabilite.demande_signee ? '✅ Oui' : '❌ Non'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Numéros à porter - sur toute la largeur */}
+            <div className="mt-6">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Numéros à porter</p>
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <pre className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap font-mono">
+                  {portabilite.numeros_portes}
+                </pre>
               </div>
             </div>
           </div>
