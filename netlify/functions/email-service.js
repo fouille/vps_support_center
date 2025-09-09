@@ -719,7 +719,8 @@ const sendEmail = async (to, subject, htmlContent, textContent) => {
 const emailService = {
   // Envoi d'email lors de la création d'un ticket
   sendTicketCreatedEmail: async (ticket, client, demandeur) => {
-    const template = createEmailTemplate.ticketCreated(ticket, client, demandeur);
+    const baseUrl = getBaseUrl();
+    const template = createEmailTemplate.ticketCreated(ticket, client, demandeur, baseUrl);
     
     // Envoyer à contact@voipservices.fr et au demandeur
     const recipients = [
