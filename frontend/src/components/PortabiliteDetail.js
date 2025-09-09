@@ -108,8 +108,28 @@ const PortabiliteDetail = () => {
     try {
       const response = await api.get(`/api/portabilite-echanges?portabiliteId=${portabilite_uuid}`);
       setCommentaires(response.data);
+      
+      // Auto-scroll vers le bas après chargement des commentaires
+      setTimeout(() => {
+        commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     } catch (err) {
       console.error('Erreur lors du chargement des commentaires:', err);
+    }
+  };
+
+  // Fonction pour récupérer les fichiers
+  const fetchFiles = async () => {
+    if (!portabilite_uuid) return;
+    
+    try {
+      setLoadingFiles(true);
+      const response = await api.get(`/api/portabilite-fichiers?portabiliteId=${portabilite_uuid}`);
+      setFiles(response.data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des fichiers:', error);
+    } finally {
+      setLoadingFiles(false);
     }
   };
 
