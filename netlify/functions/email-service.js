@@ -445,8 +445,8 @@ VoIP Services - Système de portabilité`
   }),
 
   // Template pour changement de statut de portabilité
-  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '') => ({
-    subject: `Portabilité #${portabilite.numero_portabilite} - Statut modifié`,
+  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '', clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Portabilité #${portabilite.numero_portabilite}`,
     html: `
       <!DOCTYPE html>
       <html>
