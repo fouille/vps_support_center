@@ -278,7 +278,7 @@ const Layout = ({ children }) => {
                 } ${sidebarCollapsed ? 'justify-center' : ''}`}
                 title={sidebarCollapsed ? item.name : ''}
               >
-                <item.icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                <item.icon className={`${sidebarCollapsed ? 'h-8 w-8' : 'h-5 w-5 mr-3'}`} />
                 {!sidebarCollapsed && item.name}
               </button>
             ))}
