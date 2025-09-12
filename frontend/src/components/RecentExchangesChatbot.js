@@ -10,6 +10,7 @@ const RecentExchangesChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const toggleChatbot = async () => {
