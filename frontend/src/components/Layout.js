@@ -235,16 +235,35 @@ const Layout = ({ children }) => {
                 className="h-8 w-8 object-contain"
               />
             )}
-            <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-              {appName}
-            </h1>
+            {!sidebarCollapsed && (
+              <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                {appName}
+              </h1>
+            )}
           </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleSidebarCollapse}
+              className="hidden lg:block p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text transition-colors"
+              title={sidebarCollapsed ? "Développer le menu" : "Réduire le menu"}
+            >
+              {sidebarCollapsed ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
