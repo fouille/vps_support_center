@@ -764,9 +764,9 @@ const emailService = {
   },
 
   // Envoi d'email lors de l'ajout d'un commentaire
-  sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName) => {
+  sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName, clientName = '') => {
     const baseUrl = await getBaseUrl(ticket?.demandeur_id);
-    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail, baseUrl);
+    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail, baseUrl, clientName);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
