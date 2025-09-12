@@ -801,7 +801,7 @@ const emailService = {
   sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName, clientName = '') => {
     const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author, clientName);
     
-    const recipient = { email: recipientEmailName, name: recipientName };
+    const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
