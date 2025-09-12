@@ -679,8 +679,8 @@ Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.contenu || ''}
 
+Client : ${clientName}
 Titre de production : ${production.titre}
-Client : ${production.nom_societe || production.client_display || 'N/A'}
 
 VoIP Services - Système de production`
   })
