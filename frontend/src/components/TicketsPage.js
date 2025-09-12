@@ -880,36 +880,15 @@ const TicketsPage = () => {
 
       {/* Interface style messagerie */}
       <div className="flex h-[70vh] border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
-        {/* Colonne gauche - Liste des tickets */}
-        <div className={`${isMenuCollapsed ? 'w-16' : 'w-1/4'} border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card transition-all duration-300`}>
+        {/* Colonne gauche (1/4) - Liste des tickets */}
+        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card">
           <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface">
-            <div className="flex items-center justify-between">
-              {!isMenuCollapsed && (
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 dark:text-dark-text">
-                    {isAgent ? 'Tickets de support' : 'Mes tickets'}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-dark-muted mt-1">
-                    {tickets.length} ticket{tickets.length > 1 ? 's' : ''}
-                  </p>
-                </div>
-              )}
-              <button
-                onClick={() => setIsMenuCollapsed(!isMenuCollapsed)}
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text rounded transition-colors"
-                title={isMenuCollapsed ? "Développer le menu" : "Réduire le menu"}
-              >
-                {isMenuCollapsed ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                )}
-              </button>
-            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-dark-text">
+              {isAgent ? 'Tickets de support' : 'Mes tickets'}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-dark-muted mt-1">
+              {tickets.length} ticket{tickets.length > 1 ? 's' : ''}
+            </p>
           </div>
           
           <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
