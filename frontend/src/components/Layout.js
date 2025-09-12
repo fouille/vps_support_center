@@ -23,6 +23,10 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const savedCollapsed = localStorage.getItem('sidebarCollapsed');
+    return savedCollapsed === 'true';
+  });
   
   // Initialiser le thème depuis localStorage ou par défaut dark
   const [darkMode, setDarkMode] = useState(() => {
