@@ -15,10 +15,16 @@ const RecentExchangesChatbot = () => {
 
   const toggleChatbot = async () => {
     if (!isOpen) {
+      // Montrer le loader sur le bouton pendant le chargement
+      setButtonLoading(true);
       // Charger les données à l'ouverture
       await fetchRecentExchanges();
+      // Cacher le loader et ouvrir le chatbot
+      setButtonLoading(false);
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
     }
-    setIsOpen(!isOpen);
   };
 
   const fetchRecentExchanges = async () => {
