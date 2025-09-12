@@ -275,10 +275,11 @@ const Layout = ({ children }) => {
                 onClick={() => handleNavigate(item.path)}
                 className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
                   isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
-                }`}
+                } ${sidebarCollapsed ? 'justify-center' : ''}`}
+                title={sidebarCollapsed ? item.name : ''}
               >
-                <item.icon className="h-5 w-5 mr-3" />
-                {item.name}
+                <item.icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                {!sidebarCollapsed && item.name}
               </button>
             ))}
           </div>
