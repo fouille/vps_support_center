@@ -495,13 +495,34 @@ exports.handler = async (event, context) => {
             const detailResult = await sql(detailQuery, [productionId]);
             const productionDetail = detailResult[0];
 
+            // Récupérer les informations de l'auteur depuis la base de données
+            let authorInfo = { prenom: 'Utilisateur', nom: 'inconnu' };
+            if ((decoded.type_utilisateur || decoded.type) === 'agent') {
+              const agentInfo = await sql`SELECT nom, prenom FROM agents WHERE id = ${decoded.id}`;
+              if (agentInfo.length > 0) {
+                authorInfo = agentInfo[0];
+              }
+            } else if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
+              const demandeurInfo = await sql`SELECT nom, prenom FROM demandeurs WHERE id = ${decoded.id}`;
+              if (demandeurInfo.length > 0) {
+                authorInfo = demandeurInfo[0];
+              }
+            }
+
+            // Déterminer le nom du client
+            const clientName = productionDetail.nom_societe || 
+                             (productionDetail.client_nom ? 
+                               `${productionDetail.client_nom} ${productionDetail.client_prenom || ''}`.trim() : 
+                               'N/A');
+
             await emailService.sendProductionStatusChangeEmail(
               productionDetail, 
               currentProduction.status, 
               status,
-              { prenom: decoded.prenom, nom: decoded.nom }, // author info
+              authorInfo,
               productionDetail.demandeur_email,
-              `${productionDetail.demandeur_prenom || ''} ${productionDetail.demandeur_nom || ''}`.trim()
+              `${productionDetail.demandeur_prenom || ''} ${productionDetail.demandeur_nom || ''}`.trim(),
+              clientName
             );
           }
         } catch (emailError) {
