@@ -4,6 +4,14 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.12.1] - 2025-09-12
+### Fixed
+- 🔧 Correction des emails de production : affichage correct du nom du client et de l'auteur dans les changements de statut et commentaires
+
+## [2.12.0] - 2025-09-12
+### Added
+- ✨ Amélioration des emails : ajout du nom du client dans l'objet et le corps des emails de commentaires et changements de statut pour tickets, portabilités et productions
+
 ## [2.10.7] - 2025-09-09
 ### Fixed
 - 🔧 mineur Implémentation système de routing avec React Router - URLs dynamiques pour tickets, portabilités et productions

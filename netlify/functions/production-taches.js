@@ -259,18 +259,36 @@ exports.handler = async (event, context) => {
               if (productionInfo.length > 0) {
                 const emailService = loadEmailService();
                 if (emailService) {
-                  // Enrichir les données auteur avec les informations complètes
-                  const enrichedAuthor = {
-                    ...decoded,
-                    nom: productionInfo[0].auteur_nom,
-                    prenom: productionInfo[0].auteur_prenom
+                  // Récupérer les informations de l'auteur depuis la base de données
+                  let authorInfo = { 
+                    prenom: 'Utilisateur', 
+                    nom: 'inconnu', 
+                    type_utilisateur: decoded.type_utilisateur || decoded.type || 'inconnu'
                   };
+                  
+                  if ((decoded.type_utilisateur || decoded.type) === 'agent') {
+                    const agentInfo = await sql`SELECT nom, prenom FROM agents WHERE id = ${decoded.id}`;
+                    if (agentInfo.length > 0) {
+                      authorInfo = {
+                        ...agentInfo[0],
+                        type_utilisateur: 'agent'
+                      };
+                    }
+                  } else if ((decoded.type_utilisateur || decoded.type) === 'demandeur') {
+                    const demandeurInfo = await sql`SELECT nom, prenom FROM demandeurs WHERE id = ${decoded.id}`;
+                    if (demandeurInfo.length > 0) {
+                      authorInfo = {
+                        ...demandeurInfo[0],
+                        type_utilisateur: 'demandeur'
+                      };
+                    }
+                  }
                   
                   await emailService.sendProductionCommentEmail(
                     productionInfo[0],
                     updatedTache,
                     commentResult[0],
-                    enrichedAuthor
+                    authorInfo
                   );
                 }
               }

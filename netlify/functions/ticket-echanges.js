@@ -225,7 +225,8 @@ exports.handler = async (event, context) => {
                   echangeWithAuthor[0],
                   authorInfo,
                   recipientEmail,
-                  recipientName
+                  recipientName,
+                  ticket.client_nom
                 );
                 console.log('Comment notification email sent successfully');
               }

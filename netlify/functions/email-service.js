@@ -141,18 +141,19 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour l'ajout d'un commentaire
-  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '') => {
+  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '', clientName = '') => {
     console.log('commentAdded template called with:', {
       ticketId: ticket?.id,
       commentId: comment?.id,
       commentContenu: comment?.message,  // Corrigé: message au lieu de contenu
       commentCreatedAt: comment?.created_at,  // Ajouté pour debug
       authorId: author?.id,
-      recipientEmail
+      recipientEmail,
+      clientName
     });
     
     return {
-      subject: `Commentaire ajouté - Ticket #${ticket.numero_ticket}`,
+      subject: `Commentaire ajouté - ${clientName} - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -183,6 +184,7 @@ VoIP Services - Système de gestion des tickets`
               <strong>Commentaire :</strong><br>
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
@@ -207,6 +209,7 @@ Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.message || ''}
 
+Client : ${clientName}
 Titre du ticket : ${ticket.titre}
 
 VoIP Services - Système de gestion des tickets`
@@ -214,8 +217,8 @@ VoIP Services - Système de gestion des tickets`
   },
 
   // Template pour le changement de statut
-  statusChanged: (ticket, oldStatus, newStatus, author) => ({
-    subject: `Statut modifié - Ticket #${ticket.numero_ticket}`,
+  statusChanged: (ticket, oldStatus, newStatus, author, clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -246,6 +249,7 @@ VoIP Services - Système de gestion des tickets`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author.prenom} ${author.nom}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
           <div class="footer">
@@ -261,6 +265,7 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author.prenom} ${author.nom}
 
+Client : ${clientName}
 Titre du ticket : ${ticket.titre}
 
 VoIP Services - Système de gestion des tickets`
@@ -319,8 +324,8 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour changement de statut de production
-  productionStatusChanged: (production, oldStatus, newStatus, author) => ({
-    subject: `Production #${production.numero_production} - Statut modifié`,
+  productionStatusChanged: (production, oldStatus, newStatus, author, clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Production #${production.numero_production}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -351,8 +356,8 @@ VoIP Services - Système de gestion des tickets`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author.prenom} ${author.nom}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre :</strong> ${production.titre}</p>
-            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
           </div>
           <div class="footer">
             <p>VoIP Services - Système de production</p>
@@ -367,8 +372,8 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author.prenom} ${author.nom}
 
+Client : ${clientName}
 Titre : ${production.titre}
-Client : ${production.nom_societe || production.client_display || 'N/A'}
 
 VoIP Services - Système de production`
   }),
@@ -440,8 +445,8 @@ VoIP Services - Système de portabilité`
   }),
 
   // Template pour changement de statut de portabilité
-  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '') => ({
-    subject: `Portabilité #${portabilite.numero_portabilite} - Statut modifié`,
+  portabiliteStatusChanged: (portabilite, oldStatus, newStatus, author, baseUrl = '', clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Portabilité #${portabilite.numero_portabilite}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -472,8 +477,8 @@ VoIP Services - Système de portabilité`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author?.prenom || ''} ${author?.nom || 'Système'}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
-            <p><strong>Client :</strong> ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
               <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
@@ -495,15 +500,15 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author?.prenom || ''} ${author?.nom || 'Système'}
 
+Client : ${clientName}
 Numéros portés : ${portabilite.numeros_portes}
-Client : ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}
 
 VoIP Services - Système de portabilité`
   }),
 
   // Template pour commentaire sur portabilité
-  portabiliteCommentAdded: (portabilite, comment, author, baseUrl = '') => ({
-    subject: `Commentaire ajouté - Portabilité #${portabilite.numero_portabilite}`,
+  portabiliteCommentAdded: (portabilite, comment, author, baseUrl = '', clientName = '') => ({
+    subject: `Commentaire ajouté - ${clientName} - Portabilité #${portabilite.numero_portabilite}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -534,6 +539,7 @@ VoIP Services - Système de portabilité`
               <strong>Commentaire :</strong><br>
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
@@ -558,6 +564,7 @@ Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.message || ''}
 
+Client : ${clientName}
 Numéros portés : ${portabilite.numeros_portes}
 
 VoIP Services - Système de portabilité`
@@ -622,8 +629,8 @@ VoIP Services - Système de production`
   }),
 
   // Template pour commentaire sur production
-  productionCommentAdded: (production, tache, comment, author) => ({
-    subject: `Commentaire ajouté - Production #${production.numero_production} - ${tache?.nom_tache || 'Tâche'}`,
+  productionCommentAdded: (production, tache, comment, author, clientName = '') => ({
+    subject: `Commentaire ajouté - ${clientName} - Production #${production.numero_production} - ${tache?.nom_tache || 'Tâche'}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -653,8 +660,8 @@ VoIP Services - Système de production`
               <strong>Commentaire :</strong><br>
               ${(comment.contenu || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre de production :</strong> ${production.titre}</p>
-            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
           </div>
           <div class="footer">
             <p>VoIP Services - Système de production</p>
@@ -672,8 +679,8 @@ Date : ${new Date(comment.date_creation).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.contenu || ''}
 
+Client : ${clientName}
 Titre de production : ${production.titre}
-Client : ${production.nom_societe || production.client_display || 'N/A'}
 
 VoIP Services - Système de production`
   })
@@ -757,17 +764,17 @@ const emailService = {
   },
 
   // Envoi d'email lors de l'ajout d'un commentaire
-  sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName) => {
+  sendCommentEmail: async (ticket, comment, author, recipientEmail, recipientName, clientName = '') => {
     const baseUrl = await getBaseUrl(ticket?.demandeur_id);
-    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail, baseUrl);
+    const template = createEmailTemplate.commentAdded(ticket, comment, author, recipientEmail, baseUrl, clientName);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
   // Envoi d'email lors du changement de statut
-  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, author, recipientEmail, recipientName) => {
-    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, author);
+  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, author, recipientEmail, recipientName, clientName = '') => {
+    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, author, clientName);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
@@ -791,8 +798,8 @@ const emailService = {
   },
 
   // Envoi d'email pour changement de statut de production
-  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName) => {
-    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author);
+  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName, clientName = '') => {
+    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author, clientName);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
@@ -830,7 +837,8 @@ const emailService = {
   // Envoi d'email pour changement de statut de portabilité
   sendPortabiliteStatusChangeEmail: async (portabiliteDetail, oldStatus, newStatus) => {
     const baseUrl = await getBaseUrl(portabiliteDetail?.demandeur_id);
-    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null, baseUrl);
+    const clientName = portabiliteDetail.nom_societe || portabiliteDetail.nom_client + ' ' + (portabiliteDetail.prenom_client || '');
+    const template = createEmailTemplate.portabiliteStatusChanged(portabiliteDetail, oldStatus, newStatus, null, baseUrl, clientName);
     
     // Envoyer au demandeur si disponible
     if (portabiliteDetail.demandeur_email) {
@@ -847,7 +855,8 @@ const emailService = {
   // Envoi d'email pour commentaire sur portabilité
   sendPortabiliteCommentEmail: async (portabiliteInfo, commentDetail, userType) => {
     const baseUrl = await getBaseUrl(portabiliteInfo?.demandeur_id);
-    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail, baseUrl);
+    const clientName = portabiliteInfo.nom_societe || portabiliteInfo.nom_client + ' ' + (portabiliteInfo.prenom_client || '');
+    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail, baseUrl, clientName);
     
     // Déterminer le destinataire selon le type d'utilisateur qui commente
     let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
@@ -892,7 +901,8 @@ const emailService = {
 
   // Envoi d'email pour commentaire sur production
   sendProductionCommentEmail: async (productionInfo, tache, comment, author) => {
-    const template = createEmailTemplate.productionCommentAdded(productionInfo, tache, comment, author);
+    const clientName = productionInfo.nom_societe || productionInfo.client_display || 'N/A';
+    const template = createEmailTemplate.productionCommentAdded(productionInfo, tache, comment, author, clientName);
     
     // Déterminer le destinataire selon le type d'utilisateur qui commente
     let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
