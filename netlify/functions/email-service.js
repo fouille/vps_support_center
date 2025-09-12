@@ -855,7 +855,8 @@ const emailService = {
   // Envoi d'email pour commentaire sur portabilité
   sendPortabiliteCommentEmail: async (portabiliteInfo, commentDetail, userType) => {
     const baseUrl = await getBaseUrl(portabiliteInfo?.demandeur_id);
-    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail, baseUrl);
+    const clientName = portabiliteInfo.nom_societe || portabiliteInfo.nom_client + ' ' + (portabiliteInfo.prenom_client || '');
+    const template = createEmailTemplate.portabiliteCommentAdded(portabiliteInfo, commentDetail, commentDetail, baseUrl, clientName);
     
     // Déterminer le destinataire selon le type d'utilisateur qui commente
     let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
