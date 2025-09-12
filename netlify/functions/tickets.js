@@ -643,7 +643,8 @@ exports.handler = async (event, context) => {
                   upd_status,
                   authorInfo,
                   demandeurInfo[0].email,
-                  `${demandeurInfo[0].prenom} ${demandeurInfo[0].nom}`
+                  `${demandeurInfo[0].prenom} ${demandeurInfo[0].nom}`,
+                  clientInfo[0].nom_societe || `${clientInfo[0].nom} ${clientInfo[0].prenom || ''}`.trim()
                 );
                 console.log('Status change email sent successfully');
               }
