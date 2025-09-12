@@ -507,8 +507,8 @@ VoIP Services - Système de portabilité`
   }),
 
   // Template pour commentaire sur portabilité
-  portabiliteCommentAdded: (portabilite, comment, author, baseUrl = '') => ({
-    subject: `Commentaire ajouté - Portabilité #${portabilite.numero_portabilite}`,
+  portabiliteCommentAdded: (portabilite, comment, author, baseUrl = '', clientName = '') => ({
+    subject: `Commentaire ajouté - ${clientName} - Portabilité #${portabilite.numero_portabilite}`,
     html: `
       <!DOCTYPE html>
       <html>
