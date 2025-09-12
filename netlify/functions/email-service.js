@@ -209,6 +209,7 @@ Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.message || ''}
 
+Client : ${clientName}
 Titre du ticket : ${ticket.titre}
 
 VoIP Services - Système de gestion des tickets`
