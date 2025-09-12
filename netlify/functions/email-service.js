@@ -477,8 +477,8 @@ VoIP Services - Système de portabilité`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author?.prenom || ''} ${author?.nom || 'Système'}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
-            <p><strong>Client :</strong> ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
               <a href="${baseUrl}/portabilites/${portabilite.id}" class="button">
