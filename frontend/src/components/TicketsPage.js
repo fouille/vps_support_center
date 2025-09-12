@@ -917,53 +917,88 @@ const TicketsPage = () => {
             {tickets.length === 0 ? (
               <div className="p-6 text-center">
                 <Ticket className="h-12 w-12 text-gray-300 dark:text-dark-muted mx-auto mb-3" />
-                <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text mb-1">
-                  Aucun ticket
-                </h4>
-                <p className="text-xs text-gray-500 dark:text-dark-muted">
-                  {isAgent ? 'Aucun ticket trouvé' : 'Créez votre premier ticket'}
-                </p>
+                {!isMenuCollapsed && (
+                  <>
+                    <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text mb-1">
+                      Aucun ticket
+                    </h4>
+                    <p className="text-xs text-gray-500 dark:text-dark-muted">
+                      {isAgent ? 'Aucun ticket trouvé' : 'Créez votre premier ticket'}
+                    </p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="divide-y divide-gray-200 dark:divide-dark-border">
-                {tickets.map((ticket) => (
-                  <div
-                    key={ticket.id}
-                    onClick={() => setSelectedTicket(ticket)}
-                    className={`p-4 cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-dark-surface ${
-                      selectedTicket?.id === ticket.id 
-                        ? 'bg-primary-50 dark:bg-primary-900/20 border-r-2 border-primary-500' 
-                        : ''
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <Ticket className="h-4 w-4 text-primary-600 mt-1 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                {tickets.map((ticket) => {
+                  const isCritical = isDeadlineCritical(ticket.date_fin_prevue);
+                  
+                  return (
+                    <div
+                      key={ticket.id}
+                      onClick={() => setSelectedTicket(ticket)}
+                      className={`${isMenuCollapsed ? 'p-2' : 'p-4'} cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-dark-surface ${
+                        selectedTicket?.id === ticket.id 
+                          ? 'bg-primary-50 dark:bg-primary-900/20 border-r-2 border-primary-500' 
+                          : ''
+                      }`}
+                      title={isMenuCollapsed ? `${ticket.titre} - #${ticket.numero_ticket}` : ''}
+                    >
+                      {isMenuCollapsed ? (
+                        // Vue réduite - seulement l'icône
+                        <div className="flex flex-col items-center space-y-1">
+                          <div className="relative">
+                            <Ticket className="h-5 w-5 text-primary-600" />
+                            {isCritical && (
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
+                                <AlertCircle className="h-2 w-2 text-white" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 text-center">
                             #{ticket.numero_ticket}
                           </span>
-                          <div className="flex-shrink-0">
-                            {getStatusBadge(ticket.status)}
+                        </div>
+                      ) : (
+                        // Vue complète
+                        <div className="flex items-start space-x-3">
+                          <Ticket className="h-4 w-4 text-primary-600 mt-1 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                                #{ticket.numero_ticket}
+                              </span>
+                              <div className="flex-shrink-0">
+                                {getStatusBadge(ticket.status)}
+                              </div>
+                            </div>
+                            
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text truncate">
+                              {ticket.titre}
+                            </h4>
+                            
+                            {ticket.date_fin_prevue && (
+                              <div className={`mt-1 text-xs flex items-center ${
+                                isCritical 
+                                  ? 'text-red-600 dark:text-red-400' 
+                                  : 'text-orange-600 dark:text-orange-400'
+                              }`}>
+                                {isCritical ? (
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                ) : (
+                                  <Clock className="h-3 w-3 mr-1" />
+                                )}
+                                <span>
+                                  Échéance: {format(new Date(ticket.date_fin_prevue), 'dd/MM', { locale: fr })}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text truncate">
-                          {ticket.titre}
-                        </h4>
-                        
-                        {ticket.date_fin_prevue && (
-                          <div className="mt-1 text-xs text-orange-600 dark:text-orange-400 flex items-center">
-                            <Clock className="h-3 w-3 mr-1" />
-                            <span>
-                              Échéance: {format(new Date(ticket.date_fin_prevue), 'dd/MM', { locale: fr })}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
