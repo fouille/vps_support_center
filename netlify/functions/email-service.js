@@ -265,6 +265,7 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author.prenom} ${author.nom}
 
+Client : ${clientName}
 Titre du ticket : ${ticket.titre}
 
 VoIP Services - Système de gestion des tickets`
