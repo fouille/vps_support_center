@@ -7,7 +7,7 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 12,      // Version mineure - nouvelles fonctionnalités
-  patch: 0,      // Version patch - corrections de bugs
+  patch: 1,      // Version patch - corrections de bugs
   buildDate: "2025-09-12", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.12.1",
+    date: "2025-09-12",
+    type: "PATCH",
+    description: "Correction des emails de production : affichage correct du nom du client et de l'auteur dans les changements de statut et commentaires"
+  },
+{
     version: "2.12.0",
     date: "2025-09-12",
     type: "MINOR",
