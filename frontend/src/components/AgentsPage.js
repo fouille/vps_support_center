@@ -36,8 +36,14 @@ const AgentsPage = () => {
     e.preventDefault();
     try {
       if (editingAgent) {
-        await api.put(`/api/agents/${editingAgent.id}`, formData);
+        // Pour l'édition, ne pas envoyer le mot de passe s'il est vide
+        const dataToSend = { ...formData };
+        if (!formData.password.trim()) {
+          delete dataToSend.password;
+        }
+        await api.put(`/api/agents/${editingAgent.id}`, dataToSend);
       } else {
+        // Pour la création, envoyer toutes les données
         await api.post('/api/agents', formData);
       }
       fetchAgents();
