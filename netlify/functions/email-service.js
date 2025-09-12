@@ -184,6 +184,7 @@ VoIP Services - Système de gestion des tickets`
               <strong>Commentaire :</strong><br>
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
