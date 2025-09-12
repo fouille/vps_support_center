@@ -629,8 +629,8 @@ VoIP Services - Système de production`
   }),
 
   // Template pour commentaire sur production
-  productionCommentAdded: (production, tache, comment, author) => ({
-    subject: `Commentaire ajouté - Production #${production.numero_production} - ${tache?.nom_tache || 'Tâche'}`,
+  productionCommentAdded: (production, tache, comment, author, clientName = '') => ({
+    subject: `Commentaire ajouté - ${clientName} - Production #${production.numero_production} - ${tache?.nom_tache || 'Tâche'}`,
     html: `
       <!DOCTYPE html>
       <html>
