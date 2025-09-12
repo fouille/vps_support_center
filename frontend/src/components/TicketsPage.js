@@ -343,7 +343,40 @@ const TicketsPage = () => {
         : '';
       
       const response = await api.get(`/api/tickets${queryString}`);
-      setTickets(response.data);
+      
+      // Trier les tickets par échéance (les plus urgents en premier)
+      const sortedTickets = response.data.sort((a, b) => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+        
+        const aHasDeadline = a.date_fin_prevue;
+        const bHasDeadline = b.date_fin_prevue;
+        
+        // Si aucun des deux n'a d'échéance, garder l'ordre original
+        if (!aHasDeadline && !bHasDeadline) {
+          return new Date(b.date_creation) - new Date(a.date_creation);
+        }
+        
+        // Si seul A a une échéance, A vient en premier
+        if (aHasDeadline && !bHasDeadline) {
+          return -1;
+        }
+        
+        // Si seul B a une échéance, B vient en premier
+        if (!aHasDeadline && bHasDeadline) {
+          return 1;
+        }
+        
+        // Si les deux ont une échéance, trier par date (plus proche en premier)
+        const aDeadline = new Date(a.date_fin_prevue);
+        const bDeadline = new Date(b.date_fin_prevue);
+        aDeadline.setHours(0, 0, 0, 0);
+        bDeadline.setHours(0, 0, 0, 0);
+        
+        return aDeadline - bDeadline;
+      });
+      
+      setTickets(sortedTickets);
     } catch (error) {
       setError('Erreur lors du chargement des tickets');
     } finally {
