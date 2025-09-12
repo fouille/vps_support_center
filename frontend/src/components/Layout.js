@@ -273,12 +273,12 @@ const Layout = ({ children }) => {
               <button
                 key={item.path}
                 onClick={() => handleNavigate(item.path)}
-                className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
+                className={`flex items-center w-full text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
                   isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
-                } ${sidebarCollapsed ? 'justify-center' : ''}`}
+                } ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-4 py-2'}`}
                 title={sidebarCollapsed ? item.name : ''}
               >
-                <item.icon className={`${sidebarCollapsed ? 'h-8 w-8' : 'h-5 w-5 mr-3'}`} />
+                <item.icon className={`${sidebarCollapsed ? 'h-10 w-10' : 'h-5 w-5 mr-3'}`} />
                 {!sidebarCollapsed && item.name}
               </button>
             ))}
