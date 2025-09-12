@@ -96,15 +96,29 @@ exports.handler = async (event, context) => {
         const updateData = JSON.parse(event.body);
         const { nom: upd_nom, prenom: upd_prenom, societe: upd_societe, email: upd_email, password: upd_password } = updateData;
         
-        const hashedNewPassword = await bcrypt.hash(upd_password, 10);
+        let updatedAgent;
         
-        const updatedAgent = await sql`
-          UPDATE agents 
-          SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
-              email = ${upd_email}, password = ${hashedNewPassword}
-          WHERE id = ${agentId}
-          RETURNING id, email, nom, prenom, societe
-        `;
+        if (upd_password && upd_password.trim()) {
+          // Si un mot de passe est fourni, le hasher et mettre à jour tous les champs
+          const hashedNewPassword = await bcrypt.hash(upd_password, 10);
+          
+          updatedAgent = await sql`
+            UPDATE agents 
+            SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
+                email = ${upd_email}, password = ${hashedNewPassword}
+            WHERE id = ${agentId}
+            RETURNING id, email, nom, prenom, societe
+          `;
+        } else {
+          // Si pas de mot de passe, mettre à jour seulement les autres champs
+          updatedAgent = await sql`
+            UPDATE agents 
+            SET nom = ${upd_nom}, prenom = ${upd_prenom}, societe = ${upd_societe}, 
+                email = ${upd_email}
+            WHERE id = ${agentId}
+            RETURNING id, email, nom, prenom, societe
+          `;
+        }
         
         if (updatedAgent.length === 0) {
           return {

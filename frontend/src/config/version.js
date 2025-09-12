@@ -6,8 +6,8 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 12,      // Version mineure - nouvelles fonctionnalités
-  patch: 1,      // Version patch - corrections de bugs
+  minor: 13,      // Version mineure - nouvelles fonctionnalités
+  patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-09-12", // Date de build automatique
 };
 
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.13.0",
+    date: "2025-09-12",
+    type: "MINOR",
+    description: "Interface utilisateur améliorée : ajout d'un loader au chatbot lors du chargement des échanges et refonte de la page tickets en style messagerie avec vue split-screen (liste à gauche, détails à droite)"
+  },
+{
     version: "2.12.1",
     date: "2025-09-12",
     type: "PATCH",

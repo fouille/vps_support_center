@@ -31,6 +31,7 @@ const TicketsPage = () => {
   const [demandeurs, setDemandeurs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
@@ -341,7 +342,40 @@ const TicketsPage = () => {
         : '';
       
       const response = await api.get(`/api/tickets${queryString}`);
-      setTickets(response.data);
+      
+      // Trier les tickets par échéance (les plus urgents en premier)
+      const sortedTickets = response.data.sort((a, b) => {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+        
+        const aHasDeadline = a.date_fin_prevue;
+        const bHasDeadline = b.date_fin_prevue;
+        
+        // Si aucun des deux n'a d'échéance, garder l'ordre original
+        if (!aHasDeadline && !bHasDeadline) {
+          return new Date(b.date_creation) - new Date(a.date_creation);
+        }
+        
+        // Si seul A a une échéance, A vient en premier
+        if (aHasDeadline && !bHasDeadline) {
+          return -1;
+        }
+        
+        // Si seul B a une échéance, B vient en premier
+        if (!aHasDeadline && bHasDeadline) {
+          return 1;
+        }
+        
+        // Si les deux ont une échéance, trier par date (plus proche en premier)
+        const aDeadline = new Date(a.date_fin_prevue);
+        const bDeadline = new Date(b.date_fin_prevue);
+        aDeadline.setHours(0, 0, 0, 0);
+        bDeadline.setHours(0, 0, 0, 0);
+        
+        return aDeadline - bDeadline;
+      });
+      
+      setTickets(sortedTickets);
     } catch (error) {
       setError('Erreur lors du chargement des tickets');
     } finally {
@@ -692,6 +726,17 @@ const TicketsPage = () => {
     );
   };
 
+  const isDeadlineCritical = (dateFinPrevue) => {
+    if (!dateFinPrevue) return false;
+    
+    const now = new Date();
+    const deadline = new Date(dateFinPrevue);
+    now.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
+    
+    return deadline <= now; // Aujourd'hui ou dépassé
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -833,100 +878,220 @@ const TicketsPage = () => {
         </div>
       )}
 
-      <div className="overflow-y-auto max-h-[70vh] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-        <div className="grid gap-4 pr-2">
-          {tickets.map((ticket) => (
-          <div key={ticket.id} className="card p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-2">
-                  <Ticket className="h-5 w-5 text-primary-600" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
-                    {ticket.titre}
-                  </h3>
-                  <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                    #{ticket.numero_ticket}
-                  </span>
-                  {getStatusBadge(ticket.status)}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                  <div className="flex items-center text-sm text-gray-600 dark:text-dark-muted">
-                    <Building className="h-4 w-4 mr-2" />
-                    <span>Client: {formatClientDisplay({ nom_societe: ticket.client_nom, prenom: ticket.client_prenom, nom: ticket.client_nom_personne })}</span>
-                  </div>
-                  
-                  <div className="flex items-center text-sm text-gray-600 dark:text-dark-muted">
-                    <User className="h-4 w-4 mr-2" />
-                    <span>Demandeur: {ticket.demandeur_prenom} {ticket.demandeur_nom}</span>
-                  </div>
-
-                  <div className="flex items-center text-sm text-gray-600 dark:text-dark-muted">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>
-                      Créé le: {format(new Date(ticket.date_creation), 'dd MMM yyyy', { locale: fr })}
-                    </span>
-                  </div>
-                </div>
-
-                {ticket.date_fin_prevue && (
-                  <div className="flex items-center text-sm text-orange-600 dark:text-orange-400 mt-2">
-                    <Clock className="h-4 w-4 mr-2" />
-                    <span>
-                      Échéance: {format(new Date(ticket.date_fin_prevue), 'dd MMM yyyy', { locale: fr })}
-                    </span>
-                  </div>
-                )}
-
-                <p className="text-gray-700 dark:text-dark-text mt-3 line-clamp-2">
-                  {ticket.requete_initiale}
-                </p>
-              </div>
-
-              <div className="flex space-x-2 ml-4">
-                <button
-                  onClick={() => handleView(ticket)}
-                  className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                  title="Voir le détail"
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-                
-                {isAgent && (
-                  <button
-                    onClick={() => handleEdit(ticket)}
-                    className="p-2 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
-                    title="Modifier"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                )}
-                
-                {isAgent && (
-                  <button
-                    onClick={() => handleDelete(ticket.id)}
-                    className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {tickets.length === 0 && (
-          <div className="card p-12 text-center">
-            <Ticket className="h-16 w-16 text-gray-300 dark:text-dark-muted mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-2">
-              Aucun ticket
+      {/* Interface style messagerie */}
+      <div className="flex h-[70vh] border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
+        {/* Colonne gauche (1/4) - Liste des tickets */}
+        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card">
+          <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface">
+            <h3 className="font-semibold text-gray-900 dark:text-dark-text">
+              {isAgent ? 'Tickets de support' : 'Mes tickets'}
             </h3>
-            <p className="text-gray-500 dark:text-dark-muted">
-              {isAgent ? 'Aucun ticket n\'a été créé pour le moment.' : 'Vous n\'avez aucun ticket. Créez-en un nouveau !'}
+            <p className="text-sm text-gray-500 dark:text-dark-muted mt-1">
+              {tickets.length} ticket{tickets.length > 1 ? 's' : ''}
             </p>
           </div>
-        )}
+          
+          <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+            {tickets.length === 0 ? (
+              <div className="p-6 text-center">
+                <Ticket className="h-12 w-12 text-gray-300 dark:text-dark-muted mx-auto mb-3" />
+                <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text mb-1">
+                  Aucun ticket
+                </h4>
+                <p className="text-xs text-gray-500 dark:text-dark-muted">
+                  {isAgent ? 'Aucun ticket trouvé' : 'Créez votre premier ticket'}
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200 dark:divide-dark-border">
+                {tickets.map((ticket) => {
+                  const isCritical = isDeadlineCritical(ticket.date_fin_prevue);
+                  
+                  return (
+                    <div
+                      key={ticket.id}
+                      onClick={() => setSelectedTicket(ticket)}
+                      className={`p-4 cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-dark-surface ${
+                        selectedTicket?.id === ticket.id 
+                          ? 'bg-primary-50 dark:bg-primary-900/20 border-r-2 border-primary-500' 
+                          : ''
+                      }`}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <Ticket className="h-4 w-4 text-primary-600 mt-1 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                              #{ticket.numero_ticket}
+                            </span>
+                            <div className="flex-shrink-0">
+                              {getStatusBadge(ticket.status)}
+                            </div>
+                          </div>
+                          
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-dark-text truncate">
+                            {ticket.titre}
+                          </h4>
+                          
+                          {ticket.date_fin_prevue && (
+                            <div className={`mt-1 text-xs flex items-center ${
+                              isCritical 
+                                ? 'text-red-600 dark:text-red-400' 
+                                : 'text-orange-600 dark:text-orange-400'
+                            }`}>
+                              {isCritical ? (
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                              ) : (
+                                <Clock className="h-3 w-3 mr-1" />
+                              )}
+                              <span>
+                                Échéance: {format(new Date(ticket.date_fin_prevue), 'dd/MM', { locale: fr })}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Colonne droite (3/4) - Détails du ticket sélectionné */}
+        <div className="flex-1 bg-white dark:bg-dark-surface">
+          {selectedTicket ? (
+            <div className="h-full flex flex-col">
+              {/* Header du ticket sélectionné */}
+              <div className="p-6 border-b border-gray-200 dark:border-dark-border">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <Ticket className="h-5 w-5 text-primary-600" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
+                        {selectedTicket.titre}
+                      </h3>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                        #{selectedTicket.numero_ticket}
+                      </span>
+                      {getStatusBadge(selectedTicket.status)}
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleView(selectedTicket)}
+                      className="p-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                      title="Voir le détail complet"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </button>
+                    
+                    {isAgent && (
+                      <button
+                        onClick={() => handleEdit(selectedTicket)}
+                        className="p-2 text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-300"
+                        title="Modifier"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
+                    
+                    {isAgent && (
+                      <button
+                        onClick={() => handleDelete(selectedTicket.id)}
+                        className="p-2 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Contenu des détails */}
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                        Client
+                      </label>
+                      <div className="flex items-center text-sm text-gray-900 dark:text-dark-text">
+                        <Building className="h-4 w-4 mr-2 text-gray-500" />
+                        <span>{formatClientDisplay({ nom_societe: selectedTicket.client_nom, prenom: selectedTicket.client_prenom, nom: selectedTicket.client_nom_personne })}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                        Demandeur
+                      </label>
+                      <div className="flex items-center text-sm text-gray-900 dark:text-dark-text">
+                        <User className="h-4 w-4 mr-2 text-gray-500" />
+                        <span>{selectedTicket.demandeur_prenom} {selectedTicket.demandeur_nom}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                        Date de création
+                      </label>
+                      <div className="flex items-center text-sm text-gray-900 dark:text-dark-text">
+                        <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                        <span>{format(new Date(selectedTicket.date_creation), 'dd MMMM yyyy à HH:mm', { locale: fr })}</span>
+                      </div>
+                    </div>
+                    
+                    {selectedTicket.date_fin_prevue && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+                          Échéance
+                        </label>
+                        <div className={`flex items-center text-sm ${
+                          isDeadlineCritical(selectedTicket.date_fin_prevue)
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-orange-600 dark:text-orange-400'
+                        }`}>
+                          {isDeadlineCritical(selectedTicket.date_fin_prevue) ? (
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Clock className="h-4 w-4 mr-2" />
+                          )}
+                          <span>{format(new Date(selectedTicket.date_fin_prevue), 'dd MMMM yyyy', { locale: fr })}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+                      Demande initiale
+                    </label>
+                    <div className="bg-gray-50 dark:bg-dark-card p-4 rounded-lg">
+                      <p className="text-gray-900 dark:text-dark-text whitespace-pre-wrap">
+                        {selectedTicket.requete_initiale}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center">
+                <Ticket className="h-16 w-16 text-gray-300 dark:text-dark-muted mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-2">
+                  Sélectionnez un ticket
+                </h3>
+                <p className="text-gray-500 dark:text-dark-muted">
+                  Cliquez sur un ticket dans la liste pour voir ses détails
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

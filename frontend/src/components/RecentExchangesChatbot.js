@@ -10,14 +10,21 @@ const RecentExchangesChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const toggleChatbot = async () => {
     if (!isOpen) {
+      // Montrer le loader sur le bouton pendant le chargement
+      setButtonLoading(true);
       // Charger les données à l'ouverture
       await fetchRecentExchanges();
+      // Cacher le loader et ouvrir le chatbot
+      setButtonLoading(false);
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
     }
-    setIsOpen(!isOpen);
   };
 
   const fetchRecentExchanges = async () => {
@@ -105,21 +112,34 @@ const RecentExchangesChatbot = () => {
         onClick={toggleChatbot}
         className="fixed bottom-4 right-4 z-40 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-105 bg-white hover:bg-blue-50 text-blue-600 border border-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white dark:border-gray-600"
         title="Échanges récents"
+        disabled={buttonLoading}
       >
-        <svg 
-          className="w-6 h-6" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" 
-          />
-        </svg>
+        {buttonLoading ? (
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent dark:border-white dark:border-t-transparent"></div>
+        ) : (
+          <svg 
+            className="w-6 h-6" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" 
+            />
+          </svg>
+        )}
       </button>
+
+      {/* Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-20" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Panel du chatbot */}
       {isOpen && (

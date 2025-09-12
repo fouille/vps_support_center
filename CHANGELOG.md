@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.13.0] - 2025-09-12
+### Added
+- ✨ Interface utilisateur améliorée : ajout d'un loader au chatbot lors du chargement des échanges et refonte de la page tickets en style messagerie avec vue split-screen (liste à gauche, détails à droite)
+
 ## [2.12.1] - 2025-09-12
 ### Fixed
 - 🔧 Correction des emails de production : affichage correct du nom du client et de l'auteur dans les changements de statut et commentaires

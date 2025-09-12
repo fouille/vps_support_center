@@ -23,6 +23,10 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const savedCollapsed = localStorage.getItem('sidebarCollapsed');
+    return savedCollapsed === 'true';
+  });
   
   // Initialiser le thème depuis localStorage ou par défaut dark
   const [darkMode, setDarkMode] = useState(() => {
@@ -172,6 +176,12 @@ const Layout = ({ children }) => {
     }
   };
 
+  const toggleSidebarCollapse = () => {
+    const newCollapsed = !sidebarCollapsed;
+    setSidebarCollapsed(newCollapsed);
+    localStorage.setItem('sidebarCollapsed', newCollapsed.toString());
+  };
+
   const navigation = [
     { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     ...(isAgent ? [
@@ -211,9 +221,9 @@ const Layout = ({ children }) => {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-dark-surface shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:shadow-none ${
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white dark:bg-dark-surface shadow-lg transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:shadow-none ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      } ${sidebarCollapsed ? 'lg:w-16' : 'lg:w-64'} w-64`}>
         
         {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
@@ -225,16 +235,35 @@ const Layout = ({ children }) => {
                 className="h-8 w-8 object-contain"
               />
             )}
-            <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-              {appName}
-            </h1>
+            {!sidebarCollapsed && (
+              <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                {appName}
+              </h1>
+            )}
           </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={toggleSidebarCollapse}
+              className="hidden lg:block p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text transition-colors"
+              title={sidebarCollapsed ? "Développer le menu" : "Réduire le menu"}
+            >
+              {sidebarCollapsed ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 dark:text-dark-muted dark:hover:text-dark-text"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -244,12 +273,13 @@ const Layout = ({ children }) => {
               <button
                 key={item.path}
                 onClick={() => handleNavigate(item.path)}
-                className={`flex items-center w-full px-4 py-2 text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
+                className={`flex items-center w-full text-left text-gray-700 dark:text-dark-text hover:bg-primary-50 dark:hover:bg-dark-card rounded-lg transition-colors duration-200 ${
                   isCurrentPage(item.path) ? 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-300' : ''
-                }`}
+                } ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-4 py-2'}`}
+                title={sidebarCollapsed ? item.name : ''}
               >
-                <item.icon className="h-5 w-5 mr-3" />
-                {item.name}
+                <item.icon className={`${sidebarCollapsed ? 'h-5 w-5' : 'h-5 w-5 mr-3'}`} />
+                {!sidebarCollapsed && item.name}
               </button>
             ))}
           </div>
@@ -257,48 +287,87 @@ const Layout = ({ children }) => {
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 dark:border-dark-border">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 dark:text-dark-muted">Thème</span>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
-            >
-              {darkMode ? (
-                <Sun className="h-4 w-4 text-yellow-500" />
-              ) : (
-                <Moon className="h-4 w-4 text-blue-500" />
-              )}
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+          {!sidebarCollapsed ? (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-gray-600 dark:text-dark-muted">Thème</span>
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
+                >
+                  {darkMode ? (
+                    <Sun className="h-4 w-4 text-yellow-500" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-blue-500" />
+                  )}
+                </button>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {user?.prenom?.[0]}{user?.nom?.[0]}
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
+                      {user?.prenom} {user?.nom}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-dark-muted">
+                      {user?.type_utilisateur === 'agent' ? 'Agent' : 'Demandeur'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await logout();
+                    } catch (error) {
+                      console.error('Erreur lors de la déconnexion:', error);
+                      // La déconnexion s'est quand même effectuée côté interface
+                    }
+                  }}
+                  className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
+                  title="Se déconnecter"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
+              </div>
+            </>
+          ) : (
+            /* Vue réduite du footer */
+            <div className="flex flex-col items-center space-y-3">
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
+                title={darkMode ? "Mode clair" : "Mode sombre"}
+              >
+                {darkMode ? (
+                  <Sun className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-blue-500" />
+                )}
+              </button>
+              
               <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                 {user?.prenom?.[0]}{user?.nom?.[0]}
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
-                  {user?.prenom} {user?.nom}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-dark-muted">
-                  {user?.type_utilisateur === 'agent' ? 'Agent' : 'Demandeur'}
-                </p>
-              </div>
+              
+              <button
+                onClick={async () => {
+                  try {
+                    await logout();
+                  } catch (error) {
+                    console.error('Erreur lors de la déconnexion:', error);
+                    // La déconnexion s'est quand même effectuée côté interface
+                  }
+                }}
+                className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
+                title="Se déconnecter"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              onClick={async () => {
-                try {
-                  await logout();
-                } catch (error) {
-                  console.error('Erreur lors de la déconnexion:', error);
-                  // La déconnexion s'est quand même effectuée côté interface
-                }
-              }}
-              className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
