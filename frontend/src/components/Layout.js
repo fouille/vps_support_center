@@ -287,48 +287,87 @@ const Layout = ({ children }) => {
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 dark:border-dark-border">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-600 dark:text-dark-muted">Thème</span>
-            <button
-              onClick={toggleDarkMode}
-              className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
-            >
-              {darkMode ? (
-                <Sun className="h-4 w-4 text-yellow-500" />
-              ) : (
-                <Moon className="h-4 w-4 text-blue-500" />
-              )}
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+          {!sidebarCollapsed ? (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-gray-600 dark:text-dark-muted">Thème</span>
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
+                >
+                  {darkMode ? (
+                    <Sun className="h-4 w-4 text-yellow-500" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-blue-500" />
+                  )}
+                </button>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {user?.prenom?.[0]}{user?.nom?.[0]}
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
+                      {user?.prenom} {user?.nom}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-dark-muted">
+                      {user?.type_utilisateur === 'agent' ? 'Agent' : 'Demandeur'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await logout();
+                    } catch (error) {
+                      console.error('Erreur lors de la déconnexion:', error);
+                      // La déconnexion s'est quand même effectuée côté interface
+                    }
+                  }}
+                  className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
+                  title="Se déconnecter"
+                >
+                  <LogOut className="h-5 w-5" />
+                </button>
+              </div>
+            </>
+          ) : (
+            /* Vue réduite du footer */
+            <div className="flex flex-col items-center space-y-3">
+              <button
+                onClick={toggleDarkMode}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-dark-card hover:bg-gray-200 dark:hover:bg-secondary-700 transition-colors"
+                title={darkMode ? "Mode clair" : "Mode sombre"}
+              >
+                {darkMode ? (
+                  <Sun className="h-4 w-4 text-yellow-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-blue-500" />
+                )}
+              </button>
+              
               <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                 {user?.prenom?.[0]}{user?.nom?.[0]}
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-dark-text">
-                  {user?.prenom} {user?.nom}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-dark-muted">
-                  {user?.type_utilisateur === 'agent' ? 'Agent' : 'Demandeur'}
-                </p>
-              </div>
+              
+              <button
+                onClick={async () => {
+                  try {
+                    await logout();
+                  } catch (error) {
+                    console.error('Erreur lors de la déconnexion:', error);
+                    // La déconnexion s'est quand même effectuée côté interface
+                  }
+                }}
+                className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
+                title="Se déconnecter"
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              onClick={async () => {
-                try {
-                  await logout();
-                } catch (error) {
-                  console.error('Erreur lors de la déconnexion:', error);
-                  // La déconnexion s'est quand même effectuée côté interface
-                }
-              }}
-              className="p-2 text-gray-500 hover:text-red-600 dark:text-dark-muted dark:hover:text-red-400 transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
