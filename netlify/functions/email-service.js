@@ -773,8 +773,8 @@ const emailService = {
   },
 
   // Envoi d'email lors du changement de statut
-  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, author, recipientEmail, recipientName) => {
-    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, author);
+  sendStatusChangeEmail: async (ticket, oldStatus, newStatus, author, recipientEmail, recipientName, clientName = '') => {
+    const template = createEmailTemplate.statusChanged(ticket, oldStatus, newStatus, author, clientName);
     
     const recipient = { email: recipientEmail, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
