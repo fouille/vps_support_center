@@ -372,8 +372,8 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author.prenom} ${author.nom}
 
+Client : ${clientName}
 Titre : ${production.titre}
-Client : ${production.nom_societe || production.client_display || 'N/A'}
 
 VoIP Services - Système de production`
   }),
