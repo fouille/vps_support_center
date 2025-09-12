@@ -564,6 +564,7 @@ Date : ${new Date(comment.created_at).toLocaleDateString('fr-FR')}
 Commentaire :
 ${comment.message || ''}
 
+Client : ${clientName}
 Numéros portés : ${portabilite.numeros_portes}
 
 VoIP Services - Système de portabilité`
