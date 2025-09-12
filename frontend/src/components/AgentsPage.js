@@ -232,16 +232,21 @@ const AgentsPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-                  Mot de passe *
+                  Mot de passe {editingAgent ? '(optionnel)' : '*'}
                 </label>
                 <input
                   type="password"
-                  required
+                  required={!editingAgent}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   className="input"
-                  placeholder={editingAgent ? "Nouveau mot de passe" : "Mot de passe"}
+                  placeholder={editingAgent ? "Nouveau mot de passe (laisser vide pour ne pas changer)" : "Mot de passe"}
                 />
+                {editingAgent && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Laissez vide pour conserver le mot de passe actuel
+                  </p>
+                )}
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
