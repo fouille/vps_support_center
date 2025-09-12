@@ -539,6 +539,7 @@ VoIP Services - Système de portabilité`
               <strong>Commentaire :</strong><br>
               ${(comment.message || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Numéros portés :</strong> ${portabilite.numeros_portes}</p>
             ${baseUrl ? `
             <div style="text-align: center; margin: 20px 0;">
