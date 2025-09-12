@@ -901,7 +901,8 @@ const emailService = {
 
   // Envoi d'email pour commentaire sur production
   sendProductionCommentEmail: async (productionInfo, tache, comment, author) => {
-    const template = createEmailTemplate.productionCommentAdded(productionInfo, tache, comment, author);
+    const clientName = productionInfo.nom_societe || productionInfo.client_display || 'N/A';
+    const template = createEmailTemplate.productionCommentAdded(productionInfo, tache, comment, author, clientName);
     
     // Déterminer le destinataire selon le type d'utilisateur qui commente
     let recipients = [{ email: 'contact@voipservices.fr', name: 'Support VoIP Services' }];
