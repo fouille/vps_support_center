@@ -7,7 +7,7 @@ import requests
 import json
 
 # Configuration
-BACKEND_URL = "https://ticketflow-37.preview.emergentagent.com"
+BACKEND_URL = "https://ticketnav-app.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test credentials
