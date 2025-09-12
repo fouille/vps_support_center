@@ -727,6 +727,17 @@ const TicketsPage = () => {
     );
   };
 
+  const isDeadlineCritical = (dateFinPrevue) => {
+    if (!dateFinPrevue) return false;
+    
+    const now = new Date();
+    const deadline = new Date(dateFinPrevue);
+    now.setHours(0, 0, 0, 0);
+    deadline.setHours(0, 0, 0, 0);
+    
+    return deadline <= now; // Aujourd'hui ou dépassé
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
