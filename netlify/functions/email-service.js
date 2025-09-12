@@ -324,8 +324,8 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour changement de statut de production
-  productionStatusChanged: (production, oldStatus, newStatus, author) => ({
-    subject: `Production #${production.numero_production} - Statut modifié`,
+  productionStatusChanged: (production, oldStatus, newStatus, author, clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Production #${production.numero_production}`,
     html: `
       <!DOCTYPE html>
       <html>
