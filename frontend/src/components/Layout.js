@@ -176,6 +176,12 @@ const Layout = ({ children }) => {
     }
   };
 
+  const toggleSidebarCollapse = () => {
+    const newCollapsed = !sidebarCollapsed;
+    setSidebarCollapsed(newCollapsed);
+    localStorage.setItem('sidebarCollapsed', newCollapsed.toString());
+  };
+
   const navigation = [
     { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     ...(isAgent ? [
