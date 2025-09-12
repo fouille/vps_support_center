@@ -500,8 +500,8 @@ Ancien statut : ${oldStatus}
 Nouveau statut : ${newStatus}
 Par : ${author?.prenom || ''} ${author?.nom || 'Système'}
 
+Client : ${clientName}
 Numéros portés : ${portabilite.numeros_portes}
-Client : ${portabilite.nom_societe || portabilite.nom_client + ' ' + (portabilite.prenom_client || '')}
 
 VoIP Services - Système de portabilité`
   }),
