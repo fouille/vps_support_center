@@ -249,6 +249,7 @@ VoIP Services - Système de gestion des tickets`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author.prenom} ${author.nom}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre du ticket :</strong> ${ticket.titre}</p>
           </div>
           <div class="footer">
