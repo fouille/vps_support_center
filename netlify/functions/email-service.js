@@ -798,10 +798,10 @@ const emailService = {
   },
 
   // Envoi d'email pour changement de statut de production
-  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName) => {
-    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author);
+  sendProductionStatusChangeEmail: async (production, oldStatus, newStatus, author, recipientEmail, recipientName, clientName = '') => {
+    const template = createEmailTemplate.productionStatusChanged(production, oldStatus, newStatus, author, clientName);
     
-    const recipient = { email: recipientEmail, name: recipientName };
+    const recipient = { email: recipientEmailName, name: recipientName };
     return await sendEmail(recipient, template.subject, template.html, template.text);
   },
 
