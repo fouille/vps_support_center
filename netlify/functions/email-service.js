@@ -660,8 +660,8 @@ VoIP Services - Système de production`
               <strong>Commentaire :</strong><br>
               ${(comment.contenu || '').replace(/\n/g, '<br>')}
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre de production :</strong> ${production.titre}</p>
-            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
           </div>
           <div class="footer">
             <p>VoIP Services - Système de production</p>
