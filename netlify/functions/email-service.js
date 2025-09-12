@@ -217,8 +217,8 @@ VoIP Services - Système de gestion des tickets`
   },
 
   // Template pour le changement de statut
-  statusChanged: (ticket, oldStatus, newStatus, author) => ({
-    subject: `Statut modifié - Ticket #${ticket.numero_ticket}`,
+  statusChanged: (ticket, oldStatus, newStatus, author, clientName = '') => ({
+    subject: `Statut modifié - ${clientName} - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
