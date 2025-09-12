@@ -1095,8 +1095,16 @@ const TicketsPage = () => {
                         <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
                           Échéance
                         </label>
-                        <div className="flex items-center text-sm text-orange-600 dark:text-orange-400">
-                          <Clock className="h-4 w-4 mr-2" />
+                        <div className={`flex items-center text-sm ${
+                          isDeadlineCritical(selectedTicket.date_fin_prevue)
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-orange-600 dark:text-orange-400'
+                        }`}>
+                          {isDeadlineCritical(selectedTicket.date_fin_prevue) ? (
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                          ) : (
+                            <Clock className="h-4 w-4 mr-2" />
+                          )}
                           <span>{format(new Date(selectedTicket.date_fin_prevue), 'dd MMMM yyyy', { locale: fr })}</span>
                         </div>
                       </div>
