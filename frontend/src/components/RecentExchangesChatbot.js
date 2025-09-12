@@ -133,6 +133,14 @@ const RecentExchangesChatbot = () => {
         )}
       </button>
 
+      {/* Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-20" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* Panel du chatbot */}
       {isOpen && (
         <div 
