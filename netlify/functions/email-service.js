@@ -141,18 +141,19 @@ VoIP Services - Système de gestion des tickets`
   }),
 
   // Template pour l'ajout d'un commentaire
-  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '') => {
+  commentAdded: (ticket, comment, author, recipientEmail, baseUrl = '', clientName = '') => {
     console.log('commentAdded template called with:', {
       ticketId: ticket?.id,
       commentId: comment?.id,
       commentContenu: comment?.message,  // Corrigé: message au lieu de contenu
       commentCreatedAt: comment?.created_at,  // Ajouté pour debug
       authorId: author?.id,
-      recipientEmail
+      recipientEmail,
+      clientName
     });
     
     return {
-      subject: `Commentaire ajouté - Ticket #${ticket.numero_ticket}`,
+      subject: `Commentaire ajouté - ${clientName} - Ticket #${ticket.numero_ticket}`,
     html: `
       <!DOCTYPE html>
       <html>
