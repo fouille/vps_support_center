@@ -356,8 +356,8 @@ VoIP Services - Système de gestion des tickets`
               <span class="old-status">${oldStatus}</span> → <span class="new-status">${newStatus}</span><br>
               <small>Par ${author.prenom} ${author.nom}</small>
             </div>
+            <p><strong>Client :</strong> ${clientName}</p>
             <p><strong>Titre :</strong> ${production.titre}</p>
-            <p><strong>Client :</strong> ${production.nom_societe || production.client_display || 'N/A'}</p>
           </div>
           <div class="footer">
             <p>VoIP Services - Système de production</p>
