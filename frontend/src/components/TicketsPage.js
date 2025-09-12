@@ -32,7 +32,6 @@ const TicketsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [isMenuCollapsed, setIsMenuCollapsed] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
