@@ -246,7 +246,7 @@ const PortabilitesPage = () => {
 
   return (
     <div className="fade-in">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         {/* En-tête */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
