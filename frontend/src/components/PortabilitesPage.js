@@ -15,7 +15,7 @@ const PortabilitesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
-    status: '',
+    status: '!termine',
     client: '',
     search: ''
   });
