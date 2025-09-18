@@ -816,73 +816,67 @@ const TicketsPage = () => {
       </div>
 
       {/* Filtres pour les agents ET demandeurs */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Statut des tickets
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="input w-full"
-          >
-            <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
-            <option value="all">Tous les tickets</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Filtrer par client
-          </label>
-          <SearchableSelect
-            options={clientOptions}
-            value={clientFilter}
-            onChange={setClientFilter}
-            onSearch={handleFilterClientSearch}
-            loading={loadingFilterClients}
-            placeholder="Tous les clients"
-            className="w-full"
-            displayKey="label"
-            valueKey="value"
-            searchKeys={["label", "subtitle", "searchText"]}
-            emptyMessage="Aucun client trouvé"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Rechercher par numéro
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Ex: 123456"
-              value={searchFilter}
-              onChange={(e) => handleSearchFilterChange(e.target.value)}
-              className="input w-full pr-10"
-              maxLength={6}
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              {loadingSearch ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-600 border-t-transparent"></div>
-              ) : (
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              )}
-            </div>
+      {showFilters && (
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Statut des tickets
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input w-full h-[42px]"
+            >
+              <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
+              <option value="all">Tous les tickets</option>
+            </select>
           </div>
-          {searchFilter && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {searchFilter.length < 3 
-                ? `Saisissez au moins 3 chiffres (${searchFilter.length}/3)`
-                : 'Recherche par numéro de ticket'
-              }
-            </p>
-          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Filtrer par client
+            </label>
+            <SearchableSelect
+              options={clientOptions}
+              value={clientFilter}
+              onChange={setClientFilter}
+              onSearch={handleFilterClientSearch}
+              loading={loadingFilterClients}
+              placeholder="Tous les clients"
+              className="w-full h-[42px]"
+              displayKey="label"
+              valueKey="value"
+              searchKeys={["label", "subtitle", "searchText"]}
+              emptyMessage="Aucun client trouvé"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Rechercher par numéro
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Ex: 123456"
+                value={searchFilter}
+                onChange={(e) => handleSearchFilterChange(e.target.value)}
+                className="input w-full h-[42px] pr-10"
+                maxLength={6}
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+            {searchFilter && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {searchFilter.length < 3 
+                  ? `Saisissez au moins 3 chiffres (${searchFilter.length}/3)`
+                  : 'Recherche par numéro de ticket'
+                }
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {error && (
         <div className="mb-4 flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
