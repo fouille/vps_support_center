@@ -167,6 +167,14 @@ const PortabilitesPage = () => {
     return date < today;
   };
 
+  // Fonction pour vérifier si on doit appliquer les styles d'alerte
+  const shouldShowAlert = (portabilite) => {
+    // Ne pas montrer d'alerte si le statut est "terminé"
+    if (portabilite.status === 'termine') return false;
+    
+    return isToday(portabilite.date_portabilite_effective) || isPastDue(portabilite.date_portabilite_effective);
+  };
+
   // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
     navigate(`/portabilites/${portabiliteId}`);
