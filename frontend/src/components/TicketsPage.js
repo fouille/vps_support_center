@@ -753,6 +753,17 @@ const TicketsPage = () => {
           {isAgent ? 'Support' : 'Mes Tickets'}
         </h1>
         <div className="flex space-x-3">
+          {/* Bouton Filtres */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="btn-secondary flex items-center"
+            title="Filtres"
+          >
+            <Filter className="h-5 w-5 mr-2" />
+            Filtres
+            <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+          
           {/* Menu Outils - affiché pour les agents et demandeurs */}
           <div className="relative" ref={toolsMenuRef}>
             <button
