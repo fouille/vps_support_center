@@ -336,16 +336,18 @@ exports.handler = async (event, context) => {
             COUNT(t.id) as tickets_count
           FROM clients c
           LEFT JOIN tickets t ON c.id = t.client_id
+          WHERE c.nom_societe IS NOT NULL AND c.nom_societe != ''
           GROUP BY c.id, c.nom_societe
+          HAVING COUNT(t.id) > 0
           ORDER BY tickets_count DESC
           LIMIT 5
         `;
 
         const topClients = await sql(topClientsQuery);
         additionalStats.topClients = topClients.map(client => ({
-          nom: client.nom_societe,
+          nom: client.nom_societe || 'Client sans nom',
           tickets: parseInt(client.tickets_count)
-        }));
+        })).filter(client => client.tickets > 0);
       }
 
       // Évolution des tickets créés dans les 30 derniers jours
