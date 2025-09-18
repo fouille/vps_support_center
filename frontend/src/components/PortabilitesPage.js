@@ -274,6 +274,7 @@ const PortabilitesPage = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
               >
                 <option value="">Tous les statuts</option>
+                <option value="!termine">Exclure les terminés</option>
                 {Object.entries(statusLabels).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
                 ))}
