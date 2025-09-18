@@ -77,23 +77,69 @@ const getMockData = (userType) => {
         { nom: 'Client Epsilon', tickets: 3 }
       ],
       evolutionTickets: [
-        { date: '2025-07-22', count: 3 },
-        { date: '2025-07-23', count: 5 },
-        { date: '2025-07-24', count: 2 },
-        { date: '2025-07-25', count: 4 },
-        { date: '2025-07-26', count: 6 },
-        { date: '2025-07-27', count: 3 },
-        { date: '2025-07-28', count: 4 }
+        { date: '20/08', count: 3 },
+        { date: '21/08', count: 5 },
+        { date: '22/08', count: 2 },
+        { date: '23/08', count: 4 },
+        { date: '24/08', count: 6 },
+        { date: '25/08', count: 3 },
+        { date: '26/08', count: 4 },
+        { date: '27/08', count: 7 },
+        { date: '28/08', count: 2 },
+        { date: '29/08', count: 5 },
+        { date: '30/08', count: 3 },
+        { date: '31/08', count: 6 },
+        { date: '01/09', count: 4 },
+        { date: '02/09', count: 8 },
+        { date: '03/09', count: 2 },
+        { date: '04/09', count: 5 },
+        { date: '05/09', count: 3 },
+        { date: '06/09', count: 7 },
+        { date: '07/09', count: 4 },
+        { date: '08/09', count: 6 },
+        { date: '09/09', count: 3 },
+        { date: '10/09', count: 5 },
+        { date: '11/09', count: 7 },
+        { date: '12/09', count: 4 },
+        { date: '13/09', count: 6 },
+        { date: '14/09', count: 2 },
+        { date: '15/09', count: 8 },
+        { date: '16/09', count: 3 },
+        { date: '17/09', count: 5 },
+        { date: '18/09', count: 4 }
       ]
     } : {
       evolutionTickets: [
-        { date: '2025-07-22', count: 1 },
-        { date: '2025-07-23', count: 2 },
-        { date: '2025-07-24', count: 1 },
-        { date: '2025-07-25', count: 3 },
-        { date: '2025-07-26', count: 2 },
-        { date: '2025-07-27', count: 1 },
-        { date: '2025-07-28', count: 2 }
+        { date: '20/08', count: 1 },
+        { date: '21/08', count: 2 },
+        { date: '22/08', count: 1 },
+        { date: '23/08', count: 3 },
+        { date: '24/08', count: 2 },
+        { date: '25/08', count: 1 },
+        { date: '26/08', count: 2 },
+        { date: '27/08', count: 3 },
+        { date: '28/08', count: 1 },
+        { date: '29/08', count: 2 },
+        { date: '30/08', count: 1 },
+        { date: '31/08', count: 3 },
+        { date: '01/09', count: 2 },
+        { date: '02/09', count: 4 },
+        { date: '03/09', count: 1 },
+        { date: '04/09', count: 2 },
+        { date: '05/09', count: 1 },
+        { date: '06/09', count: 3 },
+        { date: '07/09', count: 2 },
+        { date: '08/09', count: 3 },
+        { date: '09/09', count: 1 },
+        { date: '10/09', count: 2 },
+        { date: '11/09', count: 3 },
+        { date: '12/09', count: 2 },
+        { date: '13/09', count: 3 },
+        { date: '14/09', count: 1 },
+        { date: '15/09', count: 4 },
+        { date: '16/09', count: 1 },
+        { date: '17/09', count: 2 },
+        { date: '18/09', count: 2 }
       ]
     }
   };
@@ -336,19 +382,21 @@ exports.handler = async (event, context) => {
             COUNT(t.id) as tickets_count
           FROM clients c
           LEFT JOIN tickets t ON c.id = t.client_id
+          WHERE c.nom_societe IS NOT NULL AND c.nom_societe != ''
           GROUP BY c.id, c.nom_societe
+          HAVING COUNT(t.id) > 0
           ORDER BY tickets_count DESC
           LIMIT 5
         `;
 
         const topClients = await sql(topClientsQuery);
         additionalStats.topClients = topClients.map(client => ({
-          nom: client.nom_societe,
+          nom: client.nom_societe || 'Client sans nom',
           tickets: parseInt(client.tickets_count)
-        }));
+        })).filter(client => client.tickets > 0);
       }
 
-      // Évolution des tickets créés dans les 7 derniers jours
+      // Évolution des tickets créés dans les 30 derniers jours
       const evolutionQuery = ticketFilter
         ? `
           SELECT 
@@ -356,7 +404,7 @@ exports.handler = async (event, context) => {
             COUNT(*) as count
           FROM tickets t
           ${ticketFilter}
-          AND t.date_creation >= CURRENT_DATE - INTERVAL '7 days'
+          AND t.date_creation >= CURRENT_DATE - INTERVAL '30 days'
           GROUP BY DATE(t.date_creation)
           ORDER BY date
         `
@@ -365,17 +413,23 @@ exports.handler = async (event, context) => {
             DATE(date_creation) as date,
             COUNT(*) as count
           FROM tickets
-          WHERE date_creation >= CURRENT_DATE - INTERVAL '7 days'
+          WHERE date_creation >= CURRENT_DATE - INTERVAL '30 days'
           GROUP BY DATE(date_creation)
           ORDER BY date
         `;
 
       try {
         const evolution = await sql(evolutionQuery, filterParams);
-        additionalStats.evolutionTickets = evolution.map(day => ({
-          date: day.date,
-          count: parseInt(day.count)
-        }));
+        additionalStats.evolutionTickets = evolution.map(day => {
+          // Formater la date au format français DD/MM
+          const date = new Date(day.date);
+          const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+          
+          return {
+            date: formattedDate,
+            count: parseInt(day.count)
+          };
+        });
       } catch (error) {
         additionalStats.evolutionTickets = [];
       }

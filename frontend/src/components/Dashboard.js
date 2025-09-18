@@ -456,7 +456,7 @@ const Dashboard = () => {
           {stats.additional.evolutionTickets && stats.additional.evolutionTickets.length > 0 && (
             <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
               <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-4">
-                Évolution des Tickets (7 derniers jours)
+                Évolution des Tickets (30 derniers jours)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={stats.additional.evolutionTickets}>
@@ -482,11 +482,31 @@ const Dashboard = () => {
                 Top 5 Clients (par nombre de tickets)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.additional.topClients} layout="horizontal">
+                <BarChart data={stats.additional.topClients}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="nom" type="category" width={150} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <XAxis 
+                    dataKey="nom" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    className="text-xs"
+                    interval={0}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white dark:bg-dark-surface p-3 border border-gray-200 dark:border-dark-border rounded-lg shadow-lg">
+                            <p className="text-gray-900 dark:text-dark-text font-medium">
+                              {label}: {payload[0].value} ticket{payload[0].value > 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
                   <Bar dataKey="tickets" fill={COLORS.secondary} />
                 </BarChart>
               </ResponsiveContainer>
