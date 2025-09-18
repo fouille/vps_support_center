@@ -359,9 +359,9 @@ const PortabilitesPage = () => {
                     <tr 
                       key={portabilite.id} 
                       className={`hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
-                        isPastDue(portabilite.date_portabilite_effective) 
+                        shouldShowAlert(portabilite) && isPastDue(portabilite.date_portabilite_effective) 
                           ? 'bg-red-100 dark:bg-red-900/30' 
-                          : isToday(portabilite.date_portabilite_effective) 
+                          : shouldShowAlert(portabilite) && isToday(portabilite.date_portabilite_effective) 
                             ? 'bg-red-50 dark:bg-red-900/20' 
                             : ''
                       }`}
