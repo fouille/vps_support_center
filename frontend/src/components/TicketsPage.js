@@ -930,6 +930,9 @@ const TicketsPage = () => {
                         <Ticket className="h-4 w-4 text-primary-600 mt-1 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
+                            <span className="text-xs text-gray-600 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded font-medium truncate max-w-[120px]">
+                              {formatClientDisplay({ nom_societe: ticket.client_nom, prenom: ticket.client_prenom, nom: ticket.client_nom_personne })}
+                            </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                               #{ticket.numero_ticket}
                             </span>
