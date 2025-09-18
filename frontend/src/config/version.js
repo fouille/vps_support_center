@@ -6,7 +6,7 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 14,      // Version mineure - nouvelles fonctionnalités
+  minor: 15,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
   buildDate: "2025-09-18", // Date de build automatique
 };
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.15.0",
+    date: "2025-09-18",
+    type: "MINOR",
+    description: "Améliorations du Dashboard : extension de l'évolution des tickets à 30 jours avec dates formatées au format français, et correction du Top 5 Clients pour afficher correctement les statistiques de tickets par client"
+  },
+{
     version: "2.14.0",
     date: "2025-09-18",
     type: "MINOR",

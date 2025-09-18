@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.15.0] - 2025-09-18
+### Added
+- ✨ Améliorations du Dashboard : extension de l'évolution des tickets à 30 jours avec dates formatées au format français, et correction du Top 5 Clients pour afficher correctement les statistiques de tickets par client
+
 ## [2.14.0] - 2025-09-18
 ### Added
 - ✨ Amélioration des portabilités : gestion conditionnelle des alertes selon le statut, filtre par défaut excluant les terminées, et largeur pleine page pour un meilleur affichage
