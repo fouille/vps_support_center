@@ -482,11 +482,31 @@ const Dashboard = () => {
                 Top 5 Clients (par nombre de tickets)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.additional.topClients} layout="horizontal">
+                <BarChart data={stats.additional.topClients}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="nom" type="category" width={150} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <XAxis 
+                    dataKey="nom" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    className="text-xs"
+                    interval={0}
+                  />
+                  <YAxis />
+                  <Tooltip 
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-white dark:bg-dark-surface p-3 border border-gray-200 dark:border-dark-border rounded-lg shadow-lg">
+                            <p className="text-gray-900 dark:text-dark-text font-medium">
+                              {label}: {payload[0].value} ticket{payload[0].value > 1 ? 's' : ''}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
                   <Bar dataKey="tickets" fill={COLORS.secondary} />
                 </BarChart>
               </ResponsiveContainer>
