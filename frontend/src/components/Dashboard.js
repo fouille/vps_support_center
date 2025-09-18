@@ -456,7 +456,7 @@ const Dashboard = () => {
           {stats.additional.evolutionTickets && stats.additional.evolutionTickets.length > 0 && (
             <div className="bg-white dark:bg-dark-surface rounded-lg shadow p-6 border border-gray-200 dark:border-dark-border">
               <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text mb-4">
-                Évolution des Tickets (7 derniers jours)
+                Évolution des Tickets (30 derniers jours)
               </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={stats.additional.evolutionTickets}>
