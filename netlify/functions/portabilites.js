@@ -193,8 +193,16 @@ exports.handler = async (event, context) => {
         // Filtrage par statut
         if (status) {
           paramCount++;
-          baseQuery += ` AND p.status = $${paramCount}`;
-          queryParams.push(status);
+          if (status.startsWith('!')) {
+            // Exclusion d'un statut (ex: !termine pour exclure les terminés)
+            const excludedStatus = status.substring(1);
+            baseQuery += ` AND p.status != $${paramCount}`;
+            queryParams.push(excludedStatus);
+          } else {
+            // Inclusion d'un statut spécifique
+            baseQuery += ` AND p.status = $${paramCount}`;
+            queryParams.push(status);
+          }
         }
 
         // Filtrage par client

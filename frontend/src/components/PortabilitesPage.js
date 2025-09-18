@@ -15,7 +15,7 @@ const PortabilitesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filters, setFilters] = useState({
-    status: '',
+    status: '!termine',
     client: '',
     search: ''
   });
@@ -167,6 +167,14 @@ const PortabilitesPage = () => {
     return date < today;
   };
 
+  // Fonction pour vérifier si on doit appliquer les styles d'alerte
+  const shouldShowAlert = (portabilite) => {
+    // Ne pas montrer d'alerte si le statut est "terminé"
+    if (portabilite.status === 'termine') return false;
+    
+    return isToday(portabilite.date_portabilite_effective) || isPastDue(portabilite.date_portabilite_effective);
+  };
+
   // Fonction pour ouvrir le modal de détail
   const goToDetail = (portabiliteId) => {
     navigate(`/portabilites/${portabiliteId}`);
@@ -238,7 +246,7 @@ const PortabilitesPage = () => {
 
   return (
     <div className="fade-in">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         {/* En-tête */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
@@ -266,6 +274,7 @@ const PortabilitesPage = () => {
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white"
               >
                 <option value="">Tous les statuts</option>
+                <option value="!termine">Exclure les terminés</option>
                 {Object.entries(statusLabels).map(([key, label]) => (
                   <option key={key} value={key}>{label}</option>
                 ))}
@@ -351,9 +360,9 @@ const PortabilitesPage = () => {
                     <tr 
                       key={portabilite.id} 
                       className={`hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors ${
-                        isPastDue(portabilite.date_portabilite_effective) 
+                        shouldShowAlert(portabilite) && isPastDue(portabilite.date_portabilite_effective) 
                           ? 'bg-red-100 dark:bg-red-900/30' 
-                          : isToday(portabilite.date_portabilite_effective) 
+                          : shouldShowAlert(portabilite) && isToday(portabilite.date_portabilite_effective) 
                             ? 'bg-red-50 dark:bg-red-900/20' 
                             : ''
                       }`}
@@ -364,10 +373,10 @@ const PortabilitesPage = () => {
                           <span className="text-sm font-medium text-gray-900 dark:text-dark-text">
                             #{portabilite.numero_portabilite}
                           </span>
-                          {isPastDue(portabilite.date_portabilite_effective) && (
+                          {shouldShowAlert(portabilite) && isPastDue(portabilite.date_portabilite_effective) && (
                             <span className="ml-2 text-red-600" title="Date effective dépassée">⚠️</span>
                           )}
-                          {isToday(portabilite.date_portabilite_effective) && !isPastDue(portabilite.date_portabilite_effective) && (
+                          {shouldShowAlert(portabilite) && isToday(portabilite.date_portabilite_effective) && !isPastDue(portabilite.date_portabilite_effective) && (
                             <span className="ml-2 text-red-500" title="Date effective aujourd'hui">🚨</span>
                           )}
                         </div>

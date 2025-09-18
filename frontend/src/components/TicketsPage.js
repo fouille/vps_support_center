@@ -17,7 +17,8 @@ import {
   Search,
   Settings,
   ChevronDown,
-  ExternalLink
+  ExternalLink,
+  Filter
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -32,6 +33,7 @@ const TicketsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTicket, setEditingTicket] = useState(null);
@@ -752,6 +754,17 @@ const TicketsPage = () => {
           {isAgent ? 'Support' : 'Mes Tickets'}
         </h1>
         <div className="flex space-x-3">
+          {/* Bouton Filtres */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="btn-secondary flex items-center"
+            title="Filtres"
+          >
+            <Filter className="h-5 w-5 mr-2" />
+            Filtres
+            <ChevronDown className={`h-4 w-4 ml-1 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+          </button>
+          
           {/* Menu Outils - affiché pour les agents et demandeurs */}
           <div className="relative" ref={toolsMenuRef}>
             <button
@@ -803,73 +816,69 @@ const TicketsPage = () => {
       </div>
 
       {/* Filtres pour les agents ET demandeurs */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Statut des tickets
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="input w-full"
-          >
-            <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
-            <option value="all">Tous les tickets</option>
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Filtrer par client
-          </label>
-          <SearchableSelect
-            options={clientOptions}
-            value={clientFilter}
-            onChange={setClientFilter}
-            onSearch={handleFilterClientSearch}
-            loading={loadingFilterClients}
-            placeholder="Tous les clients"
-            className="w-full"
-            displayKey="label"
-            valueKey="value"
-            searchKeys={["label", "subtitle", "searchText"]}
-            emptyMessage="Aucun client trouvé"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Rechercher par numéro
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Ex: 123456"
-              value={searchFilter}
-              onChange={(e) => handleSearchFilterChange(e.target.value)}
-              className="input w-full pr-10"
-              maxLength={6}
-            />
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-              {loadingSearch ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-600 border-t-transparent"></div>
-              ) : (
-                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              )}
+      {showFilters && (
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Statut des tickets
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white h-[42px]"
+            >
+              <option value="active">Actifs (Nouveau, En cours, En attente, Répondu)</option>
+              <option value="all">Tous les tickets</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Filtrer par client
+            </label>
+            <div className="h-[42px]">
+              <SearchableSelect
+                options={clientOptions}
+                value={clientFilter}
+                onChange={setClientFilter}
+                onSearch={handleFilterClientSearch}
+                loading={loadingFilterClients}
+                placeholder="Tous les clients"
+                className="w-full"
+                displayKey="label"
+                valueKey="value"
+                searchKeys={["label", "subtitle", "searchText"]}
+                emptyMessage="Aucun client trouvé"
+              />
             </div>
           </div>
-          {searchFilter && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {searchFilter.length < 3 
-                ? `Saisissez au moins 3 chiffres (${searchFilter.length}/3)`
-                : 'Recherche par numéro de ticket'
-              }
-            </p>
-          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2">
+              Rechercher par numéro
+            </label>
+            <div className="relative h-[42px]">
+              <input
+                type="text"
+                placeholder="Ex: 123456"
+                value={searchFilter}
+                onChange={(e) => handleSearchFilterChange(e.target.value)}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white h-[42px]"
+                maxLength={6}
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+            {searchFilter && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {searchFilter.length < 3 
+                  ? `Saisissez au moins 3 chiffres (${searchFilter.length}/3)`
+                  : 'Recherche par numéro de ticket'
+                }
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {error && (
         <div className="mb-4 flex items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -881,8 +890,8 @@ const TicketsPage = () => {
       {/* Interface style messagerie */}
       <div className="flex h-[70vh] border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
         {/* Colonne gauche (1/4) - Liste des tickets */}
-        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card">
-          <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface">
+        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card flex flex-col">
+          <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface flex-shrink-0">
             <h3 className="font-semibold text-gray-900 dark:text-dark-text">
               {isAgent ? 'Tickets de support' : 'Mes tickets'}
             </h3>
@@ -891,7 +900,7 @@ const TicketsPage = () => {
             </p>
           </div>
           
-          <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
             {tickets.length === 0 ? (
               <div className="p-6 text-center">
                 <Ticket className="h-12 w-12 text-gray-300 dark:text-dark-muted mx-auto mb-3" />
