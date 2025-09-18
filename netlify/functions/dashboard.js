@@ -77,13 +77,36 @@ const getMockData = (userType) => {
         { nom: 'Client Epsilon', tickets: 3 }
       ],
       evolutionTickets: [
-        { date: '2025-07-22', count: 3 },
-        { date: '2025-07-23', count: 5 },
-        { date: '2025-07-24', count: 2 },
-        { date: '2025-07-25', count: 4 },
-        { date: '2025-07-26', count: 6 },
-        { date: '2025-07-27', count: 3 },
-        { date: '2025-07-28', count: 4 }
+        { date: '20/08', count: 3 },
+        { date: '21/08', count: 5 },
+        { date: '22/08', count: 2 },
+        { date: '23/08', count: 4 },
+        { date: '24/08', count: 6 },
+        { date: '25/08', count: 3 },
+        { date: '26/08', count: 4 },
+        { date: '27/08', count: 7 },
+        { date: '28/08', count: 2 },
+        { date: '29/08', count: 5 },
+        { date: '30/08', count: 3 },
+        { date: '31/08', count: 6 },
+        { date: '01/09', count: 4 },
+        { date: '02/09', count: 8 },
+        { date: '03/09', count: 2 },
+        { date: '04/09', count: 5 },
+        { date: '05/09', count: 3 },
+        { date: '06/09', count: 7 },
+        { date: '07/09', count: 4 },
+        { date: '08/09', count: 6 },
+        { date: '09/09', count: 3 },
+        { date: '10/09', count: 5 },
+        { date: '11/09', count: 7 },
+        { date: '12/09', count: 4 },
+        { date: '13/09', count: 6 },
+        { date: '14/09', count: 2 },
+        { date: '15/09', count: 8 },
+        { date: '16/09', count: 3 },
+        { date: '17/09', count: 5 },
+        { date: '18/09', count: 4 }
       ]
     } : {
       evolutionTickets: [
