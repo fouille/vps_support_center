@@ -890,8 +890,8 @@ const TicketsPage = () => {
       {/* Interface style messagerie */}
       <div className="flex h-[70vh] border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden">
         {/* Colonne gauche (1/4) - Liste des tickets */}
-        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card">
-          <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface">
+        <div className="w-1/4 border-r border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-card flex flex-col">
+          <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-white dark:bg-dark-surface flex-shrink-0">
             <h3 className="font-semibold text-gray-900 dark:text-dark-text">
               {isAgent ? 'Tickets de support' : 'Mes tickets'}
             </h3>
@@ -900,7 +900,7 @@ const TicketsPage = () => {
             </p>
           </div>
           
-          <div className="overflow-y-auto h-full scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
             {tickets.length === 0 ? (
               <div className="p-6 text-center">
                 <Ticket className="h-12 w-12 text-gray-300 dark:text-dark-muted mx-auto mb-3" />
