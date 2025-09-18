@@ -17,7 +17,8 @@ import {
   Search,
   Settings,
   ChevronDown,
-  ExternalLink
+  ExternalLink,
+  Filter
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
