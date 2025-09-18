@@ -104,7 +104,7 @@ const SearchableSelect = ({
       {/* Main input/display */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className={`cursor-pointer flex items-center justify-between min-h-[42px] w-full p-3 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
+        className={`cursor-pointer flex items-center justify-between h-[42px] w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-dark-surface dark:border-gray-600 dark:text-white ${
           hasError ? 'border-red-500' : 'border-gray-300'
         }`}
       >
