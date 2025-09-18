@@ -6,9 +6,9 @@
 
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
-  minor: 13,      // Version mineure - nouvelles fonctionnalités
+  minor: 14,      // Version mineure - nouvelles fonctionnalités
   patch: 0,      // Version patch - corrections de bugs
-  buildDate: "2025-09-12", // Date de build automatique
+  buildDate: "2025-09-18", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.14.0",
+    date: "2025-09-18",
+    type: "MINOR",
+    description: "Amélioration des portabilités : gestion conditionnelle des alertes selon le statut, filtre par défaut excluant les terminées, et largeur pleine page pour un meilleur affichage"
+  },
+{
     version: "2.13.0",
     date: "2025-09-12",
     type: "MINOR",
