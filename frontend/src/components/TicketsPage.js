@@ -47,6 +47,7 @@ const TicketsPage = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
   const [refreshingTickets, setRefreshingTickets] = useState(false);
+  const [creatingTicket, setCreatingTicket] = useState(false);
   
   const [loadingFormClients, setLoadingFormClients] = useState(false);
   const [loadingFilterClients, setLoadingFilterClients] = useState(false);
@@ -403,6 +404,7 @@ const TicketsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setCreatingTicket(true);
     try {
       if (editingTicket) {
         await api.put(`/api/tickets/${editingTicket.id}`, formData);
@@ -413,6 +415,8 @@ const TicketsPage = () => {
       handleCloseModal();
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } finally {
+      setCreatingTicket(false);
     }
   };
 
@@ -455,11 +459,12 @@ const TicketsPage = () => {
       'application/pdf',
       'audio/wav', 'audio/wave', 'audio/x-wav',
       'text/plain', 'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/xml', 'application/xml'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC');
+      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC, XML');
       return;
     }
 
@@ -680,6 +685,23 @@ const TicketsPage = () => {
     setShowModal(true);
   };
 
+  const handleCreateNew = () => {
+    // Calculer la date de demain (J+1)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+    
+    setFormData({
+      titre: '',
+      client_id: '',
+      demandeur_id: '',
+      status: 'nouveau',
+      date_fin_prevue: tomorrowFormatted,
+      requete_initiale: ''
+    });
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingTicket(null);
@@ -806,7 +828,7 @@ const TicketsPage = () => {
             {refreshingTickets ? 'Actualisation...' : 'Actualiser'}
           </button>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={handleCreateNew}
             className="btn-primary flex items-center"
           >
             <Plus className="h-5 w-5 mr-2" />
@@ -1229,8 +1251,12 @@ const TicketsPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="btn-primary"
+                  className="btn-primary flex items-center"
+                  disabled={creatingTicket}
                 >
+                  {creatingTicket && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  )}
                   {editingTicket ? 'Modifier' : 'Créer'}
                 </button>
               </div>
@@ -1346,7 +1372,7 @@ const TicketsPage = () => {
                         type="file"
                         id="fileUpload"
                         className="hidden"
-                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx"
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx,.xml"
                         onChange={handleFileUpload}
                         disabled={uploadingFile}
                       />
@@ -1413,7 +1439,7 @@ const TicketsPage = () => {
                   )}
                   
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC) • Taille max: 10MB
+                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML) • Taille max: 10MB
                   </p>
                 </div>
               </div>

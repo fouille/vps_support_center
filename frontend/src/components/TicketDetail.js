@@ -237,11 +237,12 @@ const TicketDetail = () => {
       'application/pdf',
       'audio/wav', 'audio/wave', 'audio/x-wav',
       'text/plain', 'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/xml', 'application/xml'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Type de fichier non autorisé. Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC)');
+      setError('Type de fichier non autorisé. Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML)');
       return;
     }
 
@@ -708,6 +709,7 @@ const TicketDetail = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"
+                  accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.wav,.txt,.doc,.docx,.xml"
                   disabled={uploadingFile || !ticket}
                 />
                 <label
@@ -771,7 +773,7 @@ const TicketDetail = () => {
               )}
               
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC) • Taille max: 10MB
+                Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML) • Taille max: 10MB
               </p>
             </div>
           </div>

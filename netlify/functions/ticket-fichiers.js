@@ -148,7 +148,8 @@ exports.handler = async (event, context) => {
           'application/pdf',
           'audio/wav', 'audio/wave', 'audio/x-wav',
           'text/plain', 'application/msword',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/xml', 'application/xml'
         ];
         
         if (type_fichier && !allowedTypes.includes(type_fichier)) {
