@@ -1414,7 +1414,7 @@ const TicketsPage = () => {
                   )}
                   
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC) • Taille max: 10MB
+                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML) • Taille max: 10MB
                   </p>
                 </div>
               </div>
