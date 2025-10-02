@@ -685,6 +685,23 @@ const TicketsPage = () => {
     setShowModal(true);
   };
 
+  const handleCreateNew = () => {
+    // Calculer la date de demain (J+1)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+    
+    setFormData({
+      titre: '',
+      client_id: '',
+      demandeur_id: '',
+      status: 'nouveau',
+      date_fin_prevue: tomorrowFormatted,
+      requete_initiale: ''
+    });
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingTicket(null);
