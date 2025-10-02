@@ -455,11 +455,12 @@ const TicketsPage = () => {
       'application/pdf',
       'audio/wav', 'audio/wave', 'audio/x-wav',
       'text/plain', 'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/xml', 'application/xml'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC');
+      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC, XML');
       return;
     }
 
