@@ -47,6 +47,7 @@ const TicketsPage = () => {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [sendingComment, setSendingComment] = useState(false);
   const [refreshingTickets, setRefreshingTickets] = useState(false);
+  const [creatingTicket, setCreatingTicket] = useState(false);
   
   const [loadingFormClients, setLoadingFormClients] = useState(false);
   const [loadingFilterClients, setLoadingFilterClients] = useState(false);
