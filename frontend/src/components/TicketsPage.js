@@ -404,6 +404,7 @@ const TicketsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setCreatingTicket(true);
     try {
       if (editingTicket) {
         await api.put(`/api/tickets/${editingTicket.id}`, formData);
@@ -414,6 +415,8 @@ const TicketsPage = () => {
       handleCloseModal();
     } catch (error) {
       setError(error.response?.data?.detail || 'Erreur lors de la sauvegarde');
+    } finally {
+      setCreatingTicket(false);
     }
   };
 
