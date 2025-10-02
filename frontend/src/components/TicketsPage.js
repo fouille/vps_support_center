@@ -1347,7 +1347,7 @@ const TicketsPage = () => {
                         type="file"
                         id="fileUpload"
                         className="hidden"
-                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx"
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx,.xml"
                         onChange={handleFileUpload}
                         disabled={uploadingFile}
                       />
