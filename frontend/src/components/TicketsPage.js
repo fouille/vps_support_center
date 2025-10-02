@@ -828,7 +828,7 @@ const TicketsPage = () => {
             {refreshingTickets ? 'Actualisation...' : 'Actualiser'}
           </button>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={handleCreateNew}
             className="btn-primary flex items-center"
           >
             <Plus className="h-5 w-5 mr-2" />
