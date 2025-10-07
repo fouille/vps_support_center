@@ -4,6 +4,10 @@ Toutes les modifications notables de ce projet sont documentées dans ce fichier
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/lang/fr/).
 
+## [2.15.3] - 2025-10-07
+### Fixed
+- 🔧 Ajout du support des fichiers tableurs CSV, XLS et XLSX dans les pièces jointes des tickets
+
 ## [2.15.2] - 2025-10-02
 ### Fixed
 - 🔧 Ajout du support des fichiers XML dans les pièces jointes des tickets

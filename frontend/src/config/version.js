@@ -7,8 +7,8 @@
 export const VERSION_CONFIG = {
   major: 2,      // Version majeure - changements breaking
   minor: 15,      // Version mineure - nouvelles fonctionnalités
-  patch: 2,      // Version patch - corrections de bugs
-  buildDate: "2025-10-02", // Date de build automatique
+  patch: 3,      // Version patch - corrections de bugs
+  buildDate: "2025-10-07", // Date de build automatique
 };
 
 // Génération automatique du numéro de version
@@ -34,6 +34,12 @@ export const getVersionInfo = () => {
 // Historique des versions (à des fins de documentation)
 export const VERSION_HISTORY = [
   {
+    version: "2.15.3",
+    date: "2025-10-07",
+    type: "PATCH",
+    description: "Ajout du support des fichiers tableurs CSV, XLS et XLSX dans les pièces jointes des tickets"
+  },
+{
     version: "2.15.2",
     date: "2025-10-02",
     type: "PATCH",
