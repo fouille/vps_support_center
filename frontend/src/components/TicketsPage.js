@@ -460,11 +460,13 @@ const TicketsPage = () => {
       'audio/wav', 'audio/wave', 'audio/x-wav',
       'text/plain', 'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/xml', 'application/xml'
+      'text/xml', 'application/xml',
+      'text/csv', 'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC, XML');
+      setError('Type de fichier non autorisé. Formats acceptés: Images, PDF, WAV, TXT, DOC, XML, CSV, XLS, XLSX');
       return;
     }
 
@@ -1372,7 +1374,7 @@ const TicketsPage = () => {
                         type="file"
                         id="fileUpload"
                         className="hidden"
-                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx,.xml"
+                        accept=".jpg,.jpeg,.png,.gif,.pdf,.wav,.txt,.doc,.docx,.xml,.csv,.xls,.xlsx"
                         onChange={handleFileUpload}
                         disabled={uploadingFile}
                       />
@@ -1439,7 +1441,7 @@ const TicketsPage = () => {
                   )}
                   
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML) • Taille max: 10MB
+                    Formats acceptés: Images (JPG, PNG, GIF), PDF, Audio (WAV), Documents (TXT, DOC, XML), Tableurs (CSV, XLS, XLSX) • Taille max: 10MB
                   </p>
                 </div>
               </div>
