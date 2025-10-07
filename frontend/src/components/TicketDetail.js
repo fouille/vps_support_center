@@ -711,7 +711,7 @@ const TicketDetail = () => {
                   onChange={handleFileUpload}
                   className="hidden"
                   id="file-upload"
-                  accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.wav,.txt,.doc,.docx,.xml"
+                  accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.wav,.txt,.doc,.docx,.xml,.csv,.xls,.xlsx"
                   disabled={uploadingFile || !ticket}
                 />
                 <label
